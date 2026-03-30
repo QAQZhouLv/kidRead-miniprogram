@@ -1,0 +1,99 @@
+<session-drawer
+  visible="{{drawerVisible}}"
+  title="历史会话"
+  sessions="{{sessions}}"
+  currentSessionId="{{sessionId}}"
+  bind:close="closeDrawer"
+  bind:newsession="startNewSessionFromDrawer"
+  bind:selectsession="switchSessionFromDrawer"
+  bind:deletesession="onDeleteSession"
+  bind:longpresssession="onLongPressSession"
+/>
+
+<view class="page">
+  <view class="page-header">
+    <view>
+      <view class="book-title">{{story ? story.title : '书内聊天'}}</view>
+      <view class="book-meta">
+        <text wx:if="{{story}}">年龄：{{story.age}}</text>
+        <text style="margin-left:16rpx;">{{isHistorySession ? '历史会话' : '新会话'}}</text>
+      </view>
+    </view>
+    <view class="tts-toggle {{autoReadEnabled ? 'tts-on' : 'tts-off'}}" bindtap="onToggleAutoRead">
+      <text class="tts-icon">{{autoReadEnabled ? '🔊' : '🔇'}}</text>
+      <text class="tts-label">自动朗读</text>
+    </view>
+  </view>
+
+  <block wx:if="{{story}}">
+    <view class="book-preview">
+      <view class="preview-title">当前正文</view>
+      <scroll-view scroll-y class="preview-scroll">
+        <view class="preview-scroll-inner">
+          <view class="preview-content">{{story.content}}</view>
+        </view>
+      </scroll-view>
+    </view>
+  </block>
+
+  <view wx:if="{{sessionDraftSegments.length}}" class="draft-preview">
+    <view class="draft-title">本次续写草稿</view>
+    <view class="draft-content">{{sessionDraftText}}</view>
+  </view>
+
+  <view class="chat-list">
+    <block wx:for="{{messages}}" wx:key="id">
+      <message-card
+        message="{{item}}"
+        ttsEnabled="{{autoReadEnabled}}"
+        playingMessageId="{{playingMessageId}}"
+        playingSection="{{playingSection}}"
+        playingSentenceIndex="{{playingSentenceIndex}}"
+        bind:choicetap="onChoiceTap"
+        bind:sectiontap="onSectionTap"
+      />
+    </block>
+  </view>
+
+  <view style="height: 320rpx;"></view>
+
+  <view wx:if="{{draftText}}" class="draft-bubble-wrap" bindtap="openDraftEditor">
+    <view class="draft-bubble">
+      {{draftText}}
+    </view>
+  </view>
+
+  <view wx:if="{{hasUnsavedDraft && !keyboardVisible}}" class="archive-wrap">
+    <button class="archive-btn" bindtap="onArchiveSession">归档</button>
+  </view>
+
+  <chat-input-bar
+    loading="{{loading}}"
+    value="{{draftText}}"
+    placeholder="发消息或按住说话..."
+    bind:draftchange="onBarDraftChange"
+    bind:send="onBarSend"
+    bind:menu="onBarMenu"
+    bind:focus="onBarFocus"
+    bind:blur="onBarBlur"
+  />
+
+  <view wx:if="{{showEditPanel}}" class="edit-mask">
+    <view class="edit-panel">
+      <view class="edit-header">
+        <text class="edit-title">修改</text>
+        <view class="edit-close" bindtap="closeDraftEditor">×</view>
+      </view>
+
+      <view class="edit-body">
+        <input
+          class="edit-input"
+          value="{{editingText}}"
+          bindinput="onEditInput"
+          focus
+        />
+        <view class="edit-confirm" bindtap="confirmDraftEdit">✓</view>
+      </view>
+    </view>
+  </view>
+</view>

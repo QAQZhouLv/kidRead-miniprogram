@@ -1,0 +1,30 @@
+<view class="page" style="padding: 24rpx;">
+  <!-- <view style="display:flex;justify-content:space-between;align-items:center;">
+    <view style="font-size: 40rpx; font-weight: 700;">书架</view>
+    <button size="mini" bindtap="goCreate">去创作</button>
+  </view> -->
+
+  <view style="margin-top: 24rpx;">
+    <block wx:if="{{stories.length === 0}}">
+      <view style="color:#888;">还没有故事，先去创作一个吧。</view>
+    </block>
+
+    <block wx:for="{{stories}}" wx:key="id">
+      <view
+        data-id="{{item.id}}"
+        bindtap="openBook"
+        style="margin-top:16rpx;padding:20rpx;background:#fff;border-radius:18rpx;"
+      >
+        <view style="font-size: 30rpx; font-weight: 600;">
+          {{item.title}}
+        </view>
+        <view style="margin-top:8rpx;color:#666;font-size:24rpx;">
+          年龄：{{item.age}}
+        </view>
+        <view style="margin-top:8rpx;color:#999;font-size:22rpx;">
+          {{item.created_at}}
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

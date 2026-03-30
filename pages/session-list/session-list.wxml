@@ -1,0 +1,45 @@
+<view style="padding: 24rpx;">
+  <view style="display:flex; justify-content:space-between; align-items:center;">
+    <view style="font-size: 40rpx; font-weight: 700;">历史会话</view>
+    <button size="mini" bindtap="startNewSession">新会话</button>
+  </view>
+
+  <view wx:if="{{story}}" style="margin-top: 12rpx; color:#666;">
+    当前书籍：{{story.title}}
+  </view>
+
+  <view style="margin-top: 24rpx;">
+    <block wx:if="{{sessions.length === 0}}">
+      <view style="color:#888;">还没有历史会话，先开启一次新的讨论吧。</view>
+    </block>
+
+    <block wx:for="{{sessions}}" wx:key="session_id">
+      <view
+        data-sessionid="{{item.session_id}}"
+        bindtap="openSession"
+        style="margin-top:16rpx; padding:20rpx; background:#fff; border-radius:18rpx;"
+      >
+        <view style="display:flex; justify-content:space-between; align-items:center;">
+          <view style="font-size: 30rpx; font-weight: 600;">
+            {{item.title || '新对话'}}
+          </view>
+          <view style="font-size: 22rpx; color:#999;">
+            {{item.status}}
+          </view>
+        </view>
+
+        <view wx:if="{{item.summary}}" style="margin-top:10rpx; color:#666; line-height:1.6;">
+          {{item.summary}}
+        </view>
+
+        <view wx:if="{{item.draft_content}}" style="margin-top:10rpx; color:#444; line-height:1.6;">
+          草稿：{{item.draft_content}}
+        </view>
+
+        <view style="margin-top:10rpx; font-size:22rpx; color:#999;">
+          更新时间：{{item.updated_at}}
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

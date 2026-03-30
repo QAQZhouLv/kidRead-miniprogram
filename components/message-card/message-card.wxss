@@ -1,0 +1,106 @@
+ .msg-wrap {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+
+.user-wrap {
+  justify-content: flex-end;
+}
+
+.assistant-wrap {
+  justify-content: flex-start;
+}
+
+.user-bubble {
+  max-width: 70%;
+  background: #1677ff;
+  color: #fff;
+  border-radius: 20rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.assistant-card {
+  max-width: 86%;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 20rpx;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-block {
+  border-radius: 18rpx;
+  padding: 8rpx 10rpx;
+  transition: all 0.2s ease;
+}
+
+.section-block + .section-block {
+  margin-top: 8rpx;
+}
+
+.section-block-enabled {
+  border: 2rpx solid transparent;
+}
+
+.section-block-disabled {
+  opacity: 0.92;
+}
+
+.section-block-playing {
+  background: #eef5ff;
+  border-color: #7fb0ff;
+}
+
+.lead-block {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.story-block {
+  background: #fff4d8;
+  font-size: 30rpx;
+  font-weight: 500;
+  line-height: 1.85;
+  color: #222;
+  white-space: pre-wrap;
+}
+
+.guide-block {
+  font-size: 26rpx;
+  color: #888;
+}
+
+.sentence-text {
+  display: inline;
+  line-height: 1.85;
+  border-bottom: 4rpx dashed transparent;
+}
+
+.story-sentence {
+  color: #222;
+}
+
+.sentence-text-playing {
+  border-bottom-color: #5b8def;
+}
+
+.pending-text {
+  font-size: 24rpx;
+  color: #aaa;
+  margin-top: 8rpx;
+}
+
+.choices-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.choice-btn {
+  background: #f0f0f0;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+}

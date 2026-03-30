@@ -1,0 +1,92 @@
+<session-drawer
+  visible="{{drawerVisible}}"
+  title="创作历史"
+  sessions="{{sessions}}"
+  currentSessionId="{{sessionId}}"
+  bind:close="closeDrawer"
+  bind:newsession="startNewCreateSession"
+  bind:selectsession="switchCreateSession"
+  bind:deletesession="onDeleteSession"
+  bind:longpresssession="onLongPressSession"
+/>
+
+<view class="page">
+  <view class="page-header">
+    <view>
+      <view class="page-title">创作故事</view>
+      <view class="page-subtitle">和慧童一起边写边读</view>
+    </view>
+    <view class="tts-toggle {{autoReadEnabled ? 'tts-on' : 'tts-off'}}" bindtap="onToggleAutoRead">
+      <text class="tts-icon">{{autoReadEnabled ? '🔊' : '🔇'}}</text>
+      <text class="tts-label">自动朗读</text>
+    </view>
+  </view>
+
+  <view class="top-bar">
+    <view class="age-box">
+      <text>年龄：</text>
+      <input
+        class="age-input"
+        type="number"
+        value="{{age}}"
+        disabled
+      />
+    </view>
+  </view>
+
+  <view class="chat-list">
+    <block wx:for="{{messages}}" wx:key="id">
+      <message-card
+        message="{{item}}"
+        ttsEnabled="{{autoReadEnabled}}"
+        playingMessageId="{{playingMessageId}}"
+        playingSection="{{playingSection}}"
+        playingSentenceIndex="{{playingSentenceIndex}}"
+        bind:choicetap="onChoiceTap"
+        bind:sectiontap="onSectionTap"
+      />
+    </block>
+  </view>
+
+  <view style="height: 300rpx;"></view>
+
+  <view wx:if="{{draftText}}" class="draft-bubble-wrap" bindtap="openDraftEditor">
+    <view class="draft-bubble">
+      {{draftText}}
+    </view>
+  </view>
+
+  <view wx:if="{{!keyboardVisible}}" class="archive-wrap">
+    <button class="archive-btn" bindtap="onArchiveStory">归档</button>
+  </view>
+
+  <chat-input-bar
+    loading="{{loading}}"
+    value="{{draftText}}"
+    placeholder="发消息或按住说话..."
+    bind:draftchange="onBarDraftChange"
+    bind:send="onBarSend"
+    bind:menu="onBarMenu"
+    bind:focus="onBarFocus"
+    bind:blur="onBarBlur"
+  />
+
+  <view wx:if="{{showEditPanel}}" class="edit-mask">
+    <view class="edit-panel">
+      <view class="edit-header">
+        <text class="edit-title">修改</text>
+        <view class="edit-close" bindtap="closeDraftEditor">×</view>
+      </view>
+
+      <view class="edit-body">
+        <input
+          class="edit-input"
+          value="{{editingText}}"
+          bindinput="onEditInput"
+          focus
+        />
+        <view class="edit-confirm" bindtap="confirmDraftEdit">✓</view>
+      </view>
+    </view>
+  </view>
+</view>

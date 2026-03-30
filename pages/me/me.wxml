@@ -1,0 +1,9 @@
+<view style="padding: 24rpx;">
+  <view style="margin-top: 24rpx; background:#fff; border-radius:20rpx; padding:24rpx;">
+    <view style="font-size: 30rpx; font-weight: 600;">KidRead</view>
+    <view style="margin-top: 12rpx; color:#666; line-height:1.7;">
+      这里后续可以放：
+      年龄偏好、语音开关、阅读等级、用户画像等。
+    </view>
+  </view>
+</view>

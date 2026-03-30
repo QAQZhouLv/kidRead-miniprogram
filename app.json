@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/shelf/shelf",
+    "pages/create/create",
+    "pages/book/book",
+    "pages/me/me",
+    "pages/bookchat/bookchat",
+    "pages/session-list/session-list"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "KidRead",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f7f8fa",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#1677ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/shelf/shelf",
+        "text": "书架"
+      },
+      {
+        "pagePath": "pages/create/create",
+        "text": "创作"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.record": {
+      "desc": "用于语音输入故事内容"
+    }
+  }
+}

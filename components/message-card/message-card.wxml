@@ -1,0 +1,75 @@
+<view class="msg-wrap {{message.role === 'user' ? 'user-wrap' : 'assistant-wrap'}}">
+  <view wx:if="{{message.role === 'user'}}" class="user-bubble">
+    {{message.text}}
+  </view>
+
+  <view wx:if="{{message.role === 'assistant'}}" class="assistant-card">
+    <view
+      wx:if="{{message.leadText}}"
+      class="section-block lead-block {{playingMessageId === message.id && playingSection === 'lead' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
+      data-section="lead"
+      bindtap="onSectionTap"
+    >
+      <!-- <block wx:for="{{message.leadSentences || []}}" wx:key="index">
+        <text class="sentence-text {{playingMessageId === message.id && playingSection === 'lead' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+      </block> -->
+
+      <view
+        wx:if="{{message.leadText}}"
+        class="lead-text {{playingMessageId === message.id && playingSection === 'lead' ? 'playing-block' : ''}}"
+        data-section="lead"
+        bindtap="onSectionTap"
+      >
+        <block wx:if="{{message.leadSentences && message.leadSentences.length}}">
+          <text
+            wx:for="{{message.leadSentences}}"
+            wx:key="index"
+            class="sentence {{playingMessageId === message.id && playingSection === 'lead' && playingSentenceIndex === index ? 'playing-sentence' : ''}}"
+          >
+            {{item}}
+          </text>
+        </block>
+        <text wx:else>{{message.leadText}}</text>
+      </view>
+    </view>
+
+    <view
+      wx:if="{{message.storyText}}"
+      class="section-block story-block {{playingMessageId === message.id && playingSection === 'story' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
+      data-section="story"
+      bindtap="onSectionTap"
+    >
+      <block wx:for="{{message.storySentences || []}}" wx:key="index">
+        <text class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+      </block>
+    </view>
+
+    <view
+      wx:if="{{message.guideText}}"
+      class="section-block guide-block {{playingMessageId === message.id && playingSection === 'guide' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
+      data-section="guide"
+      bindtap="onSectionTap"
+    >
+      <block wx:for="{{message.guideSentences || []}}" wx:key="index">
+        <text class="sentence-text {{playingMessageId === message.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+      </block>
+    </view>
+
+    <view wx:if="{{message.pending}}" class="pending-text">
+      正在生成中…
+    </view>
+
+    <view wx:if="{{message.choices && message.choices.length}}" class="choices-wrap">
+      <block wx:for="{{message.choices}}" wx:key="*this">
+        <button
+          class="choice-btn"
+          size="mini"
+          data-text="{{item}}"
+          bindtap="onChoiceTap"
+        >
+          {{item}}
+        </button>
+      </block>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,183 @@
+ .page {
+  padding: 24rpx;
+  box-sizing: border-box;
+  background: #f7f7f7;
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18rpx;
+  margin-bottom: 20rpx;
+}
+
+.book-title {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.book-meta {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 8rpx;
+}
+
+.tts-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+.tts-on {
+  background: #eaf3ff;
+  color: #1677ff;
+}
+
+.tts-off {
+  background: #f1f1f1;
+  color: #999;
+}
+
+.book-preview {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.preview-title {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+
+.preview-scroll {
+  height: 33vh;
+}
+
+.preview-scroll-inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.preview-content {
+  font-size: 28rpx;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+.draft-preview {
+  background: #fff7e8;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.draft-title {
+  font-size: 26rpx;
+  color: #c57a00;
+  margin-bottom: 10rpx;
+}
+
+.draft-content {
+  font-size: 28rpx;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  color: #7a4b00;
+}
+
+.chat-list {
+  margin-top: 10rpx;
+}
+
+.draft-bubble-wrap {
+  position: fixed;
+  bottom: 160rpx;
+  left: 24rpx;
+  right: 24rpx;
+  z-index: 80;
+}
+
+.draft-bubble {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  border: 2rpx dashed #ddd;
+  color: #333;
+}
+
+.archive-wrap {
+  position: fixed;
+  right: 24rpx;
+  bottom: 140rpx;
+  z-index: 90;
+}
+
+.archive-btn {
+  min-width: 140rpx;
+  background: #fff7e8;
+  color: #a86500;
+  border-radius: 999rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.edit-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-panel {
+  width: 80%;
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+}
+
+.edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.edit-title {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.edit-close {
+  font-size: 36rpx;
+  color: #999;
+}
+
+.edit-body {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.edit-input {
+  flex: 1;
+  border-bottom: 2rpx solid #ddd;
+  font-size: 28rpx;
+  padding: 10rpx 0;
+}
+
+.edit-confirm {
+  margin-left: 20rpx;
+  font-size: 34rpx;
+  color: #1677ff;
+}

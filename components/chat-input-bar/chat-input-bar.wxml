@@ -1,0 +1,49 @@
+<view class="input-bar-wrap">
+  <view class="input-bar">
+    <view class="left-icon-btn" bindtap="onMenuTap">
+      <text class="icon-text">☰</text>
+    </view>
+
+    <block wx:if="{{mode === 'text'}}">
+      <input
+        class="text-input"
+        placeholder="{{placeholder}}"
+        value="{{inputText}}"
+        bindinput="onInput"
+        bindfocus="onInputFocus"
+        bindblur="onInputBlur"
+        confirm-type="send"
+        bindconfirm="onSend"
+      />
+
+      <view class="right-icon-btn" bindtap="switchToVoice">
+        <text class="icon-text">◉</text>
+      </view>
+    </block>
+
+    <block wx:if="{{mode === 'voice'}}">
+      <view
+        class="voice-press-area {{pressActive ? 'voice-press-area-active' : ''}}"
+        bindtouchstart="onPressToTalkStart"
+        bindtouchend="onPressToTalkEnd"
+        bindtouchcancel="onPressToTalkEnd"
+      >
+        <block wx:if="{{!isRecording}}">
+          <text class="voice-main-text">按住说话</text>
+        </block>
+
+        <block wx:if="{{isRecording}}">
+          <view class="voice-anim-wrap">
+            <view class="dot dot1"></view>
+            <view class="dot dot2"></view>
+            <view class="dot dot3"></view>
+          </view>
+        </block>
+      </view>
+
+      <view class="right-icon-btn" bindtap="switchToText">
+        <text class="icon-text">⌨</text>
+      </view>
+    </block>
+  </view>
+</view>
