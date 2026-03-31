@@ -11,56 +11,72 @@
 />
 
 <view class="page">
-  <view class="page-header">
-    <view>
-      <view class="book-title">{{story ? story.title : '书内聊天'}}</view>
-      <view class="book-meta">
-        <text wx:if="{{story}}">年龄：{{story.age}}</text>
-        <text style="margin-left:16rpx;">{{isHistorySession ? '历史会话' : '新会话'}}</text>
+
+  <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
+    <view class="nav-side nav-side-left">
+      <view class="nav-back" bindtap="onTapNavBack">‹</view>
+    </view>
+
+    <view class="nav-center">
+      <view class="nav-title">{{story ? story.title : '书内聊天'}}</view>
+      <view class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}" bindtap="onToggleAutoRead">
+        <image
+          class="nav-bell-image"
+          src="{{autoReadEnabled ? '/assets/icons/tts_on.png' : '/assets/icons/tts_off.png'}}"
+          mode="aspectFit"
+        />
       </view>
     </view>
-    <view class="tts-toggle {{autoReadEnabled ? 'tts-on' : 'tts-off'}}" bindtap="onToggleAutoRead">
-      <text class="tts-icon">{{autoReadEnabled ? '🔊' : '🔇'}}</text>
-      <text class="tts-label">自动朗读</text>
-    </view>
+
+    <view class="nav-side nav-side-right"></view>
   </view>
 
-  <block wx:if="{{story}}">
-    <view class="book-preview">
-      <view class="preview-title">当前正文</view>
-      <scroll-view scroll-y class="preview-scroll">
-        <view class="preview-scroll-inner">
-          <view class="preview-content">{{story.content}}</view>
+  <view class="page-content" style="padding-top:{{navTotalHeight + 12}}px;">
+    <view class="page-header">
+      <view>
+        <view class="book-title">{{story ? story.title : '书内聊天'}}</view>
+        <view class="book-meta">
+          <text wx:if="{{story}}">年龄：{{story.age}}</text>
+          <text style="margin-left:16rpx;">{{isHistorySession ? '历史会话' : '新会话'}}</text>
         </view>
-      </scroll-view>
+      </view>
     </view>
-  </block>
 
-  <view wx:if="{{sessionDraftSegments.length}}" class="draft-preview">
-    <view class="draft-title">本次续写草稿</view>
-    <view class="draft-content">{{sessionDraftText}}</view>
-  </view>
-
-  <view class="chat-list">
-    <block wx:for="{{messages}}" wx:key="id">
-      <message-card
-        message="{{item}}"
-        ttsEnabled="{{autoReadEnabled}}"
-        playingMessageId="{{playingMessageId}}"
-        playingSection="{{playingSection}}"
-        playingSentenceIndex="{{playingSentenceIndex}}"
-        bind:choicetap="onChoiceTap"
-        bind:sectiontap="onSectionTap"
-      />
+    <block wx:if="{{story}}">
+      <view class="book-preview">
+        <view class="preview-title">当前正文</view>
+        <scroll-view scroll-y class="preview-scroll">
+          <view class="preview-scroll-inner">
+            <view class="preview-content">{{story.content}}</view>
+          </view>
+        </scroll-view>
+      </view>
     </block>
-  </view>
 
-  <view style="height: 320rpx;"></view>
+    <view wx:if="{{sessionDraftSegments.length}}" class="draft-preview">
+      <view class="draft-title">本次续写草稿</view>
+      <view class="draft-content">{{sessionDraftText}}</view>
+    </view>
+
+    <view class="chat-list">
+      <block wx:for="{{messages}}" wx:key="id">
+        <message-card
+          message="{{item}}"
+          ttsEnabled="{{autoReadEnabled}}"
+          playingMessageId="{{playingMessageId}}"
+          playingSection="{{playingSection}}"
+          playingSentenceIndex="{{playingSentenceIndex}}"
+          bind:choicetap="onChoiceTap"
+          bind:sectiontap="onSectionTap"
+        />
+      </block>
+    </view>
+
+    <view style="height: 320rpx;"></view>
+  </view>
 
   <view wx:if="{{draftText}}" class="draft-bubble-wrap" bindtap="openDraftEditor">
-    <view class="draft-bubble">
-      {{draftText}}
-    </view>
+    <view class="draft-bubble">{{draftText}}</view>
   </view>
 
   <view wx:if="{{hasUnsavedDraft && !keyboardVisible}}" class="archive-wrap">
@@ -86,12 +102,7 @@
       </view>
 
       <view class="edit-body">
-        <input
-          class="edit-input"
-          value="{{editingText}}"
-          bindinput="onEditInput"
-          focus
-        />
+        <input class="edit-input" value="{{editingText}}" bindinput="onEditInput" focus />
         <view class="edit-confirm" bindtap="confirmDraftEdit">✓</view>
       </view>
     </view>

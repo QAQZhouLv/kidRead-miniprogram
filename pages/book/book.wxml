@@ -1,21 +1,23 @@
-<view class="page" style="padding: 24rpx;">
+<view class="page" bindtap="onPageTap">
+  <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
+    <view class="nav-left">
+      <view class="nav-back" bindtap="onTapNavBack" catchtap="onTapNavBack">‹</view>
+    </view>
+    <view class="nav-title">{{story ? story.title : '故事详情'}}</view>
+    <view class="nav-right"></view>
+  </view>
+
   <block wx:if="{{story}}">
-    <view style="font-size: 40rpx; font-weight: 700;">
-      {{story.title}}
-    </view>
-
-    <view style="margin-top: 12rpx; color: #666; font-size: 24rpx;">
-      年龄：{{story.age}}
-    </view>
-
-    <view style="margin-top:20rpx;">
-      <button bindtap="goBookChat">
-        继续聊这本书
-      </button>
-    </view>
-
-    <view style="margin-top: 24rpx; background:#fff; border-radius:20rpx; padding:24rpx; line-height:1.9; white-space:pre-wrap;">
-      {{story.content}}
+    <view class="reader" style="padding-top:{{navTotalHeight + 10}}px;">
+      <view class="chapter-title" wx:if="{{story.chapter_title}}">{{story.chapter_title}}</view>
+      <block wx:for="{{contentParagraphs}}" wx:key="index">
+        <view class="content-paragraph">{{item}}</view>
+      </block>
     </view>
   </block>
+
+  <view wx:if="{{controlsVisible}}" class="reader-actions">
+    <view class="reader-action" bindtap="onListenTap" catchtap="onListenTap">{{isReading ? '停' : '听'}}</view>
+    <view class="reader-action" bindtap="onChatTap" catchtap="onChatTap">聊</view>
+  </view>
 </view>

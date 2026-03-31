@@ -1,4 +1,4 @@
- .msg-wrap {
+.msg-wrap {
   display: flex;
   margin-bottom: 20rpx;
 }
@@ -57,18 +57,34 @@
   color: #666;
 }
 
+.guide-block {
+  font-size: 26rpx;
+  color: #888;
+}
+
 .story-block {
   background: #fff4d8;
   font-size: 30rpx;
   font-weight: 500;
-  line-height: 1.85;
+  line-height: 1.95;
   color: #222;
-  white-space: pre-wrap;
 }
 
-.guide-block {
-  font-size: 26rpx;
-  color: #888;
+.story-paragraph {
+  margin-bottom: 22rpx;
+  text-indent: 2em;
+  line-height: 1.95;
+}
+
+.story-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.story-fallback {
+  display: block;
+  line-height: 1.95;
+  white-space: pre-wrap;
+  text-indent: 2em;
 }
 
 .sentence-text {
@@ -83,6 +99,14 @@
 
 .sentence-text-playing {
   border-bottom-color: #5b8def;
+}
+
+.sentence {
+  line-height: 1.8;
+}
+
+.playing-sentence {
+  border-bottom: 4rpx dashed #5b8def;
 }
 
 .pending-text {

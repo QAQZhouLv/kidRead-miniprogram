@@ -1,1 +1,99 @@
-/* pages/book/book.wxss */
+.page {
+  min-height: 100vh;
+  background: #d8d6be;
+  position: relative;
+}
+
+.custom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+  background: rgba(216, 214, 190, 0.88);
+  backdrop-filter: blur(12rpx);
+  box-sizing: content-box;
+}
+
+.nav-left,
+.nav-right {
+  width: 96rpx;
+  display: flex;
+  align-items: center;
+}
+
+.nav-back {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52rpx;
+  line-height: 1;
+  color: #222;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #2a2a2a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reader {
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  padding-bottom: 80rpx;
+  box-sizing: border-box;
+}
+
+.chapter-title {
+  font-size: 50rpx;
+  font-weight: 700;
+  color: #1d1d1d;
+  line-height: 1.35;
+  margin-bottom: 18rpx;
+}
+
+.content-paragraph {
+  font-size: 36rpx;
+  line-height: 2.05;
+  color: #181818;
+  text-indent: 2em;
+  margin-bottom: 20rpx;
+}
+
+.reader-actions {
+  position: fixed;
+  right: 24rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.reader-action {
+  width: 108rpx;
+  height: 108rpx;
+  border-radius: 54rpx;
+  background: rgba(89, 87, 67, 0.82);
+  color: #f5f1e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.14);
+}

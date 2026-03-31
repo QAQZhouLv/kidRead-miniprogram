@@ -1,4 +1,5 @@
 {
+  "navigationStyle": "custom",
   "usingComponents": {
     "chat-input-bar": "/components/chat-input-bar/chat-input-bar",
     "session-drawer": "/components/session-drawer/session-drawer",

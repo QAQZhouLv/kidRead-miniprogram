@@ -12,9 +12,64 @@ const {
 } = require("../../services/session");
 
 
+
+function getNavMetrics() {
+  const systemInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+  const menuButton = wx.getMenuButtonBoundingClientRect ? wx.getMenuButtonBoundingClientRect() : null;
+  const statusBarHeight = systemInfo.statusBarHeight || 20;
+
+  if (!menuButton) {
+    return {
+      statusBarHeight,
+      navBarHeight: 44,
+      navTotalHeight: statusBarHeight + 44,
+      capsuleWidth: 88,
+      capsuleHeight: 32
+    };
+  }
+
+  const navBarHeight = (menuButton.top - statusBarHeight) * 2 + menuButton.height;
+  return {
+    statusBarHeight,
+    navBarHeight,
+    navTotalHeight: statusBarHeight + navBarHeight,
+    capsuleWidth: menuButton.width,
+    capsuleHeight: menuButton.height
+  };
+}
+
+
+function buildStoryParagraphs(text = "") {
+  const normalized = String(text || "")
+    .replace(/\r/g, "")
+    .trim();
+
+  if (!normalized) return [];
+
+  const rawParagraphs = normalized
+    .split(/\n+/)
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  let globalIndex = 0;
+
+  return rawParagraphs.map((paragraph) => {
+    const sentences = splitTextToSentences(paragraph).map((sentence) => ({
+      text: sentence,
+      index: globalIndex++
+    }));
+
+    return {
+      text: paragraph,
+      sentences
+    };
+  });
+}
+
 function decorateAssistantMessage(message = {}) {
   message.leadSentences = splitTextToSentences(message.leadText || "");
   message.storySentences = splitTextToSentences(message.storyText || "");
+  message.storyParagraphs = buildStoryParagraphs(message.storyText || "");
   message.guideSentences = splitTextToSentences(message.guideText || "");
   return message;
 }
@@ -28,6 +83,11 @@ Page({
     playingMessageId: "",
     playingSection: "",
     playingSentenceIndex: -1,
+    statusBarHeight: 20,
+    navBarHeight: 44,
+    navTotalHeight: 64,
+    capsuleWidth: 88,
+    capsuleHeight: 32,
 
     sessionId: "",
     sessionCreated: false,
@@ -49,6 +109,7 @@ Page({
   },
 
   async onLoad(options) {
+    this.initNavBar();
     this.ttsPlayer = createTTSPlayer();
     this.bindTtsCallbacks();
 
@@ -80,6 +141,18 @@ Page({
     }
 
     await this.loadSessions();
+  },
+
+  initNavBar() {
+    this.setData(getNavMetrics());
+  },
+
+  onTapNavBack() {
+    if (getCurrentPages().length > 1) {
+      wx.navigateBack();
+      return;
+    }
+    wx.switchTab({ url: '/pages/shelf/shelf' });
   },
 
   onHide() {

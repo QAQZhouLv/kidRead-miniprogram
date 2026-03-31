@@ -11,49 +11,59 @@
 />
 
 <view class="page">
-  <view class="page-header">
-    <view>
-      <view class="page-title">创作故事</view>
-      <view class="page-subtitle">和慧童一起边写边读</view>
+
+  <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
+    <view class="nav-side nav-side-left"></view>
+
+    <view class="nav-center">
+      <view class="nav-title">KidRead</view>
+      <view class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}" bindtap="onToggleAutoRead">
+        <image
+          class="nav-bell-image"
+          src="{{autoReadEnabled ? '/assets/icons/tts_on.png' : '/assets/icons/tts_off.png'}}"
+          mode="aspectFit"
+        />
+      </view>
     </view>
-    <view class="tts-toggle {{autoReadEnabled ? 'tts-on' : 'tts-off'}}" bindtap="onToggleAutoRead">
-      <text class="tts-icon">{{autoReadEnabled ? '🔊' : '🔇'}}</text>
-      <text class="tts-label">自动朗读</text>
-    </view>
+
+    <view class="nav-side nav-side-right"></view>
   </view>
 
-  <view class="top-bar">
-    <view class="age-box">
-      <text>年龄：</text>
-      <input
-        class="age-input"
-        type="number"
-        value="{{age}}"
-        disabled
-      />
+
+  <view class="page-content" style="padding-top:{{navTotalHeight + 12}}px;">
+    <view class="page-header">
+      <view>
+        <view class="page-title">创作故事</view>
+        <view class="page-subtitle">和慧童一起边写边读</view>
+      </view>
     </view>
-  </view>
 
-  <view class="chat-list">
-    <block wx:for="{{messages}}" wx:key="id">
-      <message-card
-        message="{{item}}"
-        ttsEnabled="{{autoReadEnabled}}"
-        playingMessageId="{{playingMessageId}}"
-        playingSection="{{playingSection}}"
-        playingSentenceIndex="{{playingSentenceIndex}}"
-        bind:choicetap="onChoiceTap"
-        bind:sectiontap="onSectionTap"
-      />
-    </block>
-  </view>
+    <view class="top-bar">
+      <view class="age-box">
+        <text>年龄：</text>
+        <input class="age-input" type="number" value="{{age}}" disabled />
+      </view>
+    </view>
 
-  <view style="height: 300rpx;"></view>
+    <view class="chat-list">
+      <block wx:for="{{messages}}" wx:key="id">
+        <message-card
+          message="{{item}}"
+          ttsEnabled="{{autoReadEnabled}}"
+          playingMessageId="{{playingMessageId}}"
+          playingSection="{{playingSection}}"
+          playingSentenceIndex="{{playingSentenceIndex}}"
+          bind:choicetap="onChoiceTap"
+          bind:sectiontap="onSectionTap"
+        />
+      </block>
+    </view>
+
+    <view style="height: 300rpx;"></view>
+  </view>
 
   <view wx:if="{{draftText}}" class="draft-bubble-wrap" bindtap="openDraftEditor">
-    <view class="draft-bubble">
-      {{draftText}}
-    </view>
+    <view class="draft-bubble">{{draftText}}</view>
   </view>
 
   <view wx:if="{{!keyboardVisible}}" class="archive-wrap">
@@ -79,12 +89,7 @@
       </view>
 
       <view class="edit-body">
-        <input
-          class="edit-input"
-          value="{{editingText}}"
-          bindinput="onEditInput"
-          focus
-        />
+        <input class="edit-input" value="{{editingText}}" bindinput="onEditInput" focus />
         <view class="edit-confirm" bindtap="confirmDraftEdit">✓</view>
       </view>
     </view>

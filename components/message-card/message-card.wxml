@@ -10,10 +10,6 @@
       data-section="lead"
       bindtap="onSectionTap"
     >
-      <!-- <block wx:for="{{message.leadSentences || []}}" wx:key="index">
-        <text class="sentence-text {{playingMessageId === message.id && playingSection === 'lead' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
-      </block> -->
-
       <view
         wx:if="{{message.leadText}}"
         class="lead-text {{playingMessageId === message.id && playingSection === 'lead' ? 'playing-block' : ''}}"
@@ -40,9 +36,14 @@
       data-section="story"
       bindtap="onSectionTap"
     >
-      <block wx:for="{{message.storySentences || []}}" wx:key="index">
-        <text id="sent-{{message.id}}-story-{{index}}" class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+      <block wx:if="{{message.storyParagraphs && message.storyParagraphs.length}}">
+        <view wx:for="{{message.storyParagraphs}}" wx:key="index" class="story-paragraph">
+          <block wx:for="{{item.sentences}}" wx:key="index" wx:for-item="sentence">
+            <text id="sent-{{message.id}}-story-{{sentence.index}}" class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === sentence.index ? 'sentence-text-playing' : ''}}">{{sentence.text}}</text>
+          </block>
+        </view>
       </block>
+      <text wx:else class="story-fallback">{{message.storyText}}</text>
     </view>
 
     <view

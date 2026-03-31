@@ -1,8 +1,75 @@
- .page {
-  padding: 24rpx;
+.page {
   box-sizing: border-box;
   background: #f7f8fa;
   min-height: 100vh;
+}
+
+.custom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+  background: rgba(247, 248, 250, 0.96);
+  backdrop-filter: blur(12rpx);
+  box-sizing: content-box;
+}
+
+.nav-side {
+  width: 96rpx;
+  flex-shrink: 0;
+}
+
+.nav-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.nav-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+  line-height: 1;
+}
+
+.nav-bell {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.nav-bell-on {
+  background: #eff5ff;
+  border: 2rpx solid #d5e6ff;
+}
+
+.nav-bell-off {
+  background: #ffffff;
+  border: 2rpx solid #e6e6e6;
+}
+
+.nav-bell-image {
+  width: 38rpx;
+  height: 38rpx;
+}
+
+.page-content {
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+  padding-bottom: 24rpx;
+  box-sizing: border-box;
 }
 
 .page-header {
@@ -21,25 +88,6 @@
   margin-top: 6rpx;
   font-size: 24rpx;
   color: #8a8a8a;
-}
-
-.tts-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 14rpx 18rpx;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-}
-
-.tts-on {
-  background: #eaf3ff;
-  color: #1677ff;
-}
-
-.tts-off {
-  background: #f1f1f1;
-  color: #999;
 }
 
 .top-bar {
