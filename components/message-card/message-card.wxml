@@ -24,6 +24,7 @@
           <text
             wx:for="{{message.leadSentences}}"
             wx:key="index"
+            id="sent-{{message.id}}-lead-{{index}}"
             class="sentence {{playingMessageId === message.id && playingSection === 'lead' && playingSentenceIndex === index ? 'playing-sentence' : ''}}"
           >
             {{item}}
@@ -40,7 +41,7 @@
       bindtap="onSectionTap"
     >
       <block wx:for="{{message.storySentences || []}}" wx:key="index">
-        <text class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+        <text id="sent-{{message.id}}-story-{{index}}" class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
       </block>
     </view>
 
@@ -51,7 +52,7 @@
       bindtap="onSectionTap"
     >
       <block wx:for="{{message.guideSentences || []}}" wx:key="index">
-        <text class="sentence-text {{playingMessageId === message.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+        <text id="sent-{{message.id}}-guide-{{index}}" class="sentence-text {{playingMessageId === message.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
       </block>
     </view>
 
