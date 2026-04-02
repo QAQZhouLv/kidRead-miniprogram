@@ -1,1 +1,139 @@
-/* pages/me/me.wxss */
+.page {
+  min-height: 100vh;
+  background: #f7f8fc;
+}
+
+.me-page {
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.profile-card,
+.section-card {
+  background: #ffffff;
+  border-radius: 30rpx;
+  box-shadow: 0 12rpx 32rpx rgba(31, 56, 88, 0.05);
+}
+
+.profile-card {
+  padding: 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+}
+
+.avatar-wrap {
+  flex-shrink: 0;
+}
+
+.avatar,
+.avatar-default {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+}
+
+.avatar-default {
+  background: linear-gradient(135deg, #8fc5ff 0%, #b8deff 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42rpx;
+  font-weight: 700;
+}
+
+.profile-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #263148;
+}
+
+.profile-sub {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #96a1b4;
+}
+
+.section-card {
+  margin-top: 22rpx;
+  padding: 26rpx 24rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #263148;
+  margin-bottom: 18rpx;
+}
+
+.field-block {
+  margin-top: 18rpx;
+}
+
+.field-label,
+.setting-label {
+  font-size: 26rpx;
+  color: #66748c;
+}
+
+.field-input,
+.picker-display {
+  margin-top: 12rpx;
+  min-height: 82rpx;
+  border-radius: 22rpx;
+  border: 2rpx solid #e7edf7;
+  background: #fbfcff;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #263148;
+}
+
+.save-btn,
+.action-btn {
+  margin-top: 16rpx;
+  height: 82rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(135deg, #7db6ff 0%, #9dd8ff 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.setting-row {
+  min-height: 90rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.theme-list {
+  margin-top: 14rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.theme-chip {
+  padding: 16rpx 22rpx;
+  border-radius: 999rpx;
+  background: #f4f7fd;
+  color: #6d7a92;
+  font-size: 24rpx;
+}
+
+.theme-chip-active {
+  background: linear-gradient(135deg, #7db6ff 0%, #9dd8ff 100%);
+  color: #ffffff;
+}

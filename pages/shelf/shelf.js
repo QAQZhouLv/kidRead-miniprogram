@@ -10,6 +10,8 @@ const SEARCH_HISTORY_KEY = "kidread_shelf_search_history";
 const RECENT_READ_KEY = "kidread_recent_reading_ids";
 const MAX_HISTORY = 10;
 const MAX_RECENT = 3;
+const { getBootstrapConfig } = require("../../services/app");
+const { getUserProfile } = require("../../utils/user-profile");
 
 function pickThemeIndex(story) {
   const seedSource = `${story.id || ""}${story.title || ""}${story.age || ""}`;
@@ -90,10 +92,24 @@ Page({
     actionSheetVisible: false,
     actionSheetTitle: "",
     actionStory: null,
-    actionSource: "" // recent | favorite | all | search
+    actionSource: "", // recent | favorite | all | search
+
+    hasCheckedOnboarding: false
   },
 
-  onShow() {
+  async onShow() {
+    if (!this.data.hasCheckedOnboarding) {
+      const shouldGo = await this.checkShouldShowOnboarding();
+      if (shouldGo) {
+        this.setData({ hasCheckedOnboarding: true });
+        wx.navigateTo({
+          url: "/pages/onboarding/onboarding"
+        });
+        return;
+      }
+      this.setData({ hasCheckedOnboarding: true });
+    }
+  
     this.loadShelfPage();
   },
 
@@ -492,6 +508,21 @@ Page({
         }
       }
     });
+  },
+
+  async checkShouldShowOnboarding() {
+    const profile = getUserProfile();
+  
+    try {
+      const config = await getBootstrapConfig();
+      if (config && config.force_show_onboarding) {
+        return true;
+      }
+    } catch (err) {
+      console.error("getBootstrapConfig error:", err);
+    }
+  
+    return !profile.hasSeenOnboarding;
   },
 
   noop() {},

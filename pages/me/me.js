@@ -1,66 +1,86 @@
-// pages/me/me.js
+const {
+  getUserProfile,
+  saveUserProfile,
+  resetOnboardingFlag
+} = require("../../utils/user-profile");
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    profile: {
+      nickname: "童童",
+      avatarUrl: "",
+      avatarType: "default",
+      age: 6,
+      themeName: "sky",
+      autoReadEnabled: true,
+      hasSeenOnboarding: false
+    },
+    themeOptions: [
+      { key: "sky", label: "天空蓝" },
+      { key: "peach", label: "蜜桃粉" },
+      { key: "mint", label: "薄荷绿" }
+    ],
+    ageOptions: Array.from({ length: 12 }, (_, i) => i + 1)
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {
-
+    this.loadProfile();
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
+  loadProfile() {
+    const profile = getUserProfile();
+    this.setData({ profile });
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
+  onNicknameInput(e) {
+    this.setData({
+      "profile.nickname": e.detail.value || ""
+    });
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
+  saveNickname() {
+    const nickname = (this.data.profile.nickname || "").trim() || "童童";
+    saveUserProfile({ nickname });
+    this.loadProfile();
 
+    wx.showToast({
+      title: "称呼已保存",
+      icon: "success"
+    });
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
+  onAgeChange(e) {
+    const ageIndex = Number(e.detail.value || 0);
+    const age = this.data.ageOptions[ageIndex] || 6;
+    saveUserProfile({ age });
+    this.loadProfile();
   },
 
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
+  onThemeTap(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
 
+    saveUserProfile({ themeName: key });
+    this.loadProfile();
+
+    wx.showToast({
+      title: "主题已切换",
+      icon: "success"
+    });
+  },
+
+  onAutoReadChange(e) {
+    const autoReadEnabled = !!e.detail.value;
+    saveUserProfile({ autoReadEnabled });
+    this.loadProfile();
+  },
+
+  onResetOnboarding() {
+    resetOnboardingFlag();
+
+    wx.showToast({
+      title: "已重置欢迎引导",
+      icon: "success"
+    });
   }
-})
+});

@@ -1,11 +1,12 @@
 {
   "pages": [
+    "pages/onboarding/onboarding",
     "pages/shelf/shelf",
     "pages/create/create",
     "pages/book/book",
     "pages/me/me",
     "pages/bookchat/bookchat",
-    "pages/session-list/session-list"
+    "pages/session-list/session-list"    
   ],
   "window": {
     "navigationBarTextStyle": "black",

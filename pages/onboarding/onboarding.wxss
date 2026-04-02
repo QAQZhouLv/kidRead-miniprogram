@@ -1,0 +1,248 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fffaf1 0%, #f6fbff 100%);
+}
+
+.onboarding-page {
+  position: relative;
+  overflow: hidden;
+  padding: 60rpx 28rpx;
+  box-sizing: border-box;
+}
+
+.sky-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.onboarding-card {
+  position: relative;
+  z-index: 2;
+  margin-top: 120rpx;
+  padding: 40rpx 30rpx 36rpx;
+  border-radius: 36rpx;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20rpx 50rpx rgba(63, 96, 140, 0.1);
+  backdrop-filter: blur(8rpx);
+}
+
+.title {
+  font-size: 42rpx;
+  line-height: 1.4;
+  font-weight: 700;
+  color: #2b3550;
+  text-align: center;
+}
+
+.desc {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #7f8aa2;
+  text-align: center;
+}
+
+.hero-illustration {
+  height: 220rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+}
+
+.doodle-house,
+.doodle-book,
+.doodle-star-big {
+  position: absolute;
+  border-radius: 24rpx;
+  animation: floaty 2.8s ease-in-out infinite;
+}
+
+.doodle-house {
+  width: 180rpx;
+  height: 140rpx;
+  left: 50%;
+  top: 30rpx;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ffd9a8 0%, #ffe9c4 100%);
+  box-shadow: 0 8rpx 24rpx rgba(255, 190, 120, 0.2);
+}
+
+.doodle-book {
+  width: 120rpx;
+  height: 88rpx;
+  left: 50%;
+  bottom: 10rpx;
+  transform: translateX(-50%) rotate(-8deg);
+  background: linear-gradient(135deg, #a8d8ff 0%, #d6f0ff 100%);
+  box-shadow: 0 8rpx 24rpx rgba(112, 173, 255, 0.2);
+}
+
+.doodle-star-big {
+  width: 140rpx;
+  height: 140rpx;
+  left: 50%;
+  top: 30rpx;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe18f 0%, #fff1bf 100%);
+  box-shadow: 0 8rpx 24rpx rgba(255, 213, 95, 0.2);
+}
+
+.input-wrap {
+  margin-top: 28rpx;
+  background: #ffffff;
+  border: 2rpx solid #e7edf8;
+  border-radius: 22rpx;
+  padding: 0 20rpx;
+}
+
+.text-input {
+  height: 88rpx;
+  font-size: 30rpx;
+  color: #2b3550;
+}
+
+.input-placeholder {
+  color: #b3bdd0;
+}
+
+.btn-row {
+  margin-top: 20rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.primary-btn,
+.ghost-btn {
+  height: 88rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.primary-btn {
+  margin-top: 28rpx;
+  background: linear-gradient(135deg, #7db6ff 0%, #9dd8ff 100%);
+  color: #ffffff;
+}
+
+.ghost-btn {
+  flex: 1;
+  background: #f4f7fd;
+  color: #6c7a96;
+}
+
+.link-btn {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #8ea0bd;
+}
+
+.age-picker-wrap {
+  margin-top: 30rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  padding: 10rpx 0;
+  border: 2rpx solid #e7edf8;
+}
+
+.age-picker {
+  width: 100%;
+  height: 240rpx;
+}
+
+.age-item {
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: 34rpx;
+  color: #2f3c58;
+}
+
+.cloud,
+.star,
+.scribble {
+  position: absolute;
+  animation: sway 3.4s ease-in-out infinite;
+}
+
+.cloud {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 999rpx;
+}
+
+.cloud-1 {
+  width: 180rpx;
+  height: 70rpx;
+  left: 40rpx;
+  top: 100rpx;
+}
+
+.cloud-2 {
+  width: 220rpx;
+  height: 80rpx;
+  right: 20rpx;
+  top: 220rpx;
+  animation-delay: 0.8s;
+}
+
+.star {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: #ffe08a;
+}
+
+.star-1 {
+  left: 100rpx;
+  top: 260rpx;
+}
+
+.star-2 {
+  right: 120rpx;
+  top: 140rpx;
+  animation-delay: 1.1s;
+}
+
+.scribble {
+  border: 4rpx solid rgba(255, 174, 122, 0.45);
+  border-radius: 999rpx;
+}
+
+.scribble-1 {
+  width: 140rpx;
+  height: 40rpx;
+  left: 30rpx;
+  bottom: 220rpx;
+  transform: rotate(-8deg);
+}
+
+.scribble-2 {
+  width: 120rpx;
+  height: 36rpx;
+  right: 40rpx;
+  bottom: 320rpx;
+  transform: rotate(10deg);
+}
+
+@keyframes sway {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-6rpx) translateX(4rpx);
+  }
+}
+
+@keyframes floaty {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-8rpx);
+  }
+}

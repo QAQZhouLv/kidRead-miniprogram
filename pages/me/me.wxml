@@ -1,9 +1,76 @@
-<view style="padding: 24rpx;">
-  <view style="margin-top: 24rpx; background:#fff; border-radius:20rpx; padding:24rpx;">
-    <view style="font-size: 30rpx; font-weight: 600;">KidRead</view>
-    <view style="margin-top: 12rpx; color:#666; line-height:1.7;">
-      这里后续可以放：
-      年龄偏好、语音开关、阅读等级、用户画像等。
+<view class="page me-page">
+  <view class="profile-card">
+    <view class="avatar-wrap">
+      <image
+        wx:if="{{profile.avatarUrl}}"
+        class="avatar"
+        src="{{profile.avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="avatar avatar-default">童</view>
     </view>
+
+    <view class="profile-main">
+      <view class="profile-name">{{profile.nickname || '童童'}}</view>
+      <view class="profile-sub">{{profile.age}} 岁 · KidRead 小朋友</view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">个人资料</view>
+
+    <view class="field-block">
+      <view class="field-label">称呼</view>
+      <input
+        class="field-input"
+        value="{{profile.nickname}}"
+        maxlength="20"
+        placeholder="请输入称呼"
+        bindinput="onNicknameInput"
+      />
+      <view class="save-btn" bindtap="saveNickname">保存称呼</view>
+    </view>
+
+    <view class="field-block">
+      <view class="field-label">年龄</view>
+      <picker
+        mode="selector"
+        range="{{ageOptions}}"
+        value="{{profile.age - 1}}"
+        bindchange="onAgeChange"
+      >
+        <view class="picker-display">{{profile.age}} 岁</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">阅读与互动</view>
+
+    <view class="setting-row">
+      <view class="setting-label">自动朗读</view>
+      <switch checked="{{profile.autoReadEnabled}}" bindchange="onAutoReadChange" />
+    </view>
+
+    <view class="field-block">
+      <view class="field-label">主题色</view>
+      <view class="theme-list">
+        <block wx:for="{{themeOptions}}" wx:key="key">
+          <view
+            class="theme-chip {{profile.themeName === item.key ? 'theme-chip-active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="onThemeTap"
+          >
+            {{item.label}}
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">帮助与系统</view>
+
+    <view class="action-btn" bindtap="onResetOnboarding">重新查看欢迎引导</view>
   </view>
 </view>
