@@ -3,12 +3,134 @@
   background: #f7f8fc;
 }
 
-.shelf-body {
-  padding: 24rpx;
+.shelf-page {
+  padding: 24rpx 24rpx 36rpx;
   box-sizing: border-box;
 }
 
-.shelf-tip {
+/* 顶部搜索 */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.search-box {
+  flex: 1;
+  height: 78rpx;
+  padding: 0 16rpx 0 24rpx;
+  border-radius: 22rpx;
+  background: #ffffff;
+  border: 2rpx solid #dbe4f2;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  font-size: 28rpx;
+  color: #243041;
+}
+
+.search-placeholder {
+  color: #b1b8c6;
+}
+
+.search-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.search-cancel {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: #7b8494;
+}
+
+/* 搜索面板 */
+.search-panel {
+  margin-top: 20rpx;
+  padding: 24rpx;
+  background: #ffffff;
+  border-radius: 28rpx;
+  box-shadow: 0 12rpx 32rpx rgba(31, 56, 88, 0.05);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.panel-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #243041;
+}
+
+.panel-action,
+.panel-desc {
+  font-size: 24rpx;
+  color: #93a0b2;
+}
+
+.panel-empty {
+  padding: 36rpx 0 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #9aa4b2;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.history-item {
+  min-height: 68rpx;
+  padding: 0 18rpx;
+  border-radius: 18rpx;
+  background: #f7f8fc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-keyword {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
+  color: #425066;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-delete {
+  width: 44rpx;
+  text-align: center;
+  font-size: 32rpx;
+  line-height: 1;
+  color: #a8b1bf;
+}
+
+/* 默认内容 */
+.shelf-main {
+  margin-top: 20rpx;
+}
+
+.loading-text {
   padding: 80rpx 0;
   text-align: center;
   color: #7f8796;
@@ -16,7 +138,7 @@
 }
 
 .empty-wrap {
-  margin-top: 80rpx;
+  margin-top: 40rpx;
   padding: 64rpx 36rpx;
   background: #ffffff;
   border-radius: 32rpx;
@@ -54,40 +176,65 @@
   font-weight: 600;
 }
 
-.story-list {
+/* 分区 */
+.section {
+  margin-top: 22rpx;
+}
+
+.section:first-child {
+  margin-top: 0;
+}
+
+.section-header {
   display: flex;
-  flex-direction: column;
-  gap: 20rpx;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.story-card {
-  background: #ffffff;
-  border-radius: 28rpx;
-  padding: 20rpx;
-  display: flex;
-  gap: 20rpx;
-  box-shadow: 0 12rpx 32rpx rgba(31, 56, 88, 0.06);
-}
-
-.cover-box {
-  width: 180rpx;
-  height: 240rpx;
-  flex-shrink: 0;
-}
-
-.story-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.story-title {
+.section-title {
+  margin-bottom: 18rpx;
   font-size: 30rpx;
-  line-height: 1.45;
   font-weight: 700;
   color: #243041;
+}
+
+.section-desc {
+  margin-bottom: 18rpx;
+  font-size: 24rpx;
+  color: #99a4b3;
+}
+
+/* 网格书架 */
+.grid-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 18rpx;
+  row-gap: 26rpx;
+}
+
+.book-item {
+  min-width: 0;
+}
+
+.book-cover-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 24rpx rgba(45, 69, 102, 0.08);
+  background: #eef2f7;
+}
+
+.recent-cover {
+  aspect-ratio: 3 / 4;
+}
+
+.book-title {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.45;
+  color: #243041;
+  font-weight: 600;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -96,24 +243,9 @@
   word-break: break-all;
 }
 
-.story-meta-row {
-  margin-top: 10rpx;
-  display: flex;
-  align-items: center;
-  font-size: 24rpx;
-  color: #6f7785;
-}
-
-.meta-label {
-  color: #98a0af;
-}
-
-.meta-value {
-  color: #5b6270;
-}
-
-.story-time {
-  margin-top: 14rpx;
+.book-sub {
+  margin-top: 6rpx;
   font-size: 22rpx;
-  color: #a0a7b4;
+  line-height: 1.3;
+  color: #98a3b3;
 }
