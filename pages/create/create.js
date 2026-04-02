@@ -2,15 +2,17 @@ const { createStory } = require("../../services/story");
 const { getMessagesBySession } = require("../../services/message");
 const { createChatStream } = require("../../services/chat_stream");
 const { createTTSPlayer, splitTextToSentences } = require("../../services/tts_player");
+const { getCreateOpening } = require("../../services/opening");
 const {
   createSession,
   getSession,
   getSessions,
   updateSessionDraft,
   renameSession,
+  pinSession,
+  unpinSession,
   deleteSession
 } = require("../../services/session");
-
 
 
 function getNavMetrics() {
@@ -100,9 +102,13 @@ Page({
     showEditPanel: false,
     editingText: "",
 
+    archiving: false,
+
     drawerVisible: false,
     sessions: [],
     keyboardVisible: false,
+
+    openingPlayed: false,
 
     messages: [
       decorateAssistantMessage({
@@ -122,6 +128,7 @@ Page({
     this.ttsPlayer = createTTSPlayer();
     this.bindTtsCallbacks();
     await this.loadSessions();
+    await this.loadCreateOpening();
   },
 
   initNavBar() {
@@ -232,6 +239,54 @@ Page({
     await this.loadSessions();
   },
 
+  buildOpeningMessage(payload = {}) {
+    return decorateAssistantMessage({
+      id: "opening_" + Date.now(),
+      role: "assistant",
+      leadText: payload.lead_text || "欢迎来到故事创作世界！",
+      storyText: "",
+      guideText: payload.guide_text || "先选一个你喜欢的故事方向吧。",
+      choices: payload.choices || ["森林冒险", "星空旅行", "海底秘密"],
+      shouldSave: false
+    });
+  },
+  
+  async loadCreateOpening() {
+    try {
+      const payload = await getCreateOpening();
+      const opening = this.buildOpeningMessage(payload);
+      this.setData({
+        messages: [opening],
+        openingPlayed: false
+      });
+      this.playOpeningIfNeeded();
+    } catch (err) {
+      console.error("loadCreateOpening error:", err);
+      const opening = this.buildOpeningMessage();
+      this.setData({
+        messages: [opening],
+        openingPlayed: false
+      });
+      this.playOpeningIfNeeded();
+    }
+  },
+  
+  playOpeningIfNeeded() {
+    if (!this.data.autoReadEnabled) return;
+    if (this.data.openingPlayed) return;
+    const firstAssistant = (this.data.messages || []).find(item => item.role === "assistant");
+    if (!firstAssistant) return;
+  
+    setTimeout(async () => {
+      try {
+        await this.playAssistantMessageFrom(firstAssistant, "lead");
+        this.setData({ openingPlayed: true });
+      } catch (err) {
+        console.error("playOpeningIfNeeded error:", err);
+      }
+    }, 300);
+  },
+
   async loadSessions() {
     try {
       const sessions = await getSessions({ scene: "create" });
@@ -296,7 +351,7 @@ Page({
   async startNewCreateSession() {
     this.stopTTS();
     const sessionId = this.buildSessionId();
-
+  
     this.setData({
       drawerVisible: false,
       sessionId,
@@ -306,18 +361,11 @@ Page({
       draftText: "",
       showEditPanel: false,
       editingText: "",
-      messages: [
-        decorateAssistantMessage({
-          id: "opening_" + Date.now(),
-          role: "assistant",
-          leadText: "欢迎来到故事创作世界！",
-          storyText: "",
-          guideText: "你可以告诉我一个角色、一个地方，或者一件神奇的事情。",
-          choices: ["写一个小猫故事", "写一个森林冒险", "写一个会发光的城堡"],
-          shouldSave: false
-        })
-      ]
+      messages: [],
+      openingPlayed: false
     });
+  
+    await this.loadCreateOpening();
   },
 
   async switchCreateSession(e) {
@@ -354,6 +402,7 @@ Page({
               })
             ]
       });
+      this.playOpeningIfNeeded();
     } catch (err) {
       console.error("switchCreateSession error:", err);
       this.setData({ drawerVisible: false });
@@ -376,36 +425,87 @@ Page({
     }
   },
 
-  async onLongPressSession(e) {
-    const { sessionId, title } = e.detail;
+  // async onLongPressSession(e) {
+  //   const { sessionId, title } = e.detail;
 
-    wx.showActionSheet({
-      itemList: ["重命名", "删除"],
-      success: async (res) => {
-        if (res.tapIndex === 0) {
-          wx.showModal({
-            title: "重命名会话",
-            editable: true,
-            placeholderText: "请输入新名称",
-            content: title || "",
-            success: async (modalRes) => {
-              if (modalRes.confirm && modalRes.content) {
-                await renameSession(sessionId, modalRes.content);
-                await this.loadSessions();
-              }
-            }
-          });
-        } else if (res.tapIndex === 1) {
-          await this.onDeleteSession({ detail: { sessionId } });
-        }
-      }
-    });
-  },
+  //   wx.showActionSheet({
+  //     itemList: ["重命名", "删除"],
+  //     success: async (res) => {
+  //       if (res.tapIndex === 0) {
+  //         wx.showModal({
+  //           title: "重命名会话",
+  //           editable: true,
+  //           placeholderText: "请输入新名称",
+  //           content: title || "",
+  //           success: async (modalRes) => {
+  //             if (modalRes.confirm && modalRes.content) {
+  //               await renameSession(sessionId, modalRes.content);
+  //               await this.loadSessions();
+  //             }
+  //           }
+  //         });
+  //       } else if (res.tapIndex === 1) {
+  //         await this.onDeleteSession({ detail: { sessionId } });
+  //       }
+  //     }
+  //   });
+  // },
 
   onChoiceTap(e) {
     const text = e.detail.text;
     if (!text || this.data.loading) return;
     this.sendMessage(text, "choice");
+  },
+
+  async onMoreSession(e) {
+    const session = e.detail.session || {};
+    const sessionId = session.session_id;
+    const title = session.title || "";
+    const isPinned = !!session.is_pinned;
+  
+    if (!sessionId) return;
+  
+    const itemList = isPinned
+      ? ["重命名", "取消置顶", "删除"]
+      : ["重命名", "置顶", "删除"];
+  
+    wx.showActionSheet({
+      itemList,
+      success: async (res) => {
+        const tapIndex = res.tapIndex;
+  
+        if (tapIndex === 0) {
+          wx.showModal({
+            title: "重命名会话",
+            editable: true,
+            placeholderText: "请输入新名称",
+            content: title,
+            success: async (modalRes) => {
+              const value = (modalRes.content || "").trim();
+              if (modalRes.confirm && value) {
+                await renameSession(sessionId, value);
+                await this.loadSessions();
+              }
+            }
+          });
+          return;
+        }
+  
+        if (tapIndex === 1) {
+          if (isPinned) {
+            await unpinSession(sessionId);
+          } else {
+            await pinSession(sessionId);
+          }
+          await this.loadSessions();
+          return;
+        }
+  
+        if (tapIndex === 2) {
+          await this.onDeleteSession({ detail: { sessionId } });
+        }
+      }
+    });
   },
 
   async sendMessage(text, inputMode = "text") {
@@ -552,9 +652,12 @@ Page({
       .join("\n");
   },
 
+  
   async onArchiveStory() {
+    if (this.data.archiving) return;
+  
     const content = this.collectStoryText();
-
+  
     if (!content.trim()) {
       wx.showToast({
         title: "没有新故事哦，和慧童聊一聊吧",
@@ -562,25 +665,42 @@ Page({
       });
       return;
     }
-
+  
+    this.setData({ archiving: true });
+  
+    wx.showLoading({
+      title: "正在归档...",
+      mask: true
+    });
+  
     try {
       const story = await createStory({
-        title: "我的新故事",
+        title: "",
         age: this.data.age,
         summary: "",
         content
       });
-
+  
       this.setData({
-        createdStoryId: story.id
+        createdStoryId: story.id,
+        archiving: false
       });
-
+  
+      wx.hideLoading();
+  
       wx.showToast({
         title: "已归档成新书",
         icon: "success"
       });
     } catch (err) {
       console.error("createStory error:", err);
+  
+      this.setData({
+        archiving: false
+      });
+  
+      wx.hideLoading();
+  
       wx.showToast({
         title: "归档失败",
         icon: "none"

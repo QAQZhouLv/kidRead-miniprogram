@@ -7,7 +7,7 @@
   bind:newsession="startNewCreateSession"
   bind:selectsession="switchCreateSession"
   bind:deletesession="onDeleteSession"
-  bind:longpresssession="onLongPressSession"
+  bind:moresession="onMoreSession"
 />
 
 <view class="page">
@@ -67,7 +67,13 @@
   </view>
 
   <view wx:if="{{!keyboardVisible}}" class="archive-wrap">
-    <button class="archive-btn" bindtap="onArchiveStory">归档</button>
+    <button 
+      class="archive-btn" 
+      bindtap="onArchiveStory"
+      disabled="{{archiving}}"
+    >
+      {{archiving ? '归档中...' : '归档'}}
+    </button>
   </view>
 
   <chat-input-bar

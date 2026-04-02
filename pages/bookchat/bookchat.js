@@ -8,9 +8,10 @@ const {
   getSessions,
   updateSessionDraft,
   renameSession,
+  pinSession,
+  unpinSession,
   deleteSession
 } = require("../../services/session");
-
 
 
 function getNavMetrics() {
@@ -104,6 +105,7 @@ Page({
 
     showEditPanel: false,
     editingText: "",
+    openingPlayed: false,
 
     keyboardVisible: false
   },
@@ -266,8 +268,11 @@ Page({
         });
 
     this.setData({
-      messages: [opening]
+      messages: [opening],
+      openingPlayed: false
     });
+
+    openingPlayed: false
   },
 
   async loadStory() {
@@ -337,6 +342,10 @@ Page({
 
       if (!messages.length) {
         this.initOpeningMessages();
+      }
+
+      if (messages.length) {
+        this.setData({ openingPlayed: true });
       }
     } catch (err) {
       console.error("restoreMessagesAndDraft error:", err);
@@ -452,30 +461,79 @@ Page({
     }
   },
 
-  async onLongPressSession(e) {
-    const { sessionId, title } = e.detail;
+  // async onLongPressSession(e) {
+  //   const { sessionId, title } = e.detail;
 
+  //   wx.showActionSheet({
+  //     itemList: ["重命名", "删除"],
+  //     success: async (res) => {
+  //       if (res.tapIndex === 0) {
+  //         wx.showModal({
+  //           title: "重命名会话",
+  //           editable: true,
+  //           placeholderText: "请输入新名称",
+  //           content: title || "",
+  //           success: async (modalRes) => {
+  //             if (modalRes.confirm && modalRes.content) {
+  //               try {
+  //                 await renameSession(sessionId, modalRes.content);
+  //                 await this.loadSessions();
+  //               } catch (err) {
+  //                 console.error("renameSession error:", err);
+  //               }
+  //             }
+  //           }
+  //         });
+  //       } else if (res.tapIndex === 1) {
+  //         await this.onDeleteSession({ detail: { sessionId } });
+  //       }
+  //     }
+  //   });
+  // },
+
+  async onMoreSession(e) {
+    const session = e.detail.session || {};
+    const sessionId = session.session_id;
+    const title = session.title || "";
+    const isPinned = !!session.is_pinned;
+  
+    if (!sessionId) return;
+  
+    const itemList = isPinned
+      ? ["重命名", "取消置顶", "删除"]
+      : ["重命名", "置顶", "删除"];
+  
     wx.showActionSheet({
-      itemList: ["重命名", "删除"],
+      itemList,
       success: async (res) => {
         if (res.tapIndex === 0) {
           wx.showModal({
             title: "重命名会话",
             editable: true,
             placeholderText: "请输入新名称",
-            content: title || "",
+            content: title,
             success: async (modalRes) => {
-              if (modalRes.confirm && modalRes.content) {
-                try {
-                  await renameSession(sessionId, modalRes.content);
-                  await this.loadSessions();
-                } catch (err) {
-                  console.error("renameSession error:", err);
-                }
+              const value = (modalRes.content || "").trim();
+              if (modalRes.confirm && value) {
+                await renameSession(sessionId, value);
+                await this.loadSessions();
               }
             }
           });
-        } else if (res.tapIndex === 1) {
+          return;
+        }
+  
+        if (res.tapIndex === 1) {
+          if (isPinned) {
+            await unpinSession(sessionId);
+          } else {
+            await pinSession(sessionId);
+          }
+          await this.loadSessions();
+          return;
+        }
+  
+        if (res.tapIndex === 2) {
           await this.onDeleteSession({ detail: { sessionId } });
         }
       }
@@ -530,6 +588,22 @@ Page({
     const text = e.detail.text;
     if (!text || this.data.loading) return;
     this.sendMessage(text, "choice");
+  },
+
+  playOpeningIfNeeded() {
+    if (!this.data.autoReadEnabled) return;
+    if (this.data.openingPlayed) return;
+    const firstAssistant = (this.data.messages || []).find(item => item.role === "assistant");
+    if (!firstAssistant) return;
+  
+    setTimeout(async () => {
+      try {
+        await this.playAssistantMessageFrom(firstAssistant, "lead");
+        this.setData({ openingPlayed: true });
+      } catch (err) {
+        console.error("playOpeningIfNeeded error:", err);
+      }
+    }, 300);
   },
 
   buildHistory(messages) {

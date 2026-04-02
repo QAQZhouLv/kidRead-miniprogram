@@ -1,4 +1,11 @@
 const { request } = require("../utils/api");
+const { HTTP_BASE_URL } = require("../config/index");
+
+function toAbsoluteImageUrl(url) {
+  if (!url) return "";
+  if (/^https?:\/\//.test(url)) return url;
+  return `${HTTP_BASE_URL}${url}`;
+}
 
 function createStory(data) {
   return request({
@@ -34,5 +41,6 @@ module.exports = {
   createStory,
   getStories,
   getStoryDetail,
-  appendStory
+  appendStory,
+  toAbsoluteImageUrl
 };

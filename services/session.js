@@ -45,6 +45,20 @@ function renameSession(sessionId, title) {
   });
 }
 
+function pinSession(sessionId) {
+  return request({
+    url: `/api/sessions/${sessionId}/pin`,
+    method: "POST"
+  });
+}
+
+function unpinSession(sessionId) {
+  return request({
+    url: `/api/sessions/${sessionId}/unpin`,
+    method: "POST"
+  });
+}
+
 function deleteSession(sessionId) {
   return request({
     url: `/api/sessions/${sessionId}`,
@@ -65,6 +79,8 @@ module.exports = {
   getSessions,
   updateSessionDraft,
   renameSession,
+  pinSession,
+  unpinSession,
   deleteSession,
   mergeSession
 };

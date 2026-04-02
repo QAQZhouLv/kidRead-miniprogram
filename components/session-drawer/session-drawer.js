@@ -1,20 +1,26 @@
 Component({
   properties: {
-    visible: {
-      type: Boolean,
-      value: false
-    },
-    title: {
-      type: String,
-      value: "历史会话"
-    },
+    visible: Boolean,
+    title: String,
     sessions: {
       type: Array,
       value: []
     },
-    currentSessionId: {
-      type: String,
-      value: ""
+    currentSessionId: String
+  },
+
+  data: {
+    pinnedSessions: [],
+    normalSessions: []
+  },
+
+  observers: {
+    sessions(list) {
+      const rows = Array.isArray(list) ? list : [];
+      this.setData({
+        pinnedSessions: rows.filter(item => !!item.is_pinned),
+        normalSessions: rows.filter(item => !item.is_pinned)
+      });
     }
   },
 
@@ -29,18 +35,13 @@ Component({
 
     onSessionTap(e) {
       const sessionId = e.currentTarget.dataset.sessionid;
+      if (!sessionId) return;
       this.triggerEvent("selectsession", { sessionId });
     },
 
-    onDeleteTap(e) {
-      const sessionId = e.currentTarget.dataset.sessionid;
-      this.triggerEvent("deletesession", { sessionId });
-    },
-
-    onSessionLongPress(e) {
-      const sessionId = e.currentTarget.dataset.sessionid;
-      const title = e.currentTarget.dataset.title || "";
-      this.triggerEvent("longpresssession", { sessionId, title });
+    onMoreTap(e) {
+      const session = e.currentTarget.dataset.session;
+      this.triggerEvent("moresession", { session });
     }
   }
 });

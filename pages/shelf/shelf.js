@@ -1,4 +1,4 @@
-const { getStories } = require("../../services/story");
+const { getStories, toAbsoluteImageUrl } = require("../../services/story");
 
 Page({
   data: {
@@ -15,8 +15,13 @@ Page({
 
     try {
       const stories = await getStories();
+      const normalized = (stories || []).map(item => ({
+        ...item,
+        display_cover_url: toAbsoluteImageUrl(item.cover_image_url || item.fallback_cover_url)
+      }));
+
       this.setData({
-        stories,
+        stories: normalized,
         loading: false
       });
     } catch (err) {

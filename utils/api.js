@@ -1,11 +1,12 @@
 const { HTTP_BASE_URL } = require("../config/index");
 
-function request({ url, method = "GET", data = {} }) {
+function request({ url, method = "GET", data = {}, timeout = 20000 }) {
   return new Promise((resolve, reject) => {
     wx.request({
       url: HTTP_BASE_URL + url,
       method,
       data,
+      timeout,
       header: {
         "Content-Type": "application/json"
       },
