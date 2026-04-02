@@ -1,0 +1,25 @@
+<view class="book-cover {{size}}">
+  <block wx:if="{{imageUrl && !imageFailed}}">
+    <image
+      class="cover-image"
+      src="{{imageUrl}}"
+      mode="aspectFill"
+      binderror="onImageError"
+    />
+    <view wx:if="{{coverStatus === 'generating'}}" class="cover-badge">生成中</view>
+  </block>
+
+  <block wx:else>
+    <view class="fallback-cover theme-{{themeIndex}}">
+      <view class="fallback-deco deco-top"></view>
+      <view class="fallback-deco deco-bottom"></view>
+
+      <view class="fallback-inner">
+        <view class="fallback-label">KidRead</view>
+        <view class="fallback-title">{{title || '未命名故事'}}</view>
+      </view>
+
+      <view wx:if="{{coverStatus === 'generating'}}" class="cover-badge">生成中</view>
+    </view>
+  </block>
+</view>

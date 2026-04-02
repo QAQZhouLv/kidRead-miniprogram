@@ -1,0 +1,142 @@
+.book-cover {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #eef2f7;
+}
+
+.book-cover.small {
+  border-radius: 20rpx;
+}
+
+.book-cover.medium {
+  border-radius: 24rpx;
+}
+
+.book-cover.large {
+  border-radius: 28rpx;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #eef2f7;
+}
+
+.fallback-cover {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.fallback-inner {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 20rpx 18rpx 18rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fallback-label {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 18rpx;
+  letter-spacing: 1rpx;
+}
+
+.fallback-title {
+  color: #ffffff;
+  font-size: 28rpx;
+  line-height: 1.45;
+  font-weight: 700;
+  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.18);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.small .fallback-inner {
+  padding: 16rpx 14rpx;
+}
+
+.small .fallback-title {
+  font-size: 24rpx;
+  -webkit-line-clamp: 3;
+}
+
+.large .fallback-title {
+  font-size: 32rpx;
+}
+
+.fallback-deco {
+  position: absolute;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.18);
+  z-index: 1;
+}
+
+.deco-top {
+  width: 180rpx;
+  height: 180rpx;
+  top: -50rpx;
+  right: -30rpx;
+}
+
+.deco-bottom {
+  width: 120rpx;
+  height: 120rpx;
+  left: -30rpx;
+  bottom: 24rpx;
+}
+
+.cover-badge {
+  position: absolute;
+  right: 14rpx;
+  top: 14rpx;
+  z-index: 3;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.9);
+  color: #5b6270;
+  font-size: 18rpx;
+  line-height: 1;
+}
+
+/* 6 套 fallback 主题，后面你可以继续扩 */
+.theme-0 {
+  background: linear-gradient(135deg, #7ea7ff 0%, #9ec5ff 48%, #c8dbff 100%);
+}
+
+.theme-1 {
+  background: linear-gradient(135deg, #ff9bb3 0%, #ffc1a6 50%, #ffe0be 100%);
+}
+
+.theme-2 {
+  background: linear-gradient(135deg, #71c7b8 0%, #9edfc3 50%, #d8f3dc 100%);
+}
+
+.theme-3 {
+  background: linear-gradient(135deg, #8d83ff 0%, #b5a2ff 50%, #ddd2ff 100%);
+}
+
+.theme-4 {
+  background: linear-gradient(135deg, #4b7bec 0%, #6dd5ed 52%, #bfe9ff 100%);
+}
+
+.theme-5 {
+  background: linear-gradient(135deg, #f6a55f 0%, #f7c66f 52%, #fde7a8 100%);
+}

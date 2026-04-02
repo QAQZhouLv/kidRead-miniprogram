@@ -1,5 +1,47 @@
 const { getStories, toAbsoluteImageUrl } = require("../../services/story");
 
+function pickThemeIndex(story) {
+  const seedSource = `${story.id || ""}${story.title || ""}${story.age || ""}`;
+  let hash = 0;
+
+  for (let i = 0; i < seedSource.length; i++) {
+    hash = (hash * 31 + seedSource.charCodeAt(i)) % 100000;
+  }
+
+  return hash % 6;
+}
+
+function formatDateTime(input) {
+  if (!input) return "";
+
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) {
+    return String(input).replace("T", " ").slice(0, 16);
+  }
+
+  const y = date.getFullYear();
+  const m = `${date.getMonth() + 1}`.padStart(2, "0");
+  const d = `${date.getDate()}`.padStart(2, "0");
+  const hh = `${date.getHours()}`.padStart(2, "0");
+  const mm = `${date.getMinutes()}`.padStart(2, "0");
+
+  return `${y}-${m}-${d} ${hh}:${mm}`;
+}
+
+function normalizeStories(stories = []) {
+  return stories.map((item) => {
+    const aiCoverUrl = toAbsoluteImageUrl(item.cover_image_url);
+
+    return {
+      ...item,
+      ai_cover_url: aiCoverUrl,
+      themeIndex: pickThemeIndex(item),
+      displayTitle: item.title || "未命名故事",
+      displayDate: formatDateTime(item.updated_at || item.created_at)
+    };
+  });
+}
+
 Page({
   data: {
     stories: [],
@@ -15,13 +57,8 @@ Page({
 
     try {
       const stories = await getStories();
-      const normalized = (stories || []).map(item => ({
-        ...item,
-        display_cover_url: toAbsoluteImageUrl(item.cover_image_url || item.fallback_cover_url)
-      }));
-
       this.setData({
-        stories: normalized,
+        stories: normalizeStories(stories || []),
         loading: false
       });
     } catch (err) {
@@ -45,7 +82,7 @@ Page({
   },
 
   goCreate() {
-    wx.navigateTo({
+    wx.switchTab({
       url: "/pages/create/create"
     });
   }

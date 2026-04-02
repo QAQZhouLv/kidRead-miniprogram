@@ -1,38 +1,51 @@
-<view class="page" style="padding: 24rpx;">
-  <view style="margin-top: 24rpx;">
-    <block wx:if="{{stories.length === 0}}">
-      <view style="color:#888;">还没有故事，先去创作一个吧。</view>
+<view class="page">
+  <view class="shelf-body">
+    <block wx:if="{{loading}}">
+      <view class="shelf-tip">书架加载中...</view>
     </block>
 
-    <block wx:for="{{stories}}" wx:key="id">
-      <view
-        data-id="{{item.id}}"
-        bindtap="openBook"
-        style="margin-top:16rpx;padding:20rpx;background:#fff;border-radius:18rpx;display:flex;gap:20rpx;"
-      >
-        <image
-          src="{{item.display_cover_url}}"
-          mode="aspectFill"
-          style="width:180rpx;height:240rpx;border-radius:16rpx;background:#eef2f7;flex-shrink:0;"
-        />
+    <block wx:elif="{{stories.length === 0}}">
+      <view class="empty-wrap">
+        <view class="empty-emoji">📚</view>
+        <view class="empty-title">书架里还没有故事</view>
+        <view class="empty-desc">先去创作一个属于你的故事吧</view>
+        <view class="empty-btn" bindtap="goCreate">去创作</view>
+      </view>
+    </block>
 
-        <view style="flex:1;min-width:0;">
-          <view style="font-size: 30rpx; font-weight: 600;">
-            {{item.title}}
-          </view>
+    <block wx:else>
+      <view class="story-list">
+        <block wx:for="{{stories}}" wx:key="id">
+          <view class="story-card" data-id="{{item.id}}" bindtap="openBook">
+            <view class="cover-box">
+              <book-cover
+                title="{{item.displayTitle}}"
+                imageUrl="{{item.ai_cover_url}}"
+                coverStatus="{{item.cover_status}}"
+                themeIndex="{{item.themeIndex}}"
+                size="medium"
+              />
+            </view>
 
-          <view style="margin-top:8rpx;color:#666;font-size:24rpx;">
-            年龄：{{item.age}}
-          </view>
+            <view class="story-info">
+              <view class="story-title">{{item.displayTitle}}</view>
 
-          <view style="margin-top:8rpx;color:#999;font-size:22rpx;">
-            {{item.cover_status === 'ready' ? '封面已完成' : '封面准备中'}}
-          </view>
+              <view class="story-meta-row">
+                <text class="meta-label">年龄：</text>
+                <text class="meta-value">{{item.age || '未知'}}</text>
+              </view>
 
-          <view style="margin-top:8rpx;color:#999;font-size:22rpx;">
-            {{item.created_at}}
+              <view class="story-meta-row">
+                <text class="meta-label">封面：</text>
+                <text class="meta-value">
+                  {{item.ai_cover_url ? (item.cover_status === 'ready' ? 'AI正式封面' : 'AI封面生成中') : '系统默认封面'}}
+                </text>
+              </view>
+
+              <view class="story-time">{{item.displayDate}}</view>
+            </view>
           </view>
-        </view>
+        </block>
       </view>
     </block>
   </view>

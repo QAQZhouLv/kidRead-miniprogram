@@ -4,7 +4,9 @@ const { HTTP_BASE_URL } = require("../config/index");
 function toAbsoluteImageUrl(url) {
   if (!url) return "";
   if (/^https?:\/\//.test(url)) return url;
-  return `${HTTP_BASE_URL}${url}`;
+
+  const normalized = String(url).startsWith("/") ? url : `/${url}`;
+  return `${HTTP_BASE_URL}${normalized}`;
 }
 
 function createStory(data) {

@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "book-cover": "/components/book-cover/book-cover"
+  }
 }
