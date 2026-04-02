@@ -39,10 +39,36 @@ function appendStory(id, story_text) {
   });
 }
 
+function renameStory(id, title) {
+  return request({
+    url: `/api/stories/${id}/rename`,
+    method: "PATCH",
+    data: { title }
+  });
+}
+
+function setStoryFavorite(id, is_favorite) {
+  return request({
+    url: `/api/stories/${id}/favorite`,
+    method: "PATCH",
+    data: { is_favorite }
+  });
+}
+
+function deleteStory(id) {
+  return request({
+    url: `/api/stories/${id}`,
+    method: "DELETE"
+  });
+}
+
 module.exports = {
   createStory,
   getStories,
   getStoryDetail,
   appendStory,
+  renameStory,
+  setStoryFavorite,
+  deleteStory,
   toAbsoluteImageUrl
 };

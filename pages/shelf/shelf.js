@@ -1,4 +1,10 @@
-const { getStories, toAbsoluteImageUrl } = require("../../services/story");
+const {
+  getStories,
+  renameStory,
+  setStoryFavorite,
+  deleteStory,
+  toAbsoluteImageUrl
+} = require("../../services/story");
 
 const SEARCH_HISTORY_KEY = "kidread_shelf_search_history";
 const RECENT_READ_KEY = "kidread_recent_reading_ids";
@@ -38,7 +44,8 @@ function normalizeStories(stories = []) {
     displayTitle: item.title || "未命名故事",
     displayAge: item.age || "未知",
     displayDate: normalizeDate(item.updated_at || item.created_at),
-    themeIndex: pickThemeIndex(item)
+    themeIndex: pickThemeIndex(item),
+    is_favorite: !!item.is_favorite
   }));
 }
 
@@ -66,10 +73,24 @@ Page({
     stories: [],
     filteredStories: [],
     recentStories: [],
+    favoriteStories: [],
 
     keyword: "",
     showSearchPanel: false,
-    searchHistory: []
+    searchHistory: [],
+
+    activeTab: "all",
+
+    renameDialogVisible: false,
+    renameStoryId: null,
+    renameValue: "",
+    renameOriginalTitle: "",
+    submittingRename: false,
+
+    actionSheetVisible: false,
+    actionSheetTitle: "",
+    actionStory: null,
+    actionSource: "" // recent | favorite | all | search
   },
 
   onShow() {
@@ -88,6 +109,7 @@ Page({
         stories: normalized,
         filteredStories: this.filterStories(normalized, this.data.keyword),
         recentStories: this.buildRecentStories(normalized),
+        favoriteStories: normalized.filter((item) => item.is_favorite),
         searchHistory,
         loading: false
       });
@@ -142,6 +164,16 @@ Page({
     safeSetStorage(RECENT_READ_KEY, next);
   },
 
+  removeFromRecentReading(storyId) {
+    const current = safeGetStorage(RECENT_READ_KEY, []);
+    const next = current.filter((id) => String(id) !== String(storyId));
+    safeSetStorage(RECENT_READ_KEY, next);
+
+    this.setData({
+      recentStories: this.buildRecentStories(this.data.stories)
+    });
+  },
+
   updateSearchHistory(keyword) {
     const trimmed = String(keyword || "").trim();
     if (!trimmed) return;
@@ -154,6 +186,12 @@ Page({
 
     safeSetStorage(SEARCH_HISTORY_KEY, next);
     this.setData({ searchHistory: next });
+  },
+
+  onSwitchTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    if (!tab) return;
+    this.setData({ activeTab: tab });
   },
 
   onSearchInput(e) {
@@ -241,6 +279,222 @@ Page({
       url: `/pages/book/book?id=${id}`
     });
   },
+
+  onBookLongPress(e) {
+    const story = e.currentTarget.dataset.story;
+    const source = e.currentTarget.dataset.source || "all";
+    if (!story) return;
+
+    this.setData({
+      actionSheetVisible: true,
+      actionSheetTitle: story.displayTitle || "这本书",
+      actionStory: story,
+      actionSource: source
+    });
+  },
+
+  closeActionSheet() {
+    this.setData({
+      actionSheetVisible: false,
+      actionSheetTitle: "",
+      actionStory: null,
+      actionSource: ""
+    });
+  },
+
+  async onActionTap(e) {
+    const action = e.currentTarget.dataset.action;
+    const story = this.data.actionStory;
+    const source = this.data.actionSource;
+
+    if (!story || !action) return;
+
+    this.closeActionSheet();
+
+    if (action === "rename") {
+      this.openRenameDialog(story);
+      return;
+    }
+
+    if (action === "toggleFavorite") {
+      await this.handleToggleFavorite(story);
+      return;
+    }
+
+    if (action === "removeFavorite") {
+      await this.handleRemoveFavorite(story);
+      return;
+    }
+
+    if (action === "removeRecent") {
+      this.handleRemoveRecent(story);
+      return;
+    }
+
+    if (action === "delete") {
+      await this.handleDeleteStory(story, source);
+    }
+  },
+
+  openRenameDialog(story) {
+    this.setData({
+      renameDialogVisible: true,
+      renameStoryId: story.id,
+      renameOriginalTitle: story.displayTitle || "",
+      renameValue: story.displayTitle || "",
+      submittingRename: false
+    });
+  },
+
+  closeRenameDialog() {
+    if (this.data.submittingRename) return;
+
+    this.setData({
+      renameDialogVisible: false,
+      renameStoryId: null,
+      renameOriginalTitle: "",
+      renameValue: "",
+      submittingRename: false
+    });
+  },
+
+  onRenameInput(e) {
+    this.setData({
+      renameValue: e.detail.value || ""
+    });
+  },
+
+  async submitRename() {
+    if (this.data.submittingRename) return;
+
+    const storyId = this.data.renameStoryId;
+    const newTitle = String(this.data.renameValue || "").trim();
+
+    if (!storyId) return;
+
+    if (!newTitle) {
+      wx.showToast({
+        title: "书名不能为空",
+        icon: "none"
+      });
+      return;
+    }
+
+    this.setData({ submittingRename: true });
+
+    try {
+      await renameStory(storyId, newTitle);
+
+      wx.showToast({
+        title: "已重命名",
+        icon: "success"
+      });
+
+      this.setData({
+        renameDialogVisible: false,
+        renameStoryId: null,
+        renameOriginalTitle: "",
+        renameValue: "",
+        submittingRename: false
+      });
+
+      await this.loadShelfPage();
+    } catch (err) {
+      console.error("renameStory error:", err);
+      this.setData({ submittingRename: false });
+
+      wx.showToast({
+        title: "重命名失败",
+        icon: "none"
+      });
+    }
+  },
+
+  async handleToggleFavorite(story) {
+    try {
+      await setStoryFavorite(story.id, !story.is_favorite);
+
+      wx.showToast({
+        title: !story.is_favorite ? "已设为喜欢" : "已取消喜欢",
+        icon: "success"
+      });
+
+      await this.loadShelfPage();
+    } catch (err) {
+      console.error("setStoryFavorite error:", err);
+      wx.showToast({
+        title: "操作失败",
+        icon: "none"
+      });
+    }
+  },
+
+  async handleRemoveFavorite(story) {
+    try {
+      await setStoryFavorite(story.id, false);
+
+      wx.showToast({
+        title: "已移出喜欢",
+        icon: "success"
+      });
+
+      if (this.data.activeTab === "favorite") {
+        this.setData({ activeTab: "all" });
+      }
+
+      await this.loadShelfPage();
+    } catch (err) {
+      console.error("remove favorite error:", err);
+      wx.showToast({
+        title: "操作失败",
+        icon: "none"
+      });
+    }
+  },
+
+  handleRemoveRecent(story) {
+    this.removeFromRecentReading(story.id);
+
+    wx.showToast({
+      title: "已移出最近阅读",
+      icon: "success"
+    });
+  },
+
+  async handleDeleteStory(story) {
+    wx.showModal({
+      title: "移入书架回收区",
+      content: `要把《${story.displayTitle}》移出当前书架吗？`,
+      confirmText: "移出",
+      confirmColor: "#ff8a65",
+      success: async (res) => {
+        if (!res.confirm) return;
+
+        try {
+          await deleteStory(story.id);
+
+          const currentRecent = safeGetStorage(RECENT_READ_KEY, []);
+          const nextRecent = currentRecent.filter((id) => String(id) !== String(story.id));
+          safeSetStorage(RECENT_READ_KEY, nextRecent);
+
+          wx.showToast({
+            title: "已移出书架",
+            icon: "success"
+          });
+
+          await this.loadShelfPage();
+        } catch (err) {
+          console.error("deleteStory error:", err);
+          wx.showToast({
+            title: "操作失败",
+            icon: "none"
+          });
+        }
+      }
+    });
+  },
+
+  noop() {},
 
   goCreate() {
     wx.switchTab({
