@@ -3,6 +3,18 @@
   background: #f7f8fc;
 }
 
+.theme-sky.page {
+  background: #f7faff;
+}
+
+.theme-peach.page {
+  background: #fff8f4;
+}
+
+.theme-mint.page {
+  background: #f6fffb;
+}
+
 .shelf-page {
   padding: 24rpx 24rpx 36rpx;
   box-sizing: border-box;
@@ -24,6 +36,14 @@
   display: flex;
   align-items: center;
   box-sizing: border-box;
+}
+
+.theme-peach .search-box {
+  border-color: #f5d7ca;
+}
+
+.theme-mint .search-box {
+  border-color: #cdeee3;
 }
 
 .search-input {
@@ -172,11 +192,35 @@
   font-weight: 600;
 }
 
+.theme-peach .empty-btn {
+  background: linear-gradient(135deg, #ffb28c 0%, #ffd1b9 100%);
+}
+
+.theme-mint .empty-btn {
+  background: linear-gradient(135deg, #78d7be 0%, #b6f0df 100%);
+}
+
 .tab-row {
   display: flex;
   align-items: center;
   gap: 16rpx;
   margin-bottom: 20rpx;
+}
+
+.tab-row-alone {
+  margin-bottom: 18rpx;
+  justify-content: space-between;
+}
+
+.tab-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.tab-count {
+  font-size: 24rpx;
+  color: #99a4b3;
 }
 
 .tab-item {
@@ -194,6 +238,14 @@
   border-color: transparent;
 }
 
+.theme-peach .tab-item-active {
+  background: linear-gradient(135deg, #ffb28c 0%, #ffd1b9 100%);
+}
+
+.theme-mint .tab-item-active {
+  background: linear-gradient(135deg, #78d7be 0%, #b6f0df 100%);
+}
+
 .section {
   margin-top: 22rpx;
 }
@@ -202,23 +254,11 @@
   margin-top: 0;
 }
 
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .section-title {
   margin-bottom: 18rpx;
   font-size: 30rpx;
   font-weight: 700;
   color: #243041;
-}
-
-.section-desc {
-  margin-bottom: 18rpx;
-  font-size: 24rpx;
-  color: #99a4b3;
 }
 
 .grid-list {
@@ -375,6 +415,14 @@
   color: #ffffff;
 }
 
+.theme-peach .rename-btn-confirm {
+  background: linear-gradient(135deg, #ffb28c 0%, #ffd1b9 100%);
+}
+
+.theme-mint .rename-btn-confirm {
+  background: linear-gradient(135deg, #78d7be 0%, #b6f0df 100%);
+}
+
 /* 自定义操作菜单 */
 .action-mask {
   position: fixed;
@@ -409,7 +457,6 @@
   font-size: 28rpx;
   font-weight: 700;
   color: #243041;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -451,20 +498,4 @@
   font-size: 28rpx;
   font-weight: 600;
   color: #6f7b8d;
-}
-
-.tab-row-alone {
-  margin-bottom: 18rpx;
-  justify-content: space-between;
-}
-
-.tab-left {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.tab-count {
-  font-size: 24rpx;
-  color: #99a4b3;
 }

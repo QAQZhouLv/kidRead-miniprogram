@@ -9,7 +9,9 @@ function getDefaultUserProfile() {
     age: 6,
     themeName: "sky",
     autoReadEnabled: true,
-    hasSeenOnboarding: false
+    hasSeenOnboarding: false,
+    readingMode: "day", // day | warm | night
+    fontScale: "medium" // small | medium | large
   };
 }
 
@@ -17,6 +19,7 @@ function getUserProfile() {
   try {
     const saved = wx.getStorageSync(USER_PROFILE_KEY);
     if (!saved) return getDefaultUserProfile();
+
     return {
       ...getDefaultUserProfile(),
       ...saved

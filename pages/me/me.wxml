@@ -1,5 +1,8 @@
-<view class="page me-page">
+<view class="page me-page {{themeClass}}">
   <view class="profile-card">
+    <view class="profile-bubbles bubble-1"></view>
+    <view class="profile-bubbles bubble-2"></view>
+
     <view class="avatar-wrap">
       <image
         wx:if="{{profile.avatarUrl}}"
@@ -7,7 +10,9 @@
         src="{{profile.avatarUrl}}"
         mode="aspectFill"
       />
-      <view wx:else class="avatar avatar-default">童</view>
+      <view wx:else class="avatar avatar-default">
+        {{profile.avatarText}}
+      </view>
     </view>
 
     <view class="profile-main">
@@ -66,11 +71,42 @@
         </block>
       </view>
     </view>
+
+    <view class="field-block">
+      <view class="field-label">阅读模式</view>
+      <view class="mode-list">
+        <block wx:for="{{readingModes}}" wx:key="key">
+          <view
+            class="mode-chip {{profile.readingMode === item.key ? 'mode-chip-active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="onReadingModeTap"
+          >
+            {{item.label}}
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="field-block">
+      <view class="field-label">字体大小</view>
+      <view class="mode-list">
+        <block wx:for="{{fontScales}}" wx:key="key">
+          <view
+            class="mode-chip {{profile.fontScale === item.key ? 'mode-chip-active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="onFontScaleTap"
+          >
+            {{item.label}}
+          </view>
+        </block>
+      </view>
+    </view>
   </view>
 
   <view class="section-card">
     <view class="section-title">帮助与系统</view>
 
-    <view class="action-btn" bindtap="onResetOnboarding">重新查看欢迎引导</view>
+    <view class="action-btn" bindtap="onOpenOnboardingNow">再看一次欢迎引导</view>
+    <view class="action-btn action-btn-soft" bindtap="onResetOnboarding">重置首次进入状态</view>
   </view>
 </view>

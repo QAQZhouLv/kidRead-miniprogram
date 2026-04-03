@@ -3,43 +3,60 @@ const {
   saveUserProfile,
   markOnboardingSeen
 } = require("../../utils/user-profile");
+const { getTheme, getThemeOptions } = require("../../utils/theme");
 
 Page({
   data: {
-    step: 0, // 0 welcome, 1 nickname, 2 age, 3 done
+    step: 0, // 0 欢迎 1 昵称 2 年龄 3 主题 4 完成
     profile: {
       nickname: "童童",
       avatarUrl: "",
       avatarType: "default",
       age: 6,
       themeName: "sky",
-      autoReadEnabled: true
+      autoReadEnabled: true,
+      readingMode: "day",
+      fontScale: "medium"
     },
     ageOptions: Array.from({ length: 12 }, (_, i) => i + 1),
     ageIndex: 5,
-    canUseProfileApi: !!wx.getUserProfile
+    canUseProfileApi: !!wx.getUserProfile,
+    themeOptions: getThemeOptions(),
+    themeClass: "theme-sky"
   },
 
   onLoad() {
     const saved = getUserProfile();
     const age = saved.age || 6;
-    const ageIndex = Math.max(0, Math.min(18, age - 1));
+    const ageIndex = Math.max(0, Math.min(11, age - 1));
+    const theme = getTheme(saved.themeName || "sky");
 
     this.setData({
       profile: {
-        nickname: saved.nickname || "小朋友",
+        nickname: saved.nickname || "童童",
         avatarUrl: saved.avatarUrl || "",
         avatarType: saved.avatarType || "default",
         age,
         themeName: saved.themeName || "sky",
-        autoReadEnabled: typeof saved.autoReadEnabled === "boolean" ? saved.autoReadEnabled : true
+        autoReadEnabled: typeof saved.autoReadEnabled === "boolean" ? saved.autoReadEnabled : true,
+        readingMode: saved.readingMode || "day",
+        fontScale: saved.fontScale || "medium"
       },
-      ageIndex
+      ageIndex,
+      themeClass: theme.pageClass
+    });
+  },
+
+  updateThemePreview(themeName) {
+    const theme = getTheme(themeName);
+    this.setData({
+      "profile.themeName": theme.key,
+      themeClass: theme.pageClass
     });
   },
 
   nextStep() {
-    const next = Math.min(this.data.step + 1, 3);
+    const next = Math.min(this.data.step + 1, 4);
     this.setData({ step: next });
   },
 
@@ -89,21 +106,18 @@ Page({
     }
   },
 
-  skipWechatProfile() {
-    const nickname = (this.data.profile.nickname || "").trim() || "童童";
-    this.setData({
-      "profile.nickname": nickname,
-      "profile.avatarType": "default"
-    });
-    this.nextStep();
-  },
-
   confirmNickname() {
     const nickname = (this.data.profile.nickname || "").trim() || "童童";
     this.setData({
       "profile.nickname": nickname
     });
     this.nextStep();
+  },
+
+  onThemeTap(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+    this.updateThemePreview(key);
   },
 
   completeOnboarding() {
@@ -113,7 +127,9 @@ Page({
       avatarType: this.data.profile.avatarUrl ? "wechat" : "default",
       age: this.data.profile.age || 6,
       themeName: this.data.profile.themeName || "sky",
-      autoReadEnabled: true
+      autoReadEnabled: true,
+      readingMode: "day",
+      fontScale: "medium"
     };
 
     saveUserProfile(profile);
@@ -125,9 +141,14 @@ Page({
     });
 
     setTimeout(() => {
-      wx.navigateBack({
-        delta: 1
-      });
+      const pages = getCurrentPages();
+      if (pages.length > 1) {
+        wx.navigateBack({ delta: 1 });
+      } else {
+        wx.switchTab({
+          url: "/pages/shelf/shelf"
+        });
+      }
     }, 500);
   }
 });

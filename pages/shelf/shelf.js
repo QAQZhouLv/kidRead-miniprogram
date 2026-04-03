@@ -5,13 +5,14 @@ const {
   deleteStory,
   toAbsoluteImageUrl
 } = require("../../services/story");
+const { getBootstrapConfig } = require("../../services/app");
+const { getUserProfile } = require("../../utils/user-profile");
+const { getTheme } = require("../../utils/theme");
 
 const SEARCH_HISTORY_KEY = "kidread_shelf_search_history";
 const RECENT_READ_KEY = "kidread_recent_reading_ids";
 const MAX_HISTORY = 10;
 const MAX_RECENT = 3;
-const { getBootstrapConfig } = require("../../services/app");
-const { getUserProfile } = require("../../utils/user-profile");
 
 function pickThemeIndex(story) {
   const seedSource = `${story.id || ""}${story.title || ""}${story.age || ""}`;
@@ -92,12 +93,17 @@ Page({
     actionSheetVisible: false,
     actionSheetTitle: "",
     actionStory: null,
-    actionSource: "", // recent | favorite | all | search
+    actionSource: "",
 
-    hasCheckedOnboarding: false
+    hasCheckedOnboarding: false,
+
+    themeName: "sky",
+    themeClass: "theme-sky"
   },
 
   async onShow() {
+    this.applyTheme();
+
     if (!this.data.hasCheckedOnboarding) {
       const shouldGo = await this.checkShouldShowOnboarding();
       if (shouldGo) {
@@ -109,8 +115,33 @@ Page({
       }
       this.setData({ hasCheckedOnboarding: true });
     }
-  
+
     this.loadShelfPage();
+  },
+
+  applyTheme() {
+    const profile = getUserProfile();
+    const theme = getTheme(profile.themeName);
+
+    this.setData({
+      themeName: theme.key,
+      themeClass: theme.pageClass
+    });
+  },
+
+  async checkShouldShowOnboarding() {
+    const profile = getUserProfile();
+
+    try {
+      const config = await getBootstrapConfig();
+      if (config && config.force_show_onboarding) {
+        return true;
+      }
+    } catch (err) {
+      console.error("getBootstrapConfig error:", err);
+    }
+
+    return !profile.hasSeenOnboarding;
   },
 
   async loadShelfPage() {
@@ -321,7 +352,6 @@ Page({
   async onActionTap(e) {
     const action = e.currentTarget.dataset.action;
     const story = this.data.actionStory;
-    const source = this.data.actionSource;
 
     if (!story || !action) return;
 
@@ -348,7 +378,7 @@ Page({
     }
 
     if (action === "delete") {
-      await this.handleDeleteStory(story, source);
+      await this.handleDeleteStory(story);
     }
   },
 
@@ -508,21 +538,6 @@ Page({
         }
       }
     });
-  },
-
-  async checkShouldShowOnboarding() {
-    const profile = getUserProfile();
-  
-    try {
-      const config = await getBootstrapConfig();
-      if (config && config.force_show_onboarding) {
-        return true;
-      }
-    } catch (err) {
-      console.error("getBootstrapConfig error:", err);
-    }
-  
-    return !profile.hasSeenOnboarding;
   },
 
   noop() {},

@@ -3,6 +3,7 @@ const {
   saveUserProfile,
   resetOnboardingFlag
 } = require("../../utils/user-profile");
+const { getThemeOptions, getTheme } = require("../../utils/theme");
 
 Page({
   data: {
@@ -13,14 +14,25 @@ Page({
       age: 6,
       themeName: "sky",
       autoReadEnabled: true,
-      hasSeenOnboarding: false
+      hasSeenOnboarding: false,
+      readingMode: "day",
+      fontScale: "medium",
+
+      avatarText: "童"  
     },
-    themeOptions: [
-      { key: "sky", label: "天空蓝" },
-      { key: "peach", label: "蜜桃粉" },
-      { key: "mint", label: "薄荷绿" }
+    themeOptions: getThemeOptions(),
+    ageOptions: Array.from({ length: 12 }, (_, i) => i + 1),
+    readingModes: [
+      { key: "day", label: "日间模式" },
+      { key: "warm", label: "护眼模式" },
+      { key: "night", label: "夜间模式" }
     ],
-    ageOptions: Array.from({ length: 12 }, (_, i) => i + 1)
+    fontScales: [
+      { key: "small", label: "小号字" },
+      { key: "medium", label: "标准字" },
+      { key: "large", label: "大号字" }
+    ],
+    themeClass: "theme-sky"
   },
 
   onShow() {
@@ -29,7 +41,20 @@ Page({
 
   loadProfile() {
     const profile = getUserProfile();
-    this.setData({ profile });
+    const theme = getTheme(profile.themeName);
+  
+    const nickname = profile.nickname && String(profile.nickname).trim()
+      ? String(profile.nickname).trim()
+      : "童童";
+  
+    this.setData({
+      profile: {
+        ...profile,
+        nickname,
+        avatarText: nickname.slice(0, 1)
+      },
+      themeClass: theme.pageClass
+    });
   },
 
   onNicknameInput(e) {
@@ -75,12 +100,34 @@ Page({
     this.loadProfile();
   },
 
+  onReadingModeTap(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+
+    saveUserProfile({ readingMode: key });
+    this.loadProfile();
+  },
+
+  onFontScaleTap(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+
+    saveUserProfile({ fontScale: key });
+    this.loadProfile();
+  },
+
   onResetOnboarding() {
     resetOnboardingFlag();
 
     wx.showToast({
       title: "已重置欢迎引导",
       icon: "success"
+    });
+  },
+
+  onOpenOnboardingNow() {
+    wx.navigateTo({
+      url: "/pages/onboarding/onboarding"
     });
   }
 });
