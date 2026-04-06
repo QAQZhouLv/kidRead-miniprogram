@@ -51,7 +51,17 @@
 
 .nav-bell-on { border: 3rpx solid transparent; }
 .nav-bell-off { border: 3rpx solid rgba(130, 118, 98, 0.14); opacity: 0.76; }
-.nav-bell-image { width: 38rpx; height: 38rpx; }
+
+.nav-bell {
+  overflow: hidden;
+}
+
+.edit-close,
+.edit-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .page-content {
   padding-left: 24rpx;

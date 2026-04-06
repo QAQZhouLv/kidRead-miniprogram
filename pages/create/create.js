@@ -112,6 +112,9 @@ Page({
     keyboardVisible: false,
 
     openingPlayed: false,
+    
+    bellIconColor: "#ffffff",
+    bellOffIconColor: "#7a7062",
 
     messages: [
       decorateAssistantMessage({

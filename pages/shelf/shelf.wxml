@@ -12,7 +12,13 @@
           bindfocus="onSearchFocus"
           bindconfirm="onSearchConfirm"
         />
-        <view class="search-icon" bindtap="onTapSearchIcon">🔍</view>
+        <view class="search-icon" bindtap="onTapSearchIcon">
+          <svg-icon
+            name="search"
+            color="#7b8494"
+            size="28rpx"
+          />
+        </view>
       </view>
 
       <view
@@ -49,7 +55,11 @@
                   data-keyword="{{item}}"
                   bindtap="onDeleteHistoryItem"
                 >
-                  ×
+                  <svg-icon
+                    name="close"
+                    color="#a8b1bf"
+                    size="24rpx"
+                  />
                 </view>
               </view>
             </block>
@@ -84,7 +94,13 @@
                     themeIndex="{{item.themeIndex}}"
                     size="medium"
                   />
-                  <view wx:if="{{item.is_favorite}}" class="favorite-badge">❤</view>
+                  <view wx:if="{{item.is_favorite}}" class="favorite-badge">
+                    <svg-icon
+                      name="heart"
+                      color="#ffffff"
+                      size="20rpx"
+                    />
+                  </view>
                 </view>
 
                 <view class="book-title">{{item.displayTitle}}</view>
@@ -105,7 +121,13 @@
 
       <block wx:elif="{{stories.length === 0}}">
         <view class="empty-wrap">
-          <view class="empty-emoji">📚</view>
+          <view class="empty-emoji">
+            <svg-icon
+              name="book"
+              color="#7b8494"
+              size="72rpx"
+            />
+          </view>
           <view class="empty-title">书架里还没有故事</view>
           <view class="empty-desc">先去创作一个属于你的故事吧</view>
           <view class="empty-btn" bindtap="goCreate">去创作</view>

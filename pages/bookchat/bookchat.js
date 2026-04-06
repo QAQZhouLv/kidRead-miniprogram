@@ -110,7 +110,10 @@ Page({
     openingPlayed: false,
 
     keyboardVisible: false,
-    themeClass: 'theme-meadow'
+    themeClass: 'theme-meadow',
+
+    bellIconColor: "#ffffff",
+    bellOffIconColor: "#7a7062",
   },
 
   async onLoad(options) {

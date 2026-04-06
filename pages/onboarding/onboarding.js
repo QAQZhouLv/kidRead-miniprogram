@@ -1,6 +1,7 @@
 // const { getTheme, applyThemeChrome, normalizeThemeName } = require("../../utils/theme");
 const { getTheme, applyThemeChrome, normalizeThemeName, getThemeOptions } = require("../../utils/theme");
 const { getThemeDecor } = require("../../utils/theme-decor");
+const { saveUserProfile } = require("../../utils/user-profile");
 
 const ROW_HEIGHT_RPX = 86;
 const BASE_OFFSET_RPX = -ROW_HEIGHT_RPX;
@@ -217,36 +218,16 @@ Page({
     }, 200);
   },
 
-  // onStartJourney() {
-  //   const result = {
-  //     nickname: this.data.displayName,
-  //     age: this.data.selectedAge
-  //   };
-
-  //   wx.setStorageSync("onboardingDone", true);
-  //   wx.setStorageSync("userProfile", result);
-
-  //   wx.showToast({
-  //     title: "准备出发啦",
-  //     icon: "success"
-  //   });
-
-  //   console.log("onboarding result:", result);
-
-  //   wx.switchTab({
-  //     url: "/pages/shelf/shelf"
-  //   });
-  // },
-
   onStartJourney() {
     const result = {
       nickname: this.data.displayName,
       age: this.data.selectedAge,
-      theme: this.data.selectedTheme
+      themeName: this.data.selectedTheme,
+      hasSeenOnboarding: true,
+      profileReady: true
     };
   
-    wx.setStorageSync("onboardingDone", true);
-    wx.setStorageSync("userProfile", result);
+    saveUserProfile(result);
     wx.setStorageSync("kidread_theme", this.data.selectedTheme);
   
     wx.showToast({

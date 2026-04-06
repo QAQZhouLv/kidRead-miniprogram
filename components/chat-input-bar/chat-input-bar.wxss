@@ -36,14 +36,17 @@
 }
 
 .left-icon-btn { margin-right: 16rpx; }
-.right-icon-btn { margin-left: 16rpx; }
+.right-icon-btn { 
+  margin-left: 16rpx;
+  overflow: hidden;
+}
 
-.icon-text {
+/* .icon-text {
   font-size: 32rpx;
   font-weight: 700;
   line-height: 1;
   color: #61584b;
-}
+} */
 
 .text-input {
   flex: 1;

@@ -1,7 +1,11 @@
 <view class="input-bar-wrap">
   <view class="input-bar">
     <view class="left-icon-btn" bindtap="onMenuTap">
-      <text class="icon-text">☰</text>
+      <svg-icon
+        name="menu"
+        color="{{iconColor}}"
+        size="34rpx"
+      />
     </view>
 
     <block wx:if="{{mode === 'text'}}">
@@ -17,7 +21,11 @@
       />
 
       <view class="right-icon-btn" bindtap="switchToVoice">
-        <text class="icon-text">◉</text>
+        <svg-icon
+          name="mic"
+          color="{{iconColor}}"
+          size="34rpx"
+        />
       </view>
     </block>
 
@@ -42,7 +50,11 @@
       </view>
 
       <view class="right-icon-btn" bindtap="switchToText">
-        <text class="icon-text">⌨</text>
+        <svg-icon
+          name="keyboard"
+          color="{{iconColor}}"
+          size="34rpx"
+        />
       </view>
     </block>
   </view>

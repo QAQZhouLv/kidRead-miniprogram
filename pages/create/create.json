@@ -3,6 +3,7 @@
   "usingComponents": {
     "chat-input-bar": "/components/chat-input-bar/chat-input-bar",
     "session-drawer": "/components/session-drawer/session-drawer",
-    "message-card": "/components/message-card/message-card"
+    "message-card": "/components/message-card/message-card",
+    "svg-icon": "/components/svg-icon/svg-icon"
   }
 }

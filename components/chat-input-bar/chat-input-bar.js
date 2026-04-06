@@ -19,15 +19,16 @@ Component({
   },
 
   data: {
-    mode: "text", // text / voice
+    mode: "text",
     inputText: "",
     isRecording: false,
     streamClient: null,
-
-    // 新增
-    voiceDraftText: "",     // 当前这一轮语音实时识别
-    voiceBaseText: "",      // 开始录音前已有文本
-    pressActive: false      // 按钮下沉态
+  
+    voiceDraftText: "",
+    voiceBaseText: "",
+    pressActive: false,
+  
+    iconColor: "#61584b"
   },
 
   observers: {

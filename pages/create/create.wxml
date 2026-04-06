@@ -18,10 +18,10 @@
     <view class="nav-center">
       <view class="nav-title">故事创作</view>
       <view class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}" bindtap="onToggleAutoRead">
-        <image
-          class="nav-bell-image"
-          src="{{autoReadEnabled ? '/assets/icons/tts_on.png' : '/assets/icons/tts_off.png'}}"
-          mode="aspectFit"
+        <svg-icon
+          name="{{autoReadEnabled ? 'bell' : 'bell-off'}}"
+          color="{{autoReadEnabled ? bellIconColor : bellOffIconColor}}"
+          size="38rpx"
         />
       </view>
     </view>
@@ -91,12 +91,24 @@
     <view class="edit-panel">
       <view class="edit-header">
         <text class="edit-title">修改</text>
-        <view class="edit-close" bindtap="closeDraftEditor">×</view>
+        <view class="edit-close" bindtap="closeDraftEditor">
+          <svg-icon
+            name="close"
+            color="#7e7466"
+            size="30rpx"
+          />
+        </view>
       </view>
 
       <view class="edit-body">
         <input class="edit-input" value="{{editingText}}" bindinput="onEditInput" focus />
-        <view class="edit-confirm" bindtap="confirmDraftEdit">✓</view>
+        <view class="edit-confirm" bindtap="confirmDraftEdit">
+          <svg-icon
+            name="check"
+            color="#ffffff"
+            size="28rpx"
+          />
+        </view>
       </view>
     </view>
   </view>
