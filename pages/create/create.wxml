@@ -10,13 +10,13 @@
   bind:moresession="onMoreSession"
 />
 
-<view class="page">
+<view class="page {{themeClass}}">
 
   <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
     <view class="nav-side nav-side-left"></view>
 
     <view class="nav-center">
-      <view class="nav-title">KidRead</view>
+      <view class="nav-title">故事创作</view>
       <view class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}" bindtap="onToggleAutoRead">
         <image
           class="nav-bell-image"

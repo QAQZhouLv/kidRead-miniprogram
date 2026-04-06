@@ -7,7 +7,7 @@ function getDefaultUserProfile() {
     avatarUrl: "",
     avatarType: "default", // default | wechat
     age: 6,
-    themeName: "sky",
+    themeName: "meadow",
     autoReadEnabled: true,
     hasSeenOnboarding: false,
     readingMode: "day", // day | warm | night

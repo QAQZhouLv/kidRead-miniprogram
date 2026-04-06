@@ -1,131 +1,233 @@
-<view class="page onboarding-page {{themeClass}}">
-  <view class="sky-bg">
-    <view class="cloud cloud-1"></view>
-    <view class="cloud cloud-2"></view>
-    <view class="star star-1"></view>
-    <view class="star star-2"></view>
-    <view class="scribble scribble-1"></view>
-    <view class="scribble scribble-2"></view>
-    <view class="circle circle-1"></view>
-    <view class="circle circle-2"></view>
-  </view>
+<view class="page {{themeClass}}">
+  <!-- STEP 1 -->
+  <view wx:if="{{step === 1}}" class="panel panel-theme-bg">
+    <view class="skip-inside" bindtap="onSkipAll">跳过全部</view>
 
-  <view class="progress-row">
-    <view class="progress-dot {{step >= 0 ? 'active' : ''}}"></view>
-    <view class="progress-dot {{step >= 1 ? 'active' : ''}}"></view>
-    <view class="progress-dot {{step >= 2 ? 'active' : ''}}"></view>
-    <view class="progress-dot {{step >= 3 ? 'active' : ''}}"></view>
-    <view class="progress-dot {{step >= 4 ? 'active' : ''}}"></view>
-  </view>
+    <view class="frame"></view>
 
-  <view class="onboarding-card">
-    <block wx:if="{{step === 0}}">
-      <view class="hero-illustration">
-        <view class="doodle-house"></view>
-        <view class="doodle-book"></view>
-        <view class="doodle-pencil"></view>
+    <!-- 第一版装饰：先统一走 flower 结构，后面再替换成 ocean/candy/stars -->
+    <view class="corner-flower corner-tl">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
       </view>
+    </view>
 
-      <view class="title">欢迎来到故事的世界</view>
-      <view class="desc">在这里，你可以和慧童一起创作、阅读、冒险，还能把自己的想象变成一本真正的小书。</view>
+    <view class="corner-flower corner-tr">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
 
-      <view class="primary-btn" bindtap="nextStep">开始认识我吧</view>
-    </block>
+    <view class="corner-flower corner-bl">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
 
-    <block wx:elif="{{step === 1}}">
-      <view class="title">小朋友，你希望我怎么称呼你呀？</view>
-      <view class="desc">可以用微信昵称，也可以自己输入。拿不到也没关系，我们先叫你童童。</view>
+    <view class="corner-flower corner-br">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
 
-      <view class="input-wrap">
+    <view class="content content-center tap-area" bindtap="goStep2">
+      <view class="title title-main">欢迎来到故事的世界</view>
+      <view class="desc">
+        这里有好多好多想象力，等着和你一起<br />变成新的故事。
+      </view>
+      <view class="tip">轻点一下屏幕，继续下一页</view>
+    </view>
+  </view>
+
+  <!-- STEP 2 -->
+  <view wx:if="{{step === 2}}" class="panel panel-paper-bg">
+    <view class="skip-inside" bindtap="onSkipAll">跳过全部</view>
+
+    <view class="decor-cluster decor-step2">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
+
+    <view class="content content-center">
+      <view class="title title-paper">小朋友，<br />你希望我怎么称呼你呢？</view>
+
+      <view class="input-paper">
+        <view class="input-label">写下你喜欢的昵称</view>
         <input
-          class="text-input"
-          value="{{profile.nickname}}"
-          placeholder="请输入称呼"
+          class="name-input"
+          maxlength="12"
+          placeholder="比如：童童"
           placeholder-class="input-placeholder"
-          maxlength="20"
+          value="{{nickname}}"
           bindinput="onNicknameInput"
         />
+        <view class="helper">不填写也可以，我会先叫你“小朋友”。</view>
       </view>
 
       <view class="btn-row">
-        <view wx:if="{{canUseProfileApi}}" class="ghost-btn" bindtap="onGetWechatProfile">
-          使用微信昵称
+        <view class="btn btn-paper" bindtap="goStep3">下一步</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- STEP 3 -->
+  <view wx:if="{{step === 3}}" class="panel panel-accent-bg">
+    <view class="skip-inside" bindtap="onSkipAll">跳过全部</view>
+
+    <view class="decor-cluster decor-step3 flower-warm">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+        <view class="flower-center"></view>
+      </view>
+    </view>
+
+    <view class="content content-center">
+      <view class="title title-contrast">小朋友，你今年几岁啦？</view>
+
+      <view
+        class="age-wheel-wrap"
+        catchtouchstart="onAgeTouchStart"
+        catchtouchmove="onAgeTouchMove"
+        catchtouchend="onAgeTouchEnd"
+      >
+        <view
+          class="age-wheel-track {{trackAnimating ? 'age-wheel-track-anim' : ''}}"
+          style="transform: translateY({{trackTranslateRpx}}rpx);"
+        >
+          <view
+            wx:for="{{wheelAges}}"
+            wx:key="index"
+            class="age-row age-row-{{index}} {{item === '' ? 'age-row-empty' : ''}}"
+          >
+            {{item !== '' ? item + '岁' : ''}}
+          </view>
         </view>
       </view>
 
-      <view class="primary-btn" bindtap="confirmNickname">下一步</view>
-      <view class="link-btn" bindtap="prevStep">上一步</view>
-    </block>
+      <view class="age-hint">上下滑动来选择年龄</view>
 
-    <block wx:elif="{{step === 2}}">
-      <view class="title">小朋友今年几岁啦？</view>
-      <view class="desc">我会根据年龄，和你一起讲更适合你的故事。</view>
+      <view class="btn-row">
+        <view class="btn btn-primary" bindtap="goStep4">我选好了</view>
+      </view>
+    </view>
+  </view>
 
-      <view class="age-display">{{profile.age}} 岁</view>
+  <!-- STEP 4 -->
+  <view wx:if="{{step === 4}}" class="panel panel-paper-bg">
+    <view class="skip-inside" bindtap="onSkipAll">跳过全部</view>
 
-      <view class="age-picker-wrap">
-        <picker-view
-          class="age-picker"
-          indicator-style="height: 72rpx;"
-          value="{{[ageIndex]}}"
-          bindchange="onAgeChange"
+    <view class="decor-cluster decor-step2">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
+
+    <view class="content content-center">
+      <view class="title title-paper">选一个你喜欢的主题吧！</view>
+
+      <view class="theme-grid">
+        <view
+          wx:for="{{themeOptions}}"
+          wx:key="key"
+          class="theme-card {{selectedTheme === item.key ? 'theme-card-active' : ''}}"
+          data-theme="{{item.key}}"
+          bindtap="onSelectTheme"
         >
-          <picker-view-column>
-            <view wx:for="{{ageOptions}}" wx:key="*this" class="age-item">
-              {{item}} 岁
-            </view>
-          </picker-view-column>
-        </picker-view>
+          <view class="theme-dot theme-dot-{{item.key}}"></view>
+          <view class="theme-label">{{item.label}}</view>
+        </view>
       </view>
 
-      <view class="primary-btn" bindtap="nextStep">下一步</view>
-      <view class="link-btn" bindtap="prevStep">上一步</view>
-    </block>
+      <view class="btn-row">
+        <view class="btn btn-primary" bindtap="goStep5">下一步</view>
+      </view>
+    </view>
+  </view>
 
-    <block wx:elif="{{step === 3}}">
-      <view class="title">选一个你喜欢的颜色吧</view>
-      <view class="desc">这个颜色会成为 KidRead 的默认主题，也可以之后在“我的”里再修改。</view>
+  <!-- STEP 5 -->
+  <view wx:if="{{step === 5}}" class="panel panel-theme-bg">
+    <view class="frame"></view>
 
-      <view class="theme-preview-card">
-        <view class="preview-cover preview-cover-1"></view>
-        <view class="preview-cover preview-cover-2"></view>
-        <view class="preview-cover preview-cover-3"></view>
+    <view class="corner-flower corner-tl">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
+
+    <view class="corner-flower corner-tr">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
+
+    <view class="corner-flower corner-bl">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
+
+    <view class="corner-flower corner-br">
+      <view class="leaf leaf-main"></view>
+      <view class="leaf leaf-side"></view>
+      <view class="flower">
+        <view class="petal petal-top"></view>
+        <view class="petal petal-left"></view>
+        <view class="petal petal-right"></view>
+      </view>
+    </view>
+
+    <view class="content content-center">
+      <view class="title title-main">让我们开启接下来的旅程吧！</view>
+
+      <view class="finish-text">
+        你好呀，<text class="highlight">{{displayName}}</text><br />
+        今年 <text class="highlight">{{selectedAge}}</text> 岁，准备出发啦。
       </view>
 
-      <view class="theme-list">
-        <block wx:for="{{themeOptions}}" wx:key="key">
-          <view
-            class="theme-chip {{profile.themeName === item.key ? 'theme-chip-active' : ''}}"
-            data-key="{{item.key}}"
-            bindtap="onThemeTap"
-          >
-            {{item.label}}
-          </view>
-        </block>
+      <view class="btn-row">
+        <view class="btn btn-primary" bindtap="onStartJourney">开始旅程</view>
       </view>
-
-      <view class="primary-btn" bindtap="nextStep">下一步</view>
-      <view class="link-btn" bindtap="prevStep">上一步</view>
-    </block>
-
-    <block wx:else>
-      <view class="hero-illustration">
-        <view class="doodle-star-big"></view>
-      </view>
-
-      <view class="title">接下来，请开始我们的共创旅程吧</view>
-      <view class="desc">
-        你好，{{profile.nickname || '童童'}}。<text>{{profile.age}}</text> 岁的小小冒险家，现在就出发吧。
-      </view>
-
-      <view class="summary-card">
-        <view class="summary-row">称呼：{{profile.nickname || '童童'}}</view>
-        <view class="summary-row">年龄：{{profile.age}} 岁</view>
-        <view class="summary-row">主题：{{profile.themeName}}</view>
-      </view>
-
-      <view class="primary-btn" bindtap="completeOnboarding">进入 KidRead</view>
-      <view class="link-btn" bindtap="prevStep">上一步</view>
-    </block>
+    </view>
   </view>
 </view>

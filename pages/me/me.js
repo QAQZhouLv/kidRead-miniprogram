@@ -3,7 +3,7 @@ const {
   saveUserProfile,
   resetOnboardingFlag
 } = require("../../utils/user-profile");
-const { getThemeOptions, getTheme } = require("../../utils/theme");
+const { getThemeOptions, getTheme, applyThemeChrome } = require("../../utils/theme");
 
 Page({
   data: {
@@ -12,7 +12,7 @@ Page({
       avatarUrl: "",
       avatarType: "default",
       age: 6,
-      themeName: "sky",
+      themeName: "meadow",
       autoReadEnabled: true,
       hasSeenOnboarding: false,
       readingMode: "day",
@@ -32,7 +32,7 @@ Page({
       { key: "medium", label: "标准字" },
       { key: "large", label: "大号字" }
     ],
-    themeClass: "theme-sky"
+    themeClass: "theme-meadow"
   },
 
   onShow() {
@@ -41,7 +41,7 @@ Page({
 
   loadProfile() {
     const profile = getUserProfile();
-    const theme = getTheme(profile.themeName);
+    const theme = applyThemeChrome(profile.themeName);
   
     const nickname = profile.nickname && String(profile.nickname).trim()
       ? String(profile.nickname).trim()

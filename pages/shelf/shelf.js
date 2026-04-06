@@ -7,7 +7,7 @@ const {
 } = require("../../services/story");
 const { getBootstrapConfig } = require("../../services/app");
 const { getUserProfile } = require("../../utils/user-profile");
-const { getTheme } = require("../../utils/theme");
+const { getTheme, applyThemeChrome } = require("../../utils/theme");
 
 const SEARCH_HISTORY_KEY = "kidread_shelf_search_history";
 const RECENT_READ_KEY = "kidread_recent_reading_ids";
@@ -97,8 +97,8 @@ Page({
 
     hasCheckedOnboarding: false,
 
-    themeName: "sky",
-    themeClass: "theme-sky"
+    themeName: "meadow",
+    themeClass: "theme-meadow"
   },
 
   async onShow() {
@@ -121,7 +121,7 @@ Page({
 
   applyTheme() {
     const profile = getUserProfile();
-    const theme = getTheme(profile.themeName);
+    const theme = applyThemeChrome(profile.themeName);
 
     this.setData({
       themeName: theme.key,

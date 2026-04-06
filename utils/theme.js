@@ -1,41 +1,98 @@
 const THEME_MAP = {
-  sky: {
-    key: "sky",
-    label: "天空蓝",
-    pageClass: "theme-sky",
-    primary: "#7DB6FF",
-    secondary: "#9DD8FF",
-    soft: "#EAF5FF",
-    accent: "#5C94F5",
-    card: "#FFFFFF",
-    bg: "#F7FAFF"
+  meadow: {
+    key: "meadow",
+    label: "糖果草地",
+    pageClass: "theme-meadow",
+    primary: "#58B368",
+    secondary: "#A8E6A3",
+    accent: "#FF9F43",
+    warm: "#FFE66D",
+    bg: "#F3FBEF",
+    paper: "#FFFFFF",
+    text: "#2E5D3B",
+    navFrontColor: "#000000"
   },
-  peach: {
-    key: "peach",
-    label: "蜜桃粉",
-    pageClass: "theme-peach",
-    primary: "#FFB38A",
-    secondary: "#FFD1BA",
-    soft: "#FFF1E8",
-    accent: "#F28F5B",
-    card: "#FFFFFF",
-    bg: "#FFF8F4"
+  ocean: {
+    key: "ocean",
+    label: "晴空海洋",
+    pageClass: "theme-ocean",
+    primary: "#4DA6FF",
+    secondary: "#BFE4FF",
+    accent: "#FF7A59",
+    warm: "#FFD166",
+    bg: "#EAF6FF",
+    paper: "#FFFFFF",
+    text: "#2B4F73",
+    navFrontColor: "#000000"
   },
-  mint: {
-    key: "mint",
-    label: "薄荷绿",
-    pageClass: "theme-mint",
-    primary: "#78D7BE",
-    secondary: "#B6F0DF",
-    soft: "#EDFFF8",
-    accent: "#3CB89B",
-    card: "#FFFFFF",
-    bg: "#F6FFFB"
+  berry: {
+    key: "berry",
+    label: "莓果甜心",
+    pageClass: "theme-berry",
+    primary: "#FF6B81",
+    secondary: "#FFC2C7",
+    accent: "#7B6CF6",
+    warm: "#FFE66D",
+    bg: "#FFF1F3",
+    paper: "#FFFFFF",
+    text: "#6B2E3A",
+    navFrontColor: "#000000"
+  },
+  sunny: {
+    key: "sunny",
+    label: "阳光拼贴",
+    pageClass: "theme-sunny",
+    primary: "#FFC93C",
+    secondary: "#FFF3B0",
+    accent: "#FF6B4A",
+    warm: "#4D96FF",
+    bg: "#FFF9E6",
+    paper: "#FFFFFF",
+    text: "#6E4C1E",
+    navFrontColor: "#000000"
+  },
+  citrus: {
+    key: "citrus",
+    label: "橘子汽水",
+    pageClass: "theme-citrus",
+    primary: "#FF8C42",
+    secondary: "#FFD166",
+    accent: "#4D96FF",
+    warm: "#6EE7B7",
+    bg: "#FFF4E8",
+    paper: "#FFFFFF",
+    text: "#6A3B1A",
+    navFrontColor: "#000000"
+  },
+  dream: {
+    key: "dream",
+    label: "星空梦境",
+    pageClass: "theme-dream",
+    primary: "#8B7CF6",
+    secondary: "#D7D2FF",
+    accent: "#FF9BD2",
+    warm: "#FFE66D",
+    bg: "#F4F2FF",
+    paper: "#FFFFFF",
+    text: "#3D3A70",
+    navFrontColor: "#000000"
   }
 };
 
-function getTheme(themeName = "sky") {
-  return THEME_MAP[themeName] || THEME_MAP.sky;
+const LEGACY_THEME_ALIAS = {
+  sky: "ocean",
+  peach: "berry",
+  mint: "meadow",
+  lagoon: "meadow"
+};
+
+function normalizeThemeName(themeName = "meadow") {
+  return LEGACY_THEME_ALIAS[themeName] || themeName || "meadow";
+}
+
+function getTheme(themeName = "meadow") {
+  const normalized = normalizeThemeName(themeName);
+  return THEME_MAP[normalized] || THEME_MAP.meadow;
 }
 
 function getThemeOptions() {
@@ -45,8 +102,36 @@ function getThemeOptions() {
   }));
 }
 
+function applyThemeChrome(themeName = "meadow") {
+  const theme = getTheme(themeName);
+
+  try {
+    wx.setNavigationBarColor({
+      frontColor: theme.navFrontColor || "#000000",
+      backgroundColor: theme.paper
+    });
+  } catch (err) {
+    console.error("setNavigationBarColor error:", err);
+  }
+
+  try {
+    wx.setTabBarStyle({
+      color: "#8D836E",
+      selectedColor: theme.primary,
+      backgroundColor: theme.paper,
+      borderStyle: "white"
+    });
+  } catch (err) {
+    console.error("setTabBarStyle error:", err);
+  }
+
+  return theme;
+}
+
 module.exports = {
   THEME_MAP,
+  normalizeThemeName,
   getTheme,
-  getThemeOptions
+  getThemeOptions,
+  applyThemeChrome
 };

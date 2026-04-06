@@ -1,5 +1,7 @@
 const { getStoryDetail } = require("../../services/story");
 const { createTTSPlayer } = require("../../services/tts_player");
+const { getUserProfile } = require("../../utils/user-profile");
+const { applyThemeChrome } = require("../../utils/theme");
 
 function getNavMetrics() {
   const systemInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
@@ -46,11 +48,13 @@ Page({
     navTotalHeight: 64,
     controlsVisible: false,
     isReading: false,
-    contentParagraphs: []
+    contentParagraphs: [],
+    themeClass: 'theme-meadow'
   },
 
   onLoad(options) {
     this.setData(getNavMetrics());
+    this.applyTheme();
     this.ttsPlayer = createTTSPlayer();
     this.bindTtsCallbacks();
 
@@ -68,9 +72,16 @@ Page({
   },
 
   onShow() {
+    this.applyTheme();
     if (this.data.storyId) {
       this.loadStory();
     }
+  },
+
+  applyTheme() {
+    const profile = getUserProfile();
+    const theme = applyThemeChrome(profile.themeName);
+    this.setData({ themeClass: theme.pageClass });
   },
 
   onHide() {

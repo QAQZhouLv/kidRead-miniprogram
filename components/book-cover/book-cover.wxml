@@ -15,7 +15,7 @@
       <view class="fallback-deco deco-bottom"></view>
 
       <view class="fallback-inner">
-        <view class="fallback-label">KidRead</view>
+        <view class="fallback-label">慧童故事</view>
         <view class="fallback-title">{{title || '未命名故事'}}</view>
       </view>
 

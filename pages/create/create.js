@@ -3,6 +3,8 @@ const { getMessagesBySession } = require("../../services/message");
 const { createChatStream } = require("../../services/chat_stream");
 const { createTTSPlayer, splitTextToSentences } = require("../../services/tts_player");
 const { getCreateOpening } = require("../../services/opening");
+const { getUserProfile } = require("../../utils/user-profile");
+const { getTheme, applyThemeChrome } = require("../../utils/theme");
 const {
   createSession,
   getSession,
@@ -84,6 +86,7 @@ Page({
     age: 8,
     loading: false,
     autoReadEnabled: true,
+    themeClass: 'theme-meadow',
     playingMessageId: "",
     playingSection: "",
     playingSentenceIndex: -1,
@@ -125,6 +128,7 @@ Page({
 
   async onLoad() {
     this.initNavBar();
+    this.applyTheme();
     this.ttsPlayer = createTTSPlayer();
     this.bindTtsCallbacks();
     await this.loadSessions();
@@ -133,6 +137,20 @@ Page({
 
   initNavBar() {
     this.setData(getNavMetrics());
+  },
+
+  applyTheme() {
+    const profile = getUserProfile();
+    const theme = applyThemeChrome(profile.themeName);
+    this.setData({
+      age: profile.age || this.data.age,
+      autoReadEnabled: typeof profile.autoReadEnabled === 'boolean' ? profile.autoReadEnabled : true,
+      themeClass: theme.pageClass
+    });
+  },
+
+  onShow() {
+    this.applyTheme();
   },
 
   onHide() {

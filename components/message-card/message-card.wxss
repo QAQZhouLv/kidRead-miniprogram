@@ -1,6 +1,7 @@
+
 .msg-wrap {
   display: flex;
-  margin-bottom: 20rpx;
+  margin-bottom: 22rpx;
 }
 
 .user-wrap {
@@ -12,31 +13,32 @@
 }
 
 .user-bubble {
-  max-width: 70%;
-  background: #1677ff;
-  color: #fff;
-  border-radius: 20rpx;
-  padding: 16rpx 20rpx;
+  max-width: 74%;
+  background: #f2d98b;
+  color: #5f4b1d;
+  border-radius: 28rpx 28rpx 10rpx 28rpx;
+  padding: 18rpx 22rpx;
   font-size: 28rpx;
-  line-height: 1.6;
+  line-height: 1.72;
+  box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .assistant-card {
-  max-width: 86%;
-  background: #ffffff;
-  border-radius: 24rpx;
+  max-width: 88%;
+  background: rgba(255, 253, 246, 0.96);
+  border-radius: 30rpx;
   padding: 20rpx;
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .section-block {
-  border-radius: 18rpx;
-  padding: 8rpx 10rpx;
+  border-radius: 22rpx;
+  padding: 12rpx 14rpx;
   transition: all 0.2s ease;
 }
 
 .section-block + .section-block {
-  margin-top: 8rpx;
+  margin-top: 10rpx;
 }
 
 .section-block-enabled {
@@ -48,26 +50,30 @@
 }
 
 .section-block-playing {
-  background: #eef5ff;
-  border-color: #7fb0ff;
+  background: #fff7dc;
+  border-color: #efd05a;
 }
 
 .lead-block {
+  background: #f7f1e4;
   font-size: 26rpx;
-  color: #666;
+  color: #7c6f5d;
+  line-height: 1.76;
 }
 
 .guide-block {
+  background: #f5efe2;
   font-size: 26rpx;
-  color: #888;
+  color: #8b7d69;
+  line-height: 1.76;
 }
 
 .story-block {
-  background: #fff4d8;
+  background: #fff2c7;
   font-size: 30rpx;
   font-weight: 500;
   line-height: 1.95;
-  color: #222;
+  color: #3f382f;
 }
 
 .story-paragraph {
@@ -94,11 +100,11 @@
 }
 
 .story-sentence {
-  color: #222;
+  color: #3f382f;
 }
 
 .sentence-text-playing {
-  border-bottom-color: #5b8def;
+  border-bottom-color: #d7ab24;
 }
 
 .sentence {
@@ -106,12 +112,12 @@
 }
 
 .playing-sentence {
-  border-bottom: 4rpx dashed #5b8def;
+  border-bottom: 4rpx dashed #d7ab24;
 }
 
 .pending-text {
   font-size: 24rpx;
-  color: #aaa;
+  color: #aaa08e;
   margin-top: 8rpx;
 }
 
@@ -119,12 +125,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
-  margin-top: 12rpx;
+  margin-top: 14rpx;
 }
 
 .choice-btn {
-  background: #f0f0f0;
+  background: #fff8e6;
   border-radius: 999rpx;
+  border: 2rpx solid #f0db95;
   font-size: 24rpx;
-  padding: 8rpx 16rpx;
+  padding: 8rpx 18rpx;
+  color: #7a6034;
 }

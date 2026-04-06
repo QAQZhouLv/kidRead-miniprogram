@@ -1,3 +1,4 @@
+
 .input-bar-wrap {
   position: fixed;
   left: 0;
@@ -10,41 +11,38 @@
 }
 
 .input-bar {
-  background: #f4f4f4;
-  border-radius: 36rpx;
-  min-height: 96rpx;
-  padding: 0 24rpx;
+  min-height: 100rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 248, 236, 0.95);
   display: flex;
   align-items: center;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 14rpx 30rpx rgba(81, 67, 44, 0.08);
 }
 
 .left-icon-btn,
 .right-icon-btn {
-  width: 72rpx;
-  height: 72rpx;
+  width: 70rpx;
+  height: 70rpx;
   border-radius: 50%;
-  border: 4rpx solid #111;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #fff;
   box-sizing: border-box;
   flex-shrink: 0;
+  box-shadow: 0 8rpx 18rpx rgba(0,0,0,0.05);
 }
 
-.left-icon-btn {
-  margin-right: 20rpx;
-}
-
-.right-icon-btn {
-  margin-left: 20rpx;
-}
+.left-icon-btn { margin-right: 16rpx; }
+.right-icon-btn { margin-left: 16rpx; }
 
 .icon-text {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 700;
   line-height: 1;
+  color: #61584b;
 }
 
 .text-input {
@@ -52,32 +50,32 @@
   height: 96rpx;
   line-height: 96rpx;
   font-size: 28rpx;
-  color: #222;
+  color: #4f473a;
 }
 
 .voice-press-area {
   flex: 1;
-  height: 96rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30rpx;
-  color: #111;
-  font-weight: 600;
-  border-radius: 24rpx;
+  color: #5e5649;
+  font-weight: 700;
+  border-radius: 999rpx;
   transition: all 0.12s ease;
 }
 
 .voice-press-area-active {
   transform: translateY(4rpx) scale(0.985);
-  background: #ebebeb;
-  box-shadow: inset 0 6rpx 14rpx rgba(0, 0, 0, 0.08);
+  background: rgba(236, 229, 209, 0.95);
+  box-shadow: inset 0 6rpx 14rpx rgba(0, 0, 0, 0.06);
 }
 
 .voice-main-text {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #111;
+  font-weight: 700;
+  color: #5e5649;
 }
 
 .voice-anim-wrap {
@@ -91,7 +89,7 @@
   width: 14rpx;
   height: 14rpx;
   border-radius: 50%;
-  background: #bdbdbd;
+  background: #bcae98;
   animation: dotPulse 1s infinite ease-in-out;
   opacity: 0.35;
 }
@@ -101,12 +99,6 @@
 .dot3 { animation-delay: 0.4s; }
 
 @keyframes dotPulse {
-  0%, 80%, 100% {
-    opacity: 0.25;
-    transform: scale(0.9);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.18);
-  }
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.9); }
+  40% { opacity: 1; transform: scale(1.18); }
 }

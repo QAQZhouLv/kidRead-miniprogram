@@ -1,16 +1,43 @@
-/**app.wxss**/
+page {
+  background: #fdf8ec;
+  color: #3f3a31;
+  font-size: 28rpx;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
 .container {
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
   box-sizing: border-box;
-} 
+}
 
-page {
-  background: #f7f8fa;
-  color: #222;
-  font-size: 28rpx;
+.theme-meadow.page,
+.theme-meadow .page {
+  background: #ece6c9;
+}
+
+.theme-ocean.page,
+.theme-ocean .page {
+  background: #eae4cc;
+}
+
+.theme-berry.page,
+.theme-berry .page {
+  background: #f3dfd6;
+}
+
+.theme-sunny.page,
+.theme-sunny .page {
+  background: #f8e8d9;
+}
+
+.theme-citrus.page,
+.theme-citrus .page {
+  background: #f3e0c8;
+}
+
+.theme-lagoon.page,
+.theme-lagoon .page {
+  background: #e8e5cf;
 }

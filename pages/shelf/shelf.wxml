@@ -137,7 +137,7 @@
                 </view>
 
                 <view class="book-title">{{item.displayTitle}}</view>
-                <view class="book-sub">年龄 {{item.displayAge}}</view>
+                <!-- <view class="book-sub">年龄 {{item.displayAge}}</view> -->
               </view>
             </block>
           </view>
@@ -190,7 +190,7 @@
                   </view>
 
                   <view class="book-title">{{item.displayTitle}}</view>
-                  <view class="book-sub">年龄 {{item.displayAge}}</view>
+                  <!-- <view class="book-sub">年龄 {{item.displayAge}}</view> -->
                 </view>
               </block>
             </view>
@@ -220,7 +220,7 @@
                     </view>
 
                     <view class="book-title">{{item.displayTitle}}</view>
-                    <view class="book-sub">年龄 {{item.displayAge}}</view>
+                    <!-- <view class="book-sub">年龄 {{item.displayAge}}</view> -->
                   </view>
                 </block>
               </view>

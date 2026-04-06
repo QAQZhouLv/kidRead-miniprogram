@@ -17,7 +17,7 @@
 
     <view class="profile-main">
       <view class="profile-name">{{profile.nickname || '童童'}}</view>
-      <view class="profile-sub">{{profile.age}} 岁 · KidRead 小朋友</view>
+      <view class="profile-sub">{{profile.age}} 岁</view>
     </view>
   </view>
 
@@ -58,7 +58,7 @@
     </view>
 
     <view class="field-block">
-      <view class="field-label">主题色</view>
+      <view class="field-label">主题配色</view>
       <view class="theme-list">
         <block wx:for="{{themeOptions}}" wx:key="key">
           <view

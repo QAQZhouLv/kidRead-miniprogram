@@ -10,7 +10,7 @@
   bind:longpresssession="onLongPressSession"
 />
 
-<view class="page">
+<view class="page {{themeClass}}">
 
   <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
     <view class="nav-side nav-side-left">
@@ -36,7 +36,7 @@
       <view>
         <view class="book-title">{{story ? story.title : '书内聊天'}}</view>
         <view class="book-meta">
-          <text wx:if="{{story}}">年龄：{{story.age}}</text>
+          <!-- <text wx:if="{{story}}">年龄：{{story.age}}</text> -->
           <text style="margin-left:16rpx;">{{isHistorySession ? '历史会话' : '新会话'}}</text>
         </view>
       </view>

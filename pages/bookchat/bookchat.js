@@ -2,6 +2,8 @@ const { getStoryDetail, appendStory } = require("../../services/story");
 const { getMessagesBySession } = require("../../services/message");
 const { createChatStream } = require("../../services/chat_stream");
 const { createTTSPlayer, splitTextToSentences } = require("../../services/tts_player");
+const { getUserProfile } = require("../../utils/user-profile");
+const { applyThemeChrome } = require("../../utils/theme");
 const {
   createSession,
   getSession,
@@ -107,11 +109,13 @@ Page({
     editingText: "",
     openingPlayed: false,
 
-    keyboardVisible: false
+    keyboardVisible: false,
+    themeClass: 'theme-meadow'
   },
 
   async onLoad(options) {
     this.initNavBar();
+    this.applyTheme();
     this.ttsPlayer = createTTSPlayer();
     this.bindTtsCallbacks();
 
@@ -147,6 +151,19 @@ Page({
 
   initNavBar() {
     this.setData(getNavMetrics());
+  },
+
+  applyTheme() {
+    const profile = getUserProfile();
+    const theme = applyThemeChrome(profile.themeName);
+    this.setData({
+      autoReadEnabled: typeof profile.autoReadEnabled === 'boolean' ? profile.autoReadEnabled : true,
+      themeClass: theme.pageClass
+    });
+  },
+
+  onShow() {
+    this.applyTheme();
   },
 
   onTapNavBack() {

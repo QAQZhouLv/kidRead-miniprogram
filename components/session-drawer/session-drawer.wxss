@@ -1,7 +1,8 @@
+
 .drawer-mask {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(42, 31, 18, 0.18);
   z-index: 140;
 }
 
@@ -12,13 +13,14 @@
   bottom: 0;
   width: 78%;
   max-width: 640rpx;
-  background: #f6f6f6;
+  background: #fff8ec;
   z-index: 150;
   transform: translateX(0);
   display: flex;
   flex-direction: column;
   padding: 40rpx 24rpx 24rpx;
   box-sizing: border-box;
+  box-shadow: 24rpx 0 40rpx rgba(0,0,0,0.08);
 }
 
 .drawer-header {
@@ -27,9 +29,18 @@
   justify-content: space-between;
 }
 
+.drawer-header button {
+  margin: 0;
+  border-radius: 999rpx;
+  border: none;
+  background: #60AB70;
+  color: #fff;
+}
+
 .drawer-title {
   font-size: 38rpx;
   font-weight: 700;
+  color: #4f473a;
 }
 
 .drawer-list {
@@ -38,22 +49,23 @@
 }
 
 .drawer-empty {
-  color: #999;
+  color: #938775;
   padding: 20rpx 8rpx;
 }
 
 .drawer-item {
-  background: #ffffff;
-  border-radius: 20rpx;
+  background: rgba(255, 253, 246, 0.96);
+  border-radius: 24rpx;
   padding: 18rpx 20rpx;
   margin-bottom: 16rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.03);
 }
 
 .drawer-item-active {
-  border: 2rpx solid #1677ff;
+  border: 3rpx solid #60AB70;
 }
 
 .drawer-item-main {
@@ -64,29 +76,15 @@
 .drawer-item-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #222;
+  color: #4a4337;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.drawer-delete-btn {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
-  background: #f2f2f2;
-  color: #888;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 16rpx;
-  flex-shrink: 0;
-  font-size: 34rpx;
-}
-
 .drawer-group-title {
   font-size: 24rpx;
-  color: #888;
+  color: #8d816f;
   margin: 18rpx 8rpx 12rpx;
 }
 
@@ -94,8 +92,8 @@
   min-width: 56rpx;
   height: 48rpx;
   border-radius: 24rpx;
-  background: #f2f2f2;
-  color: #666;
+  background: #f4ecda;
+  color: #766b5c;
   display: flex;
   align-items: center;
   justify-content: center;

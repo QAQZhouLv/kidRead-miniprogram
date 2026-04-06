@@ -1,154 +1,286 @@
-const {
-  getUserProfile,
-  saveUserProfile,
-  markOnboardingSeen
-} = require("../../utils/user-profile");
-const { getTheme, getThemeOptions } = require("../../utils/theme");
+// const { getTheme, applyThemeChrome, normalizeThemeName } = require("../../utils/theme");
+const { getTheme, applyThemeChrome, normalizeThemeName, getThemeOptions } = require("../../utils/theme");
+const { getThemeDecor } = require("../../utils/theme-decor");
+
+const ROW_HEIGHT_RPX = 86;
+const BASE_OFFSET_RPX = -ROW_HEIGHT_RPX;
+const SWIPE_THRESHOLD_PX = 18;
 
 Page({
   data: {
-    step: 0, // 0 欢迎 1 昵称 2 年龄 3 主题 4 完成
-    profile: {
-      nickname: "童童",
-      avatarUrl: "",
-      avatarType: "default",
-      age: 6,
-      themeName: "sky",
-      autoReadEnabled: true,
-      readingMode: "day",
-      fontScale: "medium"
-    },
-    ageOptions: Array.from({ length: 12 }, (_, i) => i + 1),
-    ageIndex: 5,
-    canUseProfileApi: !!wx.getUserProfile,
-    themeOptions: getThemeOptions(),
-    themeClass: "theme-sky"
+    step: 1,
+    nickname: "",
+    displayName: "小朋友",
+
+    ageList: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    ageIndex: 2,
+    selectedAge: 5,
+
+    wheelAges: [],
+    trackTranslateRpx: BASE_OFFSET_RPX,
+    trackAnimating: false,
+
+    ageTouchStartY: 0,
+    ageTouchMoveY: 0,
+
+    themeName: "meadow",
+    themeClass: "theme-meadow",
+    decorType: "flowers",
+    theme: {},
+
+    themeOptions: [],
+    selectedTheme: "meadow"
   },
 
-  onLoad() {
-    const saved = getUserProfile();
-    const age = saved.age || 6;
-    const ageIndex = Math.max(0, Math.min(11, age - 1));
-    const theme = getTheme(saved.themeName || "sky");
+  onLoad(options = {}) {
+    this.rpxRatio = 750 / wx.getSystemInfoSync().windowWidth;
 
-    this.setData({
-      profile: {
-        nickname: saved.nickname || "童童",
-        avatarUrl: saved.avatarUrl || "",
-        avatarType: saved.avatarType || "default",
-        age,
-        themeName: saved.themeName || "sky",
-        autoReadEnabled: typeof saved.autoReadEnabled === "boolean" ? saved.autoReadEnabled : true,
-        readingMode: saved.readingMode || "day",
-        fontScale: saved.fontScale || "medium"
-      },
-      ageIndex,
-      themeClass: theme.pageClass
-    });
-  },
-
-  updateThemePreview(themeName) {
+    const savedTheme = wx.getStorageSync("kidread_theme") || "meadow";
+    
+    const incomingTheme = options.theme || savedTheme || "meadow";
+    const themeName = normalizeThemeName(incomingTheme);
     const theme = getTheme(themeName);
+    const decor = getThemeDecor(themeName);
+    const themeOptions = getThemeOptions();
+
+    applyThemeChrome(themeName);
+
     this.setData({
-      "profile.themeName": theme.key,
-      themeClass: theme.pageClass
+      themeName,
+      selectedTheme: themeName,
+      themeOptions,
+      themeClass: theme.pageClass,
+      decorType: decor.decorType,
+      theme
     });
-  },
 
-  nextStep() {
-    const next = Math.min(this.data.step + 1, 4);
-    this.setData({ step: next });
-  },
-
-  prevStep() {
-    const prev = Math.max(this.data.step - 1, 0);
-    this.setData({ step: prev });
+    this.refreshWheel();
   },
 
   onNicknameInput(e) {
+    const nickname = e.detail.value || "";
     this.setData({
-      "profile.nickname": e.detail.value || ""
+      nickname,
+      displayName: nickname.trim() || "小朋友"
     });
   },
 
-  onAgeChange(e) {
-    const ageIndex = Number(e.detail.value || 0);
-    const age = this.data.ageOptions[ageIndex] || 6;
-
+  syncPreview() {
+    const nickname = (this.data.nickname || "").trim();
     this.setData({
-      ageIndex,
-      "profile.age": age
+      displayName: nickname || "小朋友"
     });
   },
 
-  async onGetWechatProfile() {
-    if (!wx.getUserProfile) {
-      wx.showToast({
-        title: "当前环境不支持",
-        icon: "none"
+  goStep2() {
+    this.setData({ step: 2 });
+  },
+
+  goStep3() {
+    this.syncPreview();
+    this.setData({ step: 3 }, () => {
+      this.refreshWheel();
+    });
+  },
+
+  goStep4() {
+    this.syncPreview();
+    this.setData({ step: 4 });
+  },
+
+  goStep5() {
+    this.syncPreview();
+    this.setData({ step: 5 });
+  },
+
+  onSkipAll() {
+    this.syncPreview();
+    this.setData({ step: 5 });
+  },
+
+  buildWheelAges(ageIndex) {
+    const { ageList } = this.data;
+
+    const getAge = (idx) => {
+      if (idx < 0 || idx > ageList.length - 1) return "";
+      return ageList[idx];
+    };
+
+    return [
+      getAge(ageIndex - 2),
+      getAge(ageIndex - 1),
+      getAge(ageIndex),
+      getAge(ageIndex + 1),
+      getAge(ageIndex + 2)
+    ];
+  },
+
+  refreshWheel() {
+    const { ageIndex, ageList } = this.data;
+    this.setData({
+      selectedAge: ageList[ageIndex],
+      wheelAges: this.buildWheelAges(ageIndex),
+      trackTranslateRpx: BASE_OFFSET_RPX,
+      trackAnimating: false
+    });
+  },
+
+  setAgeIndex(nextIndex) {
+    const maxIndex = this.data.ageList.length - 1;
+    let ageIndex = nextIndex;
+
+    if (ageIndex < 0) ageIndex = 0;
+    if (ageIndex > maxIndex) ageIndex = maxIndex;
+
+    this.setData(
+      {
+        ageIndex
+      },
+      () => {
+        this.refreshWheel();
+      }
+    );
+  },
+
+  onAgeTouchStart(e) {
+    const y = e.touches[0].clientY;
+    this.setData({
+      ageTouchStartY: y,
+      ageTouchMoveY: y,
+      trackAnimating: false
+    });
+  },
+
+  onAgeTouchMove(e) {
+    const y = e.touches[0].clientY;
+    const deltaPx = y - this.data.ageTouchStartY;
+    let deltaRpx = deltaPx * this.rpxRatio * 0.55;
+
+    const maxMove = ROW_HEIGHT_RPX * 0.9;
+    if (deltaRpx > maxMove) deltaRpx = maxMove;
+    if (deltaRpx < -maxMove) deltaRpx = -maxMove;
+
+    this.setData({
+      ageTouchMoveY: y,
+      trackTranslateRpx: BASE_OFFSET_RPX + deltaRpx
+    });
+  },
+
+  onAgeTouchEnd() {
+    const { ageTouchStartY, ageTouchMoveY, ageIndex, ageList } = this.data;
+    const deltaY = ageTouchMoveY - ageTouchStartY;
+    const maxIndex = ageList.length - 1;
+
+    if (Math.abs(deltaY) < SWIPE_THRESHOLD_PX) {
+      this.setData({
+        trackAnimating: true,
+        trackTranslateRpx: BASE_OFFSET_RPX
       });
       return;
     }
 
-    try {
-      const res = await wx.getUserProfile({
-        desc: "用于设置你的昵称和头像"
-      });
+    if (deltaY < 0) {
+      if (ageIndex >= maxIndex) {
+        this.setData({
+          trackAnimating: true,
+          trackTranslateRpx: BASE_OFFSET_RPX
+        });
+        return;
+      }
 
-      const userInfo = res.userInfo || {};
       this.setData({
-        "profile.nickname": userInfo.nickName || this.data.profile.nickname || "童童",
-        "profile.avatarUrl": userInfo.avatarUrl || "",
-        "profile.avatarType": userInfo.avatarUrl ? "wechat" : "default"
+        trackAnimating: true,
+        trackTranslateRpx: BASE_OFFSET_RPX - ROW_HEIGHT_RPX
       });
-    } catch (err) {
-      console.error("getUserProfile error:", err);
+
+      setTimeout(() => {
+        this.setAgeIndex(ageIndex + 1);
+      }, 200);
+      return;
     }
-  },
 
-  confirmNickname() {
-    const nickname = (this.data.profile.nickname || "").trim() || "童童";
+    if (ageIndex <= 0) {
+      this.setData({
+        trackAnimating: true,
+        trackTranslateRpx: BASE_OFFSET_RPX
+      });
+      return;
+    }
+
     this.setData({
-      "profile.nickname": nickname
-    });
-    this.nextStep();
-  },
-
-  onThemeTap(e) {
-    const key = e.currentTarget.dataset.key;
-    if (!key) return;
-    this.updateThemePreview(key);
-  },
-
-  completeOnboarding() {
-    const profile = {
-      nickname: (this.data.profile.nickname || "").trim() || "童童",
-      avatarUrl: this.data.profile.avatarUrl || "",
-      avatarType: this.data.profile.avatarUrl ? "wechat" : "default",
-      age: this.data.profile.age || 6,
-      themeName: this.data.profile.themeName || "sky",
-      autoReadEnabled: true,
-      readingMode: "day",
-      fontScale: "medium"
-    };
-
-    saveUserProfile(profile);
-    markOnboardingSeen();
-
-    wx.showToast({
-      title: "欢迎来到故事世界",
-      icon: "success"
+      trackAnimating: true,
+      trackTranslateRpx: BASE_OFFSET_RPX + ROW_HEIGHT_RPX
     });
 
     setTimeout(() => {
-      const pages = getCurrentPages();
-      if (pages.length > 1) {
-        wx.navigateBack({ delta: 1 });
-      } else {
-        wx.switchTab({
-          url: "/pages/shelf/shelf"
-        });
-      }
-    }, 500);
-  }
+      this.setAgeIndex(ageIndex - 1);
+    }, 200);
+  },
+
+  // onStartJourney() {
+  //   const result = {
+  //     nickname: this.data.displayName,
+  //     age: this.data.selectedAge
+  //   };
+
+  //   wx.setStorageSync("onboardingDone", true);
+  //   wx.setStorageSync("userProfile", result);
+
+  //   wx.showToast({
+  //     title: "准备出发啦",
+  //     icon: "success"
+  //   });
+
+  //   console.log("onboarding result:", result);
+
+  //   wx.switchTab({
+  //     url: "/pages/shelf/shelf"
+  //   });
+  // },
+
+  onStartJourney() {
+    const result = {
+      nickname: this.data.displayName,
+      age: this.data.selectedAge,
+      theme: this.data.selectedTheme
+    };
+  
+    wx.setStorageSync("onboardingDone", true);
+    wx.setStorageSync("userProfile", result);
+    wx.setStorageSync("kidread_theme", this.data.selectedTheme);
+  
+    wx.showToast({
+      title: "准备出发啦",
+      icon: "success"
+    });
+  
+    console.log("onboarding result:", result);
+  
+    setTimeout(() => {
+      wx.switchTab({
+        url: "/pages/shelf/shelf"
+      });
+    }, 300);
+  },
+  
+  onSelectTheme(e) {
+    const themeName = e.currentTarget.dataset.theme;
+    if (!themeName) return;
+  
+    const normalized = normalizeThemeName(themeName);
+    const theme = getTheme(normalized);
+    const decor = getThemeDecor(normalized);
+  
+    applyThemeChrome(normalized);
+  
+    this.setData({
+      selectedTheme: normalized,
+      themeName: normalized,
+      themeClass: theme.pageClass,
+      decorType: decor.decorType,
+      theme
+    });
+  },
+
+
 });
