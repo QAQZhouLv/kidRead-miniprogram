@@ -4,7 +4,7 @@ const { createChatStream } = require("../../services/chat_stream");
 const { createTTSPlayer, splitTextToSentences } = require("../../services/tts_player");
 const { getCreateOpening } = require("../../services/opening");
 const { getUserProfile } = require("../../utils/user-profile");
-const { getTheme, applyThemeChrome } = require("../../utils/theme");
+const { applyThemeChrome } = require("../../utils/theme");
 const {
   createSession,
   getSession,
@@ -87,6 +87,7 @@ Page({
     loading: false,
     autoReadEnabled: true,
     themeClass: 'theme-meadow',
+    theme: applyThemeChrome('meadow'),
     playingMessageId: "",
     playingSection: "",
     playingSentenceIndex: -1,
@@ -112,9 +113,6 @@ Page({
     keyboardVisible: false,
 
     openingPlayed: false,
-    
-    bellIconColor: "#ffffff",
-    bellOffIconColor: "#7a7062",
 
     messages: [
       decorateAssistantMessage({
@@ -148,7 +146,8 @@ Page({
     this.setData({
       age: profile.age || this.data.age,
       autoReadEnabled: typeof profile.autoReadEnabled === 'boolean' ? profile.autoReadEnabled : true,
-      themeClass: theme.pageClass
+      themeClass: theme.pageClass,
+      theme
     });
   },
 

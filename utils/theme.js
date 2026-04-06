@@ -102,6 +102,30 @@ function getThemeOptions() {
   }));
 }
 
+function getThemeTokens(themeName = "meadow") {
+  const theme = getTheme(themeName);
+  return {
+    ...theme,
+    navSurface: "rgba(255, 248, 236, 0.92)",
+    cardSurface: "rgba(255, 248, 236, 0.88)",
+    cardSurfaceStrong: "rgba(255, 248, 236, 0.96)",
+    softBorder: "rgba(130, 118, 98, 0.14)",
+    dashedBorder: "rgba(130, 118, 98, 0.22)",
+    inputText: theme.text,
+    subtleText: theme.text,
+    mutedText: theme.key === "dream" ? "#8E86C7" : "#8C816F",
+    placeholderText: theme.key === "dream" ? "#AAA5D8" : "#B1B8C6",
+    inverseText: "#FFFFFF",
+    bellOnIcon: "#FFFFFF",
+    bellOffIcon: theme.text,
+    iconPrimary: theme.primary,
+    iconText: theme.text,
+    iconMuted: theme.key === "dream" ? "#AAA5D8" : "#A8B1BF",
+    searchBorder: theme.secondary,
+    emptyButtonGradient: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`
+  };
+}
+
 function applyThemeChrome(themeName = "meadow") {
   const theme = getTheme(themeName);
 
@@ -125,13 +149,14 @@ function applyThemeChrome(themeName = "meadow") {
     console.error("setTabBarStyle error:", err);
   }
 
-  return theme;
+  return getThemeTokens(themeName);
 }
 
 module.exports = {
   THEME_MAP,
   normalizeThemeName,
   getTheme,
+  getThemeTokens,
   getThemeOptions,
   applyThemeChrome
 };

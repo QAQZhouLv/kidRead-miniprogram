@@ -111,9 +111,7 @@ Page({
 
     keyboardVisible: false,
     themeClass: 'theme-meadow',
-
-    bellIconColor: "#ffffff",
-    bellOffIconColor: "#7a7062",
+    theme: applyThemeChrome('meadow')
   },
 
   async onLoad(options) {
@@ -161,7 +159,8 @@ Page({
     const theme = applyThemeChrome(profile.themeName);
     this.setData({
       autoReadEnabled: typeof profile.autoReadEnabled === 'boolean' ? profile.autoReadEnabled : true,
-      themeClass: theme.pageClass
+      themeClass: theme.pageClass,
+      theme
     });
   },
 

@@ -11,18 +11,21 @@
 />
 
 <view class="page {{themeClass}}">
-
-  <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
+  <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px; background: {{theme.navSurface}};">
     <view class="nav-side nav-side-left">
-      <view class="nav-back" bindtap="onTapNavBack">‹</view>
+      <view class="nav-back" bindtap="onTapNavBack" style="color: {{theme.text}};">‹</view>
     </view>
 
     <view class="nav-center">
-      <view class="nav-title">{{story ? story.title : '书内聊天'}}</view>
-      <view class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}" bindtap="onToggleAutoRead">
+      <view class="nav-title" style="color: {{theme.text}};">{{story ? story.title : '书内聊天'}}</view>
+      <view
+        class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}"
+        bindtap="onToggleAutoRead"
+        style="{{autoReadEnabled ? 'background:' + theme.primary + '; border-color: transparent;' : 'background:' + theme.paper + '; border-color:' + theme.softBorder + ';'}}"
+      >
         <svg-icon
           name="{{autoReadEnabled ? 'bell' : 'bell-off'}}"
-          color="{{autoReadEnabled ? bellIconColor : bellOffIconColor}}"
+          color="{{autoReadEnabled ? theme.bellOnIcon : theme.bellOffIcon}}"
           size="38rpx"
         />
       </view>
@@ -32,33 +35,32 @@
   </view>
 
   <view class="page-content" style="padding-top:{{navTotalHeight + 12}}px;">
-    <view class="page-header">
+    <view class="page-header" style="background: {{theme.cardSurface}};">
       <view>
-        <view class="book-title">{{story ? story.title : '书内聊天'}}</view>
-        <view class="book-meta">
-          <!-- <text wx:if="{{story}}">年龄：{{story.age}}</text> -->
+        <view class="book-title" style="color: {{theme.text}};">{{story ? story.title : '书内聊天'}}</view>
+        <view class="book-meta" style="color: {{theme.mutedText}};">
           <text style="margin-left:16rpx;">{{isHistorySession ? '历史会话' : '新会话'}}</text>
         </view>
       </view>
     </view>
 
     <block wx:if="{{story}}">
-      <view class="book-preview">
-        <view class="preview-title">当前正文</view>
+      <view class="book-preview" style="background: {{theme.cardSurface}};">
+        <view class="preview-title" style="color: {{theme.mutedText}};">当前正文</view>
         <scroll-view scroll-y class="preview-scroll">
           <view class="preview-scroll-inner">
-            <view class="preview-content">{{story.content}}</view>
+            <view class="preview-content" style="color: {{theme.text}};">{{story.content}}</view>
           </view>
         </scroll-view>
       </view>
     </block>
 
-    <view wx:if="{{sessionDraftSegments.length}}" class="draft-preview">
-      <view class="draft-title">本次续写草稿</view>
-      <view class="draft-content">{{sessionDraftText}}</view>
+    <view wx:if="{{sessionDraftSegments.length}}" class="draft-preview" style="background: {{theme.cardSurface}};">
+      <view class="draft-title" style="color: {{theme.mutedText}};">本次续写草稿</view>
+      <view class="draft-content" style="color: {{theme.text}};">{{sessionDraftText}}</view>
     </view>
 
-    <view class="chat-list">
+    <view class="chat-list" style="background: {{theme.cardSurface}};">
       <block wx:for="{{messages}}" wx:key="id">
         <message-card
           message="{{item}}"
@@ -76,17 +78,18 @@
   </view>
 
   <view wx:if="{{draftText}}" class="draft-bubble-wrap" bindtap="openDraftEditor">
-    <view class="draft-bubble">{{draftText}}</view>
+    <view class="draft-bubble" style="background: {{theme.cardSurfaceStrong}}; border-color: {{theme.dashedBorder}}; color: {{theme.text}};">{{draftText}}</view>
   </view>
 
   <view wx:if="{{hasUnsavedDraft && !keyboardVisible}}" class="archive-wrap">
-    <button class="archive-btn" bindtap="onArchiveSession">归档</button>
+    <button class="archive-btn" bindtap="onArchiveSession" style="background: {{theme.primary}};">归档</button>
   </view>
 
   <chat-input-bar
     loading="{{loading}}"
     value="{{draftText}}"
     placeholder="发消息或按住说话..."
+    theme="{{theme}}"
     bind:draftchange="onBarDraftChange"
     bind:send="onBarSend"
     bind:menu="onBarMenu"
@@ -95,26 +98,18 @@
   />
 
   <view wx:if="{{showEditPanel}}" class="edit-mask">
-    <view class="edit-panel">
+    <view class="edit-panel" style="background: {{theme.cardSurfaceStrong}};">
       <view class="edit-header">
-        <text class="edit-title">修改</text>
+        <text class="edit-title" style="color: {{theme.text}};">修改</text>
         <view class="edit-close" bindtap="closeDraftEditor">
-          <svg-icon
-            name="close"
-            color="#7e7466"
-            size="30rpx"
-          />
+          <svg-icon name="close" color="{{theme.iconMuted}}" size="30rpx" />
         </view>
       </view>
 
       <view class="edit-body">
-        <input class="edit-input" value="{{editingText}}" bindinput="onEditInput" focus />
-        <view class="edit-confirm" bindtap="confirmDraftEdit">
-          <svg-icon
-            name="check"
-            color="#ffffff"
-            size="28rpx"
-          />
+        <input class="edit-input" value="{{editingText}}" bindinput="onEditInput" focus style="color: {{theme.text}}; border-bottom-color: {{theme.softBorder}};" />
+        <view class="edit-confirm" bindtap="confirmDraftEdit" style="background: {{theme.primary}};">
+          <svg-icon name="check" color="{{theme.inverseText}}" size="28rpx" />
         </view>
       </view>
     </view>

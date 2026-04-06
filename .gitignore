@@ -1,5 +1,6 @@
 # 小程序
 project.private.config.json
+project.config.json
 
 # node
 node_modules/

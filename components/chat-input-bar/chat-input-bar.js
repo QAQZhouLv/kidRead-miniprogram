@@ -1,6 +1,29 @@
 const { createVoiceStream } = require("../../services/voice_stream");
+const { getThemeTokens } = require("../../utils/theme");
 
 const recorderManager = wx.getRecorderManager();
+
+function normalizeTheme(theme) {
+  if (!theme || typeof theme !== "object") {
+    return getThemeTokens("meadow");
+  }
+  return {
+    ...getThemeTokens(theme.key || "meadow"),
+    ...theme
+  };
+}
+
+function buildStyles(theme) {
+  return {
+    inputBarStyle: `background: ${theme.cardSurfaceStrong};`,
+    iconBtnStyle: `background: ${theme.paper};`,
+    inputStyle: `color: ${theme.inputText};`,
+    voiceTextStyle: `color: ${theme.subtleText};`,
+    activeVoiceStyle: `background: ${theme.secondary}; box-shadow: inset 0 6rpx 14rpx rgba(0, 0, 0, 0.06);`,
+    dotStyle: `background: ${theme.accent};`,
+    iconColor: theme.iconText
+  };
+}
 
 Component({
   properties: {
@@ -15,6 +38,10 @@ Component({
     value: {
       type: String,
       value: ""
+    },
+    theme: {
+      type: Object,
+      value: null
     }
   },
 
@@ -23,11 +50,15 @@ Component({
     inputText: "",
     isRecording: false,
     streamClient: null,
-  
     voiceDraftText: "",
     voiceBaseText: "",
     pressActive: false,
-  
+    inputBarStyle: "",
+    iconBtnStyle: "",
+    inputStyle: "",
+    voiceTextStyle: "",
+    activeVoiceStyle: "",
+    dotStyle: "",
     iconColor: "#61584b"
   },
 
@@ -36,11 +67,16 @@ Component({
       if (val !== this.data.inputText) {
         this.setData({ inputText: val || "" });
       }
+    },
+    theme(theme) {
+      this.applyTheme(theme);
     }
   },
 
   lifetimes: {
     attached() {
+      this.applyTheme(this.properties.theme);
+
       recorderManager.onFrameRecorded((res) => {
         if (!this.data.streamClient || !res.frameBuffer) return;
         this.data.streamClient.sendFrame(res.frameBuffer);
@@ -66,6 +102,11 @@ Component({
   },
 
   methods: {
+    applyTheme(themeInput) {
+      const theme = normalizeTheme(themeInput);
+      this.setData(buildStyles(theme));
+    },
+
     switchToText() {
       this.setData({ mode: "text" });
     },
@@ -83,7 +124,7 @@ Component({
     onInputFocus() {
       this.triggerEvent("focus");
     },
-    
+
     onInputBlur() {
       this.triggerEvent("blur");
     },
@@ -130,7 +171,6 @@ Component({
             this.setData({
               isRecording: false,
               pressActive: false,
-              // 关键：不切回 text，仍保留 voice 模式
               mode: "voice"
             });
           }

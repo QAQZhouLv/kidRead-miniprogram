@@ -1,7 +1,7 @@
 <view class="page {{themeClass}}">
   <view class="shelf-page">
     <view class="search-row">
-      <view class="search-box">
+      <view class="search-box" style="background: {{theme.cardSurfaceStrong}}; border-color: {{theme.searchBorder}};">
         <input
           class="search-input"
           placeholder="搜索书名"
@@ -11,13 +11,10 @@
           bindinput="onSearchInput"
           bindfocus="onSearchFocus"
           bindconfirm="onSearchConfirm"
+          style="color: {{theme.text}};"
         />
         <view class="search-icon" bindtap="onTapSearchIcon">
-          <svg-icon
-            name="search"
-            color="#7b8494"
-            size="28rpx"
-          />
+          <svg-icon name="search" color="{{theme.iconMuted}}" size="28rpx" />
         </view>
       </view>
 
@@ -25,16 +22,17 @@
         wx:if="{{showSearchPanel || keyword}}"
         class="search-cancel"
         bindtap="onCancelSearch"
+        style="color: {{theme.mutedText}};"
       >
         取消
       </view>
     </view>
 
-    <view wx:if="{{showSearchPanel}}" class="search-panel">
+    <view wx:if="{{showSearchPanel}}" class="search-panel" style="background: {{theme.cardSurfaceStrong}};">
       <block wx:if="{{!keyword}}">
         <view class="panel-header">
-          <view class="panel-title">搜索历史</view>
-          <view wx:if="{{searchHistory.length}}" class="panel-action" bindtap="onClearHistory">
+          <view class="panel-title" style="color: {{theme.text}};">搜索历史</view>
+          <view wx:if="{{searchHistory.length}}" class="panel-action" bindtap="onClearHistory" style="color: {{theme.mutedText}};">
             清空
           </view>
         </view>
@@ -47,6 +45,7 @@
                   class="history-keyword"
                   data-keyword="{{item}}"
                   bindtap="onUseHistoryKeyword"
+                  style="color: {{theme.text}};"
                 >
                   {{item}}
                 </view>
@@ -55,24 +54,20 @@
                   data-keyword="{{item}}"
                   bindtap="onDeleteHistoryItem"
                 >
-                  <svg-icon
-                    name="close"
-                    color="#a8b1bf"
-                    size="24rpx"
-                  />
+                  <svg-icon name="close" color="{{theme.iconMuted}}" size="24rpx" />
                 </view>
               </view>
             </block>
           </view>
         </block>
 
-        <view wx:else class="panel-empty">还没有搜索历史</view>
+        <view wx:else class="panel-empty" style="color: {{theme.mutedText}};">还没有搜索历史</view>
       </block>
 
       <block wx:else>
         <view class="panel-header">
-          <view class="panel-title">搜索结果</view>
-          <view class="panel-desc">共 {{filteredStories.length}} 本</view>
+          <view class="panel-title" style="color: {{theme.text}};">搜索结果</view>
+          <view class="panel-desc" style="color: {{theme.mutedText}};">共 {{filteredStories.length}} 本</view>
         </view>
 
         <block wx:if="{{filteredStories.length}}">
@@ -95,48 +90,40 @@
                     size="medium"
                   />
                   <view wx:if="{{item.is_favorite}}" class="favorite-badge">
-                    <svg-icon
-                      name="heart"
-                      color="#ffffff"
-                      size="20rpx"
-                    />
+                    <svg-icon name="heart" color="{{theme.accent}}" size="20rpx" />
                   </view>
                 </view>
 
-                <view class="book-title">{{item.displayTitle}}</view>
-                <view class="book-sub">{{item.displayDate}}</view>
+                <view class="book-title" style="color: {{theme.text}};">{{item.displayTitle}}</view>
+                <view class="book-sub" style="color: {{theme.mutedText}};">{{item.displayDate}}</view>
               </view>
             </block>
           </view>
         </block>
 
-        <view wx:else class="panel-empty">没有找到相关书籍</view>
+        <view wx:else class="panel-empty" style="color: {{theme.mutedText}};">没有找到相关书籍</view>
       </block>
     </view>
 
     <view wx:else class="shelf-main">
       <block wx:if="{{loading}}">
-        <view class="loading-text">书架加载中...</view>
+        <view class="loading-text" style="color: {{theme.mutedText}};">书架加载中...</view>
       </block>
 
       <block wx:elif="{{stories.length === 0}}">
-        <view class="empty-wrap">
+        <view class="empty-wrap" style="background: {{theme.cardSurfaceStrong}};">
           <view class="empty-emoji">
-            <svg-icon
-              name="book"
-              color="#7b8494"
-              size="72rpx"
-            />
+            <svg-icon name="book" color="{{theme.iconPrimary}}" size="72rpx" />
           </view>
-          <view class="empty-title">书架里还没有故事</view>
-          <view class="empty-desc">先去创作一个属于你的故事吧</view>
-          <view class="empty-btn" bindtap="goCreate">去创作</view>
+          <view class="empty-title" style="color: {{theme.text}};">书架里还没有故事</view>
+          <view class="empty-desc" style="color: {{theme.mutedText}};">先去创作一个属于你的故事吧</view>
+          <view class="empty-btn" bindtap="goCreate" style="background: {{theme.emptyButtonGradient}}; color: {{theme.inverseText}};">去创作</view>
         </view>
       </block>
 
       <block wx:else>
         <view wx:if="{{recentStories.length}}" class="section">
-          <view class="section-title">最近阅读</view>
+          <view class="section-title" style="color: {{theme.text}};">最近阅读</view>
           <view class="grid-list recent-grid">
             <block wx:for="{{recentStories}}" wx:key="id">
               <view
@@ -155,11 +142,12 @@
                     themeIndex="{{item.themeIndex}}"
                     size="medium"
                   />
-                  <view wx:if="{{item.is_favorite}}" class="favorite-badge">❤</view>
+                  <view wx:if="{{item.is_favorite}}" class="favorite-badge">
+                    <svg-icon name="heart" color="{{theme.accent}}" size="20rpx" />
+                  </view>
                 </view>
 
-                <view class="book-title">{{item.displayTitle}}</view>
-                <!-- <view class="book-sub">年龄 {{item.displayAge}}</view> -->
+                <view class="book-title" style="color: {{theme.text}};">{{item.displayTitle}}</view>
               </view>
             </block>
           </view>
@@ -172,6 +160,7 @@
                 class="tab-item {{activeTab === 'all' ? 'tab-item-active' : ''}}"
                 data-tab="all"
                 bindtap="onSwitchTab"
+                style="{{activeTab === 'all' ? 'background:' + theme.emptyButtonGradient + '; color:' + theme.inverseText + '; border-color: transparent;' : 'background:' + theme.cardSurfaceStrong + '; color:' + theme.mutedText + '; border-color:' + theme.searchBorder + ';'}}"
               >
                 全部书架
               </view>
@@ -179,12 +168,13 @@
                 class="tab-item {{activeTab === 'favorite' ? 'tab-item-active' : ''}}"
                 data-tab="favorite"
                 bindtap="onSwitchTab"
+                style="{{activeTab === 'favorite' ? 'background:' + theme.emptyButtonGradient + '; color:' + theme.inverseText + '; border-color: transparent;' : 'background:' + theme.cardSurfaceStrong + '; color:' + theme.mutedText + '; border-color:' + theme.searchBorder + ';'}}"
               >
                 喜欢
               </view>
             </view>
 
-            <view class="tab-count">
+            <view class="tab-count" style="color: {{theme.mutedText}};">
               {{activeTab === 'all' ? ('共 ' + stories.length + ' 本') : ('共 ' + favoriteStories.length + ' 本')}}
             </view>
           </view>
@@ -208,11 +198,12 @@
                       themeIndex="{{item.themeIndex}}"
                       size="medium"
                     />
-                    <view wx:if="{{item.is_favorite}}" class="favorite-badge">❤</view>
+                    <view wx:if="{{item.is_favorite}}" class="favorite-badge">
+                      <svg-icon name="heart" color="{{theme.accent}}" size="20rpx" />
+                    </view>
                   </view>
 
-                  <view class="book-title">{{item.displayTitle}}</view>
-                  <!-- <view class="book-sub">年龄 {{item.displayAge}}</view> -->
+                  <view class="book-title" style="color: {{theme.text}};">{{item.displayTitle}}</view>
                 </view>
               </block>
             </view>
@@ -238,88 +229,21 @@
                         themeIndex="{{item.themeIndex}}"
                         size="medium"
                       />
-                      <view wx:if="{{item.is_favorite}}" class="favorite-badge">❤</view>
+                      <view wx:if="{{item.is_favorite}}" class="favorite-badge">
+                        <svg-icon name="heart" color="{{theme.accent}}" size="20rpx" />
+                      </view>
                     </view>
 
-                    <view class="book-title">{{item.displayTitle}}</view>
-                    <!-- <view class="book-sub">年龄 {{item.displayAge}}</view> -->
+                    <view class="book-title" style="color: {{theme.text}};">{{item.displayTitle}}</view>
                   </view>
                 </block>
               </view>
             </block>
 
-            <view wx:else class="panel-empty">你还没有标记喜欢的书</view>
+            <view wx:else class="panel-empty" style="color: {{theme.mutedText}};">还没有喜欢的书</view>
           </block>
         </view>
       </block>
-    </view>
-  </view>
-
-  <!-- 自定义重命名弹窗 -->
-  <view wx:if="{{renameDialogVisible}}" class="rename-mask" catchtouchmove="true">
-    <view class="rename-dialog">
-      <view class="rename-title">给书换个名字</view>
-      <view class="rename-subtitle">换一个更贴合故事内容的书名吧</view>
-
-      <view class="rename-input-wrap">
-        <input
-          class="rename-input"
-          value="{{renameValue}}"
-          maxlength="30"
-          placeholder="请输入新的书名"
-          placeholder-class="rename-input-placeholder"
-          focus="{{renameDialogVisible}}"
-          bindinput="onRenameInput"
-        />
-      </view>
-
-      <view class="rename-tip">
-        原书名：{{renameOriginalTitle}}
-      </view>
-
-      <view class="rename-actions">
-        <view class="rename-btn rename-btn-cancel" bindtap="closeRenameDialog">
-          取消
-        </view>
-        <view class="rename-btn rename-btn-confirm" bindtap="submitRename">
-          {{submittingRename ? '保存中...' : '保存'}}
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 自定义操作菜单 -->
-  <view wx:if="{{actionSheetVisible}}" class="action-mask" catchtouchmove="true" bindtap="closeActionSheet">
-    <view class="action-sheet" catchtap="noop">
-      <view class="action-sheet-header">
-        <view class="action-sheet-title">{{actionSheetTitle}}</view>
-      </view>
-
-      <view class="action-list">
-        <view class="action-item" data-action="rename" bindtap="onActionTap">重命名</view>
-
-        <block wx:if="{{actionSource === 'recent'}}">
-          <view class="action-item" data-action="toggleFavorite" bindtap="onActionTap">
-            {{actionStory.is_favorite ? '取消喜欢' : '设为喜欢'}}
-          </view>
-          <view class="action-item" data-action="removeRecent" bindtap="onActionTap">移出最近阅读</view>
-          <view class="action-item action-item-danger" data-action="delete" bindtap="onActionTap">删除书籍</view>
-        </block>
-
-        <block wx:elif="{{actionSource === 'favorite'}}">
-          <view class="action-item" data-action="removeFavorite" bindtap="onActionTap">移出喜欢</view>
-          <view class="action-item action-item-danger" data-action="delete" bindtap="onActionTap">删除书籍</view>
-        </block>
-
-        <block wx:else>
-          <view class="action-item" data-action="toggleFavorite" bindtap="onActionTap">
-            {{actionStory.is_favorite ? '取消喜欢' : '设为喜欢'}}
-          </view>
-          <view class="action-item action-item-danger" data-action="delete" bindtap="onActionTap">删除书籍</view>
-        </block>
-      </view>
-
-      <view class="action-cancel" bindtap="closeActionSheet">取消</view>
     </view>
   </view>
 </view>

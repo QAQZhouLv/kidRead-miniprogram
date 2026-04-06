@@ -7,11 +7,7 @@ function buildSvgMarkup(icon, color) {
     .map((d) => `<path d="${d}" fill="${color}"></path>`)
     .join("");
 
-  return `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="${icon.viewBox}">
-      ${paths}
-    </svg>
-  `;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${icon.viewBox}">${paths}</svg>`;
 }
 
 function buildSvgDataUri(svgText) {
@@ -20,22 +16,10 @@ function buildSvgDataUri(svgText) {
 
 Component({
   properties: {
-    name: {
-      type: String,
-      value: ""
-    },
-    color: {
-      type: String,
-      value: "#444444"
-    },
-    size: {
-      type: String,
-      value: "36rpx"
-    },
-    extClass: {
-      type: String,
-      value: ""
-    }
+    name: { type: String, value: "" },
+    color: { type: String, value: "#444444" },
+    size: { type: String, value: "36rpx" },
+    extClass: { type: String, value: "" }
   },
 
   data: {
@@ -61,10 +45,8 @@ Component({
         this.setData({ iconSrc: "" });
         return;
       }
-
       const svg = buildSvgMarkup(icon, color || "#444444");
       const iconSrc = buildSvgDataUri(svg);
-
       this.setData({ iconSrc });
     }
   }
