@@ -25,7 +25,8 @@ function getSessions(params = {}) {
 
   return request({
     url,
-    method: "GET"
+    method: "GET",
+    timeout: 35000
   });
 }
 
@@ -33,7 +34,8 @@ function updateSessionDraft(sessionId, draft_content) {
   return request({
     url: `/api/sessions/${sessionId}/draft`,
     method: "PUT",
-    data: { draft_content }
+    data: { draft_content },
+    timeout: 35000
   });
 }
 

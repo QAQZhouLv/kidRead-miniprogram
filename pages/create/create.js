@@ -44,15 +44,21 @@ function getNavMetrics() {
 
 
 function buildStoryParagraphs(text = "") {
-  const normalized = String(text || "").replace(/\r/g, "").trim();
+  const normalized = String(text || "")
+    .replace(/\r/g, "")
+    .trim();
+
   if (!normalized) return [];
 
   const rawParagraphs = normalized
-    .split(/\n+/)
-    .map(item => item.trim())
+    .split(/\n\s*\n+/)
+    .map(item => item.replace(/\n/g, " ").trim())
     .filter(Boolean);
 
-  const paragraphs = rawParagraphs.length ? rawParagraphs : [normalized];
+  const paragraphs = rawParagraphs.length ? rawParagraphs : [
+    normalized.replace(/\n/g, " ").trim()
+  ];
+
   let globalIndex = 0;
 
   return paragraphs.map((paragraph) => {
@@ -160,6 +166,11 @@ Page({
   },
 
   onUnload() {
+    if (this._openingPlayTimer) {
+      clearTimeout(this._openingPlayTimer);
+      this._openingPlayTimer = null;
+    }
+  
     if (this.ttsPlayer) {
       this.ttsPlayer.destroy();
       this.ttsPlayer = null;
@@ -214,8 +225,10 @@ Page({
       wx.showToast({ title: "自动朗读已关闭", icon: "none" });
       return;
     }
-
+  
     if (!message || message.role !== "assistant") return;
+    if (!this.ttsPlayer || typeof this.ttsPlayer.playMessage !== "function") return;
+  
     await this.ttsPlayer.playMessage(message, startSection || "lead");
   },
 
@@ -235,11 +248,23 @@ Page({
     }
   },
 
-  onSectionTap(e) {
-    const { message, section } = e.detail || {};
-    this.playAssistantMessageFrom(message, section || "lead");
-  },
+  // onSectionTap(e) {
+  //   const { message, section } = e.detail || {};
+  //   this.playAssistantMessageFrom(message, section || "lead");
+  // },
+  // 修改，做点点点的适配
 
+  onSectionTap(e) {
+    const detail = e.detail || {};
+    const section = detail.section || "lead";
+    const message =
+      detail.message ||
+      (this.data.messages || []).find(item => item.id === detail.messageId);
+  
+    if (!message) return;
+    this.playAssistantMessageFrom(message, section);
+  },
+  
   buildSessionId() {
     return "create_" + Date.now();
   },
@@ -294,11 +319,17 @@ Page({
   playOpeningIfNeeded() {
     if (!this.data.autoReadEnabled) return;
     if (this.data.openingPlayed) return;
+  
     const firstAssistant = (this.data.messages || []).find(item => item.role === "assistant");
     if (!firstAssistant) return;
   
-    setTimeout(async () => {
+    if (this._openingPlayTimer) {
+      clearTimeout(this._openingPlayTimer);
+    }
+  
+    this._openingPlayTimer = setTimeout(async () => {
       try {
+        if (!this.ttsPlayer || typeof this.ttsPlayer.playMessage !== "function") return;
         await this.playAssistantMessageFrom(firstAssistant, "lead");
         this.setData({ openingPlayed: true });
       } catch (err) {
@@ -319,10 +350,25 @@ Page({
   async persistDraft() {
     const text = (this.data.draftText || "").trim();
     if (!text) return;
-
+  
     await this.ensureSessionIfNeeded();
-    await updateSessionDraft(this.data.sessionId, this.data.draftText || "");
-    await this.loadSessions();
+  
+    if (this._lastSavedDraft === text) return;
+    this._lastSavedDraft = text;
+  
+    try {
+      await updateSessionDraft(this.data.sessionId, text);
+    } catch (err) {
+      console.error("persistDraft save error:", err);
+      this._lastSavedDraft = null;
+      return;
+    }
+  
+    try {
+      this.loadSessions();
+    } catch (err) {
+      console.warn("persistDraft loadSessions warn:", err);
+    }
   },
 
   mapBackendMessagesToPageMessages(rows = []) {
@@ -472,10 +518,11 @@ Page({
   // },
 
   onChoiceTap(e) {
-    const text = e.detail.text;
+    const text = e.detail.text || e.detail.choice;
     if (!text || this.data.loading) return;
     this.sendMessage(text, "choice");
   },
+
 
   async onMoreSession(e) {
     const session = e.detail.session || {};
@@ -741,7 +788,14 @@ Page({
     this.setData({
       draftText: e.detail.text || ""
     });
-    this.persistDraft();
+  
+    if (this._draftTimer) {
+      clearTimeout(this._draftTimer);
+    }
+  
+    this._draftTimer = setTimeout(() => {
+      this.persistDraft();
+    }, 400);
   },
 
   onBarSend(e) {

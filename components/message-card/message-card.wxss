@@ -85,18 +85,23 @@
 
 
 .lead-text,
-.story-fallback,
+.story-fallback {
+  letter-spacing: 0;
+  word-spacing: 0;
+  display: block;
+}
+
 .sentence-text,
 .sentence {
   letter-spacing: 0;
   word-spacing: 0;
-  display: block;
 }
 
 .story-paragraph {
   margin-bottom: 20rpx;
   text-indent: 2em;
   line-height: 1.82;
+  word-break: break-word;
 }
 
 .story-paragraph:last-child {
@@ -107,12 +112,15 @@
   line-height: 1.82;
   white-space: pre-wrap;
   text-indent: 2em;
+  word-break: break-word;
 }
 
 .sentence-text {
   display: inline;
-  line-height: 1.8;
+  line-height: 1.82;
   border-bottom: 4rpx dashed transparent;
+  padding-bottom: 2rpx;
+  word-break: break-word;
 }
 
 .story-sentence {
@@ -124,11 +132,14 @@
 }
 
 .sentence {
+  display: inline;
   line-height: 1.8;
+  border-bottom: 4rpx dashed transparent;
+  padding-bottom: 2rpx;
 }
 
 .playing-sentence {
-  border-bottom: 4rpx dashed #d7ab24;
+  border-bottom-color: #d7ab24;
 }
 
 .pending-text {

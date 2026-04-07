@@ -82,7 +82,14 @@
   </view>
 
   <view wx:if="{{hasUnsavedDraft && !keyboardVisible}}" class="archive-wrap">
-    <button class="archive-btn" bindtap="onArchiveSession" style="background: {{theme.primary}};">归档</button>
+    <button
+      class="archive-btn"
+      bindtap="onArchiveSession"
+      disabled="{{archiving}}"
+      style="background: {{theme.primary}};"
+    >
+      {{archiving ? '归档中...' : '归档'}}
+    </button>
   </view>
 
   <chat-input-bar

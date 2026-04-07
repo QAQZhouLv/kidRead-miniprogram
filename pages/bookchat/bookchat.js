@@ -50,13 +50,17 @@ function buildStoryParagraphs(text = "") {
   if (!normalized) return [];
 
   const rawParagraphs = normalized
-    .split(/\n+/)
-    .map(item => item.trim())
+    .split(/\n\s*\n+/)
+    .map(item => item.replace(/\n/g, " ").trim())
     .filter(Boolean);
+
+  const paragraphs = rawParagraphs.length ? rawParagraphs : [
+    normalized.replace(/\n/g, " ").trim()
+  ];
 
   let globalIndex = 0;
 
-  return rawParagraphs.map((paragraph) => {
+  return paragraphs.map((paragraph) => {
     const sentences = splitTextToSentences(paragraph).map((sentence) => ({
       text: sentence,
       index: globalIndex++
@@ -104,6 +108,7 @@ Page({
     sessionDraftSegments: [],
     sessionDraftText: "",
     hasUnsavedDraft: false,
+    archiving: false,
 
     showEditPanel: false,
     editingText: "",
@@ -119,6 +124,7 @@ Page({
     this.applyTheme();
     this.ttsPlayer = createTTSPlayer();
     this.bindTtsCallbacks();
+    this._lastSavedDraft = null;
 
     const storyId = options.storyId;
     if (!storyId) {
@@ -257,8 +263,14 @@ Page({
   },
 
   onSectionTap(e) {
-    const { message, section } = e.detail || {};
-    this.playAssistantMessageFrom(message, section || "lead");
+    const detail = e.detail || {};
+    const section = detail.section || "lead";
+    const message =
+      detail.message ||
+      (this.data.messages || []).find(item => item.id === detail.messageId);
+  
+    if (!message) return;
+    this.playAssistantMessageFrom(message, section);
   },
 
   buildSessionId(storyId) {
@@ -604,7 +616,7 @@ Page({
   },
 
   onChoiceTap(e) {
-    const text = e.detail.text;
+    const text = e.detail.text || e.detail.choice;
     if (!text || this.data.loading) return;
     this.sendMessage(text, "choice");
   },
@@ -663,14 +675,24 @@ Page({
   async persistDraft() {
     const content = this.data.sessionDraftSegments.join("\n").trim();
     if (!content) return;
-
+  
     await this.ensureSessionIfNeeded();
-
+  
+    if (this._lastSavedDraft === content) return;
+    this._lastSavedDraft = content;
+  
     try {
       await updateSessionDraft(this.data.sessionId, content);
-      await this.loadSessions();
     } catch (err) {
-      console.error("updateSessionDraft error:", err);
+      console.error("persistDraft save error:", err);
+      this._lastSavedDraft = null;
+      return;
+    }
+  
+    try {
+      this.loadSessions();
+    } catch (err) {
+      console.warn("persistDraft loadSessions warn:", err);
     }
   },
 
@@ -846,26 +868,34 @@ Page({
       });
       return;
     }
-
+  
+    if (this.data.archiving) return;
+  
+    this.setData({ archiving: true });
+  
     try {
       await appendStory(this.data.storyId, content);
-
+  
       wx.showToast({
         title: "已写入本书",
         icon: "success"
       });
-
+  
       this.setData({
         sessionDraftSegments: [],
         sessionDraftText: "",
-        hasUnsavedDraft: false
+        hasUnsavedDraft: false,
+        archiving: false
       });
-
+  
       await updateSessionDraft(this.data.sessionId, "");
       await this.loadStory();
       await this.loadSessions();
     } catch (err) {
       console.error("appendStory error:", err);
+  
+      this.setData({ archiving: false });
+  
       wx.showToast({
         title: "写入失败",
         icon: "none"

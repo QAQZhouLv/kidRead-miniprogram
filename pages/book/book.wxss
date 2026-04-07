@@ -93,35 +93,38 @@
   width: 116rpx;
   height: 116rpx;
   border-radius: 58rpx;
-  color: #fff8ec;
+  color: #3f382f;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 38rpx;
   font-weight: 700;
+  letter-spacing: 2rpx;
+  border: 2rpx solid rgba(255, 248, 236, 0.72);
+  text-shadow: none;
   box-shadow: 0 14rpx 28rpx rgba(0, 0, 0, 0.12);
 }
 
 .theme-meadow .reader-action,
 .theme-meadow .chapter-title { background: transparent; color: #35553A; }
-.theme-meadow .reader-action { background: rgba(96, 171, 112, 0.9); }
+.theme-meadow .reader-action { background: rgba(96, 171, 112, 0.96); }
 
 .theme-ocean .reader-action,
 .theme-ocean .chapter-title { background: transparent; color: #2C5070; }
-.theme-ocean .reader-action { background: rgba(69, 131, 189, 0.9); }
+.theme-ocean .reader-action { background: rgba(69, 131, 189, 0.96); }
 
 .theme-berry .reader-action,
 .theme-berry .chapter-title { background: transparent; color: #70414A; }
-.theme-berry .reader-action { background: rgba(220, 104, 114, 0.9); }
+.theme-berry .reader-action { background: rgba(220, 104, 114, 0.96); }
 
 .theme-sunny .reader-action,
 .theme-sunny .chapter-title { background: transparent; color: #755331; }
-.theme-sunny .reader-action { background: rgba(233, 107, 77, 0.9); }
+.theme-sunny .reader-action { background: rgba(233, 107, 77, 0.96); }
 
 .theme-citrus .reader-action,
 .theme-citrus .chapter-title { background: transparent; color: #6D4728; }
-.theme-citrus .reader-action { background: rgba(242, 131, 62, 0.92); }
+.theme-citrus .reader-action { background: rgba(242, 131, 62, 0.97); }
 
 .theme-lagoon .reader-action,
 .theme-lagoon .chapter-title { background: transparent; color: #2F5E58; }
-.theme-lagoon .reader-action { background: rgba(98, 180, 165, 0.9); }
+.theme-lagoon .reader-action { background: rgba(98, 180, 165, 0.96); }

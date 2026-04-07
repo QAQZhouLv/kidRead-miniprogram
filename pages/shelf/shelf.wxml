@@ -250,4 +250,43 @@
       </block>
     </view>
   </view>
+
+  <view wx:if="{{renameDialogVisible}}" class="rename-mask" catchtap="closeRenameDialog">
+    <view class="rename-dialog" catchtap="noop" style="background: {{theme.cardSurfaceStrong}};">
+      <view class="rename-title" style="color: {{theme.text}};">重命名书籍</view>
+
+      <input
+        class="rename-input"
+        value="{{renameValue}}"
+        maxlength="20"
+        focus
+        placeholder="请输入新的书名"
+        placeholder-class="rename-placeholder"
+        bindinput="onRenameInput"
+        style="color: {{theme.text}}; border-color: {{theme.searchBorder}}; background: {{theme.paper || theme.cardSurface}};"
+      />
+
+      <view class="rename-original" style="color: {{theme.mutedText}};">
+        原书名：{{renameOriginalTitle}}
+      </view>
+
+      <view class="rename-actions">
+        <view
+          class="rename-btn rename-btn-cancel"
+          bindtap="closeRenameDialog"
+          style="background: {{theme.cardSurface}}; color: {{theme.mutedText}}; border-color: {{theme.searchBorder}};"
+        >
+          取消
+        </view>
+
+        <view
+          class="rename-btn rename-btn-confirm"
+          bindtap="submitRename"
+          style="background: {{theme.emptyButtonGradient}}; color: {{theme.inverseText}};"
+        >
+          {{submittingRename ? '保存中...' : '保存'}}
+        </view>
+      </view>
+    </view>
+  </view>
 </view>
