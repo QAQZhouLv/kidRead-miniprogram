@@ -703,8 +703,17 @@ Page({
   
       this.setData({
         createdStoryId: story.id,
-        archiving: false
+        archiving: false,
+        sessionDraftSegments: [],
+        sessionDraftText: "",
+        hasUnsavedDraft: false
       });
+      
+      try {
+        await updateSessionDraft(this.data.sessionId, "");
+      } catch (e) {
+        console.warn("clear create draft failed:", e);
+      }
   
       wx.hideLoading();
   

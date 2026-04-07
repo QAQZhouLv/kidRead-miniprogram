@@ -74,7 +74,7 @@ const THEME_MAP = {
     warm: "#FFE66D",
     bg: "#F4F2FF",
     paper: "#FFFFFF",
-    text: "#3D3A70",
+    text: "#34306D",
     navFrontColor: "#000000"
   }
 };
@@ -102,37 +102,89 @@ function getThemeOptions() {
   }));
 }
 
-function getThemeTokens(themeName = "meadow") {
-  const theme = getTheme(themeName);
+function getReadingModeTokens(mode = "day") {
+  if (mode === "warm") {
+    return {
+      paperTint: "#FFF8EC",
+      cardTint: "rgba(255, 248, 236, 0.96)",
+      strongCardTint: "rgba(255, 250, 242, 0.98)",
+      bodyBg: "#F6EAD7",
+      textBoost: "#5A4A37",
+      mutedBoost: "#8B7965"
+    };
+  }
+  if (mode === "night") {
+    return {
+      paperTint: "#F3F0EA",
+      cardTint: "rgba(245, 240, 232, 0.96)",
+      strongCardTint: "rgba(248, 244, 238, 0.98)",
+      bodyBg: "#E7DDCF",
+      textBoost: "#40362B",
+      mutedBoost: "#726455"
+    };
+  }
   return {
-    ...theme,
-    navSurface: "rgba(255, 248, 236, 0.92)",
-    cardSurface: "rgba(255, 248, 236, 0.88)",
-    cardSurfaceStrong: "rgba(255, 248, 236, 0.96)",
-    softBorder: "rgba(130, 118, 98, 0.14)",
-    dashedBorder: "rgba(130, 118, 98, 0.22)",
-    inputText: theme.text,
-    subtleText: theme.text,
-    mutedText: theme.key === "dream" ? "#8E86C7" : "#8C816F",
-    placeholderText: theme.key === "dream" ? "#AAA5D8" : "#B1B8C6",
-    inverseText: "#FFFFFF",
-    bellOnIcon: "#FFFFFF",
-    bellOffIcon: theme.text,
-    iconPrimary: theme.primary,
-    iconText: theme.text,
-    iconMuted: theme.key === "dream" ? "#AAA5D8" : "#A8B1BF",
-    searchBorder: theme.secondary,
-    emptyButtonGradient: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`
+    paperTint: null,
+    cardTint: null,
+    strongCardTint: null,
+    bodyBg: null,
+    textBoost: null,
+    mutedBoost: null
   };
 }
 
-function applyThemeChrome(themeName = "meadow") {
+function getFontScaleTokens(scale = "medium") {
+  if (scale === "small") {
+    return { textScale: 0.92, titleScale: 0.94 };
+  }
+  if (scale === "large") {
+    return { textScale: 1.08, titleScale: 1.06 };
+  }
+  return { textScale: 1, titleScale: 1 };
+}
+
+function getThemeTokens(themeName = "meadow", options = {}) {
   const theme = getTheme(themeName);
+  const reading = getReadingModeTokens(options.readingMode || "day");
+  const font = getFontScaleTokens(options.fontScale || "medium");
+
+  return {
+    ...theme,
+    navSurface: reading.strongCardTint || "rgba(255, 248, 236, 0.92)",
+    cardSurface: reading.cardTint || "rgba(255, 248, 236, 0.88)",
+    cardSurfaceStrong: reading.strongCardTint || "rgba(255, 248, 236, 0.96)",
+    softBorder: theme.key === "dream" ? "rgba(111, 102, 181, 0.24)" : "rgba(130, 118, 98, 0.14)",
+    dashedBorder: theme.key === "dream" ? "rgba(111, 102, 181, 0.34)" : "rgba(130, 118, 98, 0.22)",
+    inputText: reading.textBoost || theme.text,
+    subtleText: reading.textBoost || theme.text,
+    mutedText: reading.mutedBoost || (theme.key === "dream" ? "#7B74B5" : "#8C816F"),
+    placeholderText: theme.key === "dream" ? "#A19AD8" : "#B1B8C6",
+    inverseText: "#FFFFFF",
+    bellOnIcon: theme.primary,
+    bellOffIcon: theme.text,
+    iconPrimary: theme.primary,
+    iconText: theme.text,
+    iconMuted: theme.key === "dream" ? "#A19AD8" : "#A8B1BF",
+    searchBorder: theme.secondary,
+    emptyButtonGradient: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
+    bodyBackground: reading.bodyBg || theme.bg,
+    readingMode: options.readingMode || "day",
+    fontScale: options.fontScale || "medium",
+    textScale: font.textScale,
+    titleScale: font.titleScale,
+    sectionText: reading.textBoost || theme.text,
+    sectionStrongText: theme.key === "dream" ? "#2F2B5A" : "#40372E"
+  };
+}
+
+function applyThemeChrome(themeName = "meadow", options = {}) {
+  const theme = getTheme(themeName);
+  const tokens = getThemeTokens(themeName, options);
 
   try {
     wx.setNavigationBarColor({
       frontColor: theme.navFrontColor || "#000000",
-      backgroundColor: theme.paper
+      backgroundColor: tokens.cardSurfaceStrong || theme.paper
     });
   } catch (err) {
     console.error("setNavigationBarColor error:", err);
@@ -140,16 +192,16 @@ function applyThemeChrome(themeName = "meadow") {
 
   try {
     wx.setTabBarStyle({
-      color: "#8D836E",
+      color: theme.key === "dream" ? "#8176C9" : "#8D836E",
       selectedColor: theme.primary,
-      backgroundColor: theme.paper,
+      backgroundColor: tokens.cardSurfaceStrong || theme.paper,
       borderStyle: "white"
     });
   } catch (err) {
     console.error("setTabBarStyle error:", err);
   }
 
-  return getThemeTokens(themeName);
+  return tokens;
 }
 
 module.exports = {

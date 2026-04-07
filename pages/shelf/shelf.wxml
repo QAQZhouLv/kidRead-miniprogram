@@ -123,7 +123,11 @@
 
       <block wx:else>
         <view wx:if="{{recentStories.length}}" class="section">
-          <view class="section-title" style="color: {{theme.text}};">最近阅读</view>
+          <view class="tab-row recent-tab-row">
+            <view class="tab-left">
+              <view class="tab-item tab-item-static" style="background: {{theme.emptyButtonGradient}}; color: {{theme.inverseText}}; border-color: transparent;">最近阅读</view>
+            </view>
+          </view>
           <view class="grid-list recent-grid">
             <block wx:for="{{recentStories}}" wx:key="id">
               <view

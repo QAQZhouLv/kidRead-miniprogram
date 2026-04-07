@@ -1,5 +1,8 @@
-<view class="page me-page {{themeClass}}">
-  <view class="profile-card">
+<view
+  class="page me-page {{themeClass}} {{readingModeClass}} {{fontScaleClass}}"
+  style="background: {{theme.bodyBackground}};"
+>
+  <view class="profile-card" style="background: {{theme.cardSurface}};">
     <view class="profile-bubbles bubble-1"></view>
     <view class="profile-bubbles bubble-2"></view>
 
@@ -21,7 +24,7 @@
     </view>
   </view>
 
-  <view class="section-card">
+  <view class="section-card" style="background: {{theme.cardSurface}};">
     <view class="section-title">个人资料</view>
 
     <view class="field-block">
@@ -32,6 +35,7 @@
         maxlength="20"
         placeholder="请输入称呼"
         bindinput="onNicknameInput"
+        style="background: {{theme.cardSurfaceStrong}}; color: {{theme.text}};"
       />
       <view class="save-btn" bindtap="saveNickname">保存称呼</view>
     </view>
@@ -44,17 +48,26 @@
         value="{{profile.age - 1}}"
         bindchange="onAgeChange"
       >
-        <view class="picker-display">{{profile.age}} 岁</view>
+        <view
+          class="picker-display"
+          style="background: {{theme.cardSurfaceStrong}}; color: {{theme.text}};"
+        >
+          {{profile.age}} 岁
+        </view>
       </picker>
     </view>
   </view>
 
-  <view class="section-card">
+  <view class="section-card" style="background: {{theme.cardSurface}};">
     <view class="section-title">阅读与互动</view>
 
     <view class="setting-row">
       <view class="setting-label">自动朗读</view>
-      <switch checked="{{profile.autoReadEnabled}}" bindchange="onAutoReadChange" />
+      <switch
+        checked="{{profile.autoReadEnabled}}"
+        bindchange="onAutoReadChange"
+        color="{{theme.primary}}"
+      />
     </view>
 
     <view class="field-block">
@@ -103,9 +116,8 @@
     </view>
   </view>
 
-  <view class="section-card">
+  <view class="section-card" style="background: {{theme.cardSurface}};">
     <view class="section-title">帮助与系统</view>
-
     <view class="action-btn" bindtap="onOpenOnboardingNow">再看一次欢迎引导</view>
     <view class="action-btn action-btn-soft" bindtap="onResetOnboarding">重置首次进入状态</view>
   </view>

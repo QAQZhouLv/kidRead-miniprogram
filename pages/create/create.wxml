@@ -17,9 +17,8 @@
     <view class="nav-center">
       <view class="nav-title" style="color: {{theme.text}};">故事创作</view>
       <view
-        class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}"
+        class="nav-bell nav-bell-static"
         bindtap="onToggleAutoRead"
-        style="{{autoReadEnabled ? 'background:' + theme.primary + '; border-color: transparent;' : 'background:' + theme.paper + '; border-color:' + theme.softBorder + ';'}}"
       >
         <svg-icon
           name="{{autoReadEnabled ? 'bell' : 'bell-off'}}"
@@ -33,21 +32,7 @@
   </view>
 
   <view class="page-content" style="padding-top:{{navTotalHeight + 12}}px;">
-    <view class="page-header" style="background: {{theme.cardSurface}};">
-      <view>
-        <view class="page-title" style="color: {{theme.text}};">创作故事</view>
-        <view class="page-subtitle" style="color: {{theme.mutedText}};">和慧童一起边写边读</view>
-      </view>
-    </view>
-
-    <view class="top-bar" style="background: {{theme.cardSurface}};">
-      <view class="age-box" style="background: {{theme.paper}}; color: {{theme.mutedText}};">
-        <text>年龄：</text>
-        <input class="age-input" type="number" value="{{age}}" disabled style="color: {{theme.text}};" />
-      </view>
-    </view>
-
-    <view class="chat-list" style="background: {{theme.cardSurface}};">
+    <view class="chat-list chat-list-top" style="background: {{theme.cardSurface}};">
       <block wx:for="{{messages}}" wx:key="id">
         <message-card
           message="{{item}}"

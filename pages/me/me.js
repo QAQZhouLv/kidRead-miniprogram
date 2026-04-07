@@ -3,7 +3,7 @@ const {
   saveUserProfile,
   resetOnboardingFlag
 } = require("../../utils/user-profile");
-const { getThemeOptions, getTheme, applyThemeChrome } = require("../../utils/theme");
+const { getThemeOptions, applyThemeChrome } = require("../../utils/theme");
 
 Page({
   data: {
@@ -17,8 +17,7 @@ Page({
       hasSeenOnboarding: false,
       readingMode: "day",
       fontScale: "medium",
-
-      avatarText: "童"  
+      avatarText: "童"
     },
     themeOptions: getThemeOptions(),
     ageOptions: Array.from({ length: 12 }, (_, i) => i + 1),
@@ -32,7 +31,10 @@ Page({
       { key: "medium", label: "标准字" },
       { key: "large", label: "大号字" }
     ],
-    themeClass: "theme-meadow"
+    themeClass: "theme-meadow",
+    theme: applyThemeChrome("meadow"),
+    readingModeClass: "mode-day",
+    fontScaleClass: "font-medium"
   },
 
   onShow() {
@@ -41,19 +43,26 @@ Page({
 
   loadProfile() {
     const profile = getUserProfile();
-    const theme = applyThemeChrome(profile.themeName);
-  
-    const nickname = profile.nickname && String(profile.nickname).trim()
-      ? String(profile.nickname).trim()
-      : "童童";
-  
+    const theme = applyThemeChrome(profile.themeName, {
+      readingMode: profile.readingMode,
+      fontScale: profile.fontScale
+    });
+
+    const nickname =
+      profile.nickname && String(profile.nickname).trim()
+        ? String(profile.nickname).trim()
+        : "童童";
+
     this.setData({
       profile: {
         ...profile,
         nickname,
         avatarText: nickname.slice(0, 1)
       },
-      themeClass: theme.pageClass
+      themeClass: theme.pageClass,
+      theme,
+      readingModeClass: `mode-${profile.readingMode || "day"}`,
+      fontScaleClass: `font-${profile.fontScale || "medium"}`
     });
   },
 
@@ -67,7 +76,6 @@ Page({
     const nickname = (this.data.profile.nickname || "").trim() || "童童";
     saveUserProfile({ nickname });
     this.loadProfile();
-
     wx.showToast({
       title: "称呼已保存",
       icon: "success"

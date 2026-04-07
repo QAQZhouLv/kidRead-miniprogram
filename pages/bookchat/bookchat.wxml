@@ -21,7 +21,7 @@
       <view
         class="nav-bell {{autoReadEnabled ? 'nav-bell-on' : 'nav-bell-off'}}"
         bindtap="onToggleAutoRead"
-        style="{{autoReadEnabled ? 'background:' + theme.primary + '; border-color: transparent;' : 'background:' + theme.paper + '; border-color:' + theme.softBorder + ';'}}"
+        style="background: transparent; border-color: transparent;"
       >
         <svg-icon
           name="{{autoReadEnabled ? 'bell' : 'bell-off'}}"

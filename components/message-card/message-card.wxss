@@ -1,4 +1,3 @@
-
 .msg-wrap {
   display: flex;
   margin-bottom: 22rpx;
@@ -27,14 +26,16 @@
   max-width: 88%;
   background: rgba(255, 253, 246, 0.96);
   border-radius: 30rpx;
-  padding: 20rpx;
+  padding: 18rpx;
   box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
 .section-block {
   border-radius: 22rpx;
-  padding: 12rpx 14rpx;
+  padding: 14rpx 16rpx;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .section-block + .section-block {
@@ -56,30 +57,46 @@
 
 .lead-block {
   background: #f7f1e4;
-  font-size: 26rpx;
   color: #7c6f5d;
-  line-height: 1.76;
+  font-size: 26rpx;
+  line-height: 1.7;
+  padding-top: 14rpx;
+  padding-bottom: 14rpx;
 }
 
 .guide-block {
   background: #f5efe2;
+  color: #7c6f5d;
   font-size: 26rpx;
-  color: #8b7d69;
-  line-height: 1.76;
+  line-height: 1.7;
+  padding-top: 14rpx;
+  padding-bottom: 14rpx;
 }
 
 .story-block {
   background: #fff2c7;
   font-size: 30rpx;
   font-weight: 500;
-  line-height: 1.95;
+  line-height: 1.82;
   color: #3f382f;
+  padding-top: 16rpx;
+  padding-bottom: 16rpx;
+}
+
+
+.lead-text,
+.story-fallback,
+.sentence-text,
+.sentence {
+  letter-spacing: 0;
+  word-spacing: 0;
+  display: block;
 }
 
 .story-paragraph {
-  margin-bottom: 22rpx;
+  margin-bottom: 20rpx;
   text-indent: 2em;
-  line-height: 1.95;
+  line-height: 1.82;
 }
 
 .story-paragraph:last-child {
@@ -87,15 +104,14 @@
 }
 
 .story-fallback {
-  display: block;
-  line-height: 1.95;
+  line-height: 1.82;
   white-space: pre-wrap;
   text-indent: 2em;
 }
 
 .sentence-text {
   display: inline;
-  line-height: 1.85;
+  line-height: 1.8;
   border-bottom: 4rpx dashed transparent;
 }
 

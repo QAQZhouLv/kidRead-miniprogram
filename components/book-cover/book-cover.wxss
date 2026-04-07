@@ -39,13 +39,12 @@
   height: 100%;
   padding: 20rpx 18rpx 18rpx;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 .fallback-label {
-  align-self: flex-start;
+  position: absolute;
+  left: 18rpx;
+  top: 20rpx;
   max-width: 100%;
   padding: 6rpx 14rpx;
   border-radius: 999rpx;
@@ -56,10 +55,16 @@
 }
 
 .fallback-title {
+  position: absolute;
+  left: 18rpx;
+  right: 18rpx;
+  top: 50%;
+  transform: translateY(-44%);
   color: #ffffff;
   font-size: 28rpx;
   line-height: 1.45;
   font-weight: 700;
+  text-align: center;
   text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.18);
 
   display: -webkit-box;
@@ -73,7 +78,14 @@
   padding: 16rpx 14rpx;
 }
 
+.small .fallback-label {
+  left: 14rpx;
+  top: 16rpx;
+}
+
 .small .fallback-title {
+  left: 14rpx;
+  right: 14rpx;
   font-size: 24rpx;
   -webkit-line-clamp: 3;
 }

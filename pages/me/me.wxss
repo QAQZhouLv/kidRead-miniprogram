@@ -1,3 +1,4 @@
+page,
 .page {
   min-height: 100vh;
 }
@@ -5,11 +6,11 @@
 .me-page {
   padding: 24rpx;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .profile-card,
 .section-card {
-  background: rgba(255, 248, 236, 0.9);
   border-radius: 34rpx;
   box-shadow: 0 14rpx 34rpx rgba(81, 67, 44, 0.06);
 }
@@ -29,10 +30,19 @@
   background: rgba(255, 255, 255, 0.42);
 }
 
-.bubble-1 { width: 160rpx; height: 160rpx; top: -30rpx; right: -20rpx; }
-.bubble-2 { width: 100rpx; height: 100rpx; bottom: -20rpx; right: 120rpx; }
+.bubble-1 {
+  width: 160rpx;
+  height: 160rpx;
+  top: -30rpx;
+  right: -20rpx;
+}
 
-.avatar-wrap { flex-shrink: 0; position: relative; z-index: 2; }
+.bubble-2 {
+  width: 100rpx;
+  height: 100rpx;
+  bottom: -20rpx;
+  right: 120rpx;
+}
 
 .avatar,
 .avatar-default {
@@ -81,7 +91,9 @@
   margin-bottom: 18rpx;
 }
 
-.field-block { margin-top: 18rpx; }
+.field-block {
+  margin-top: 18rpx;
+}
 
 .field-label,
 .setting-label {
@@ -94,7 +106,6 @@
   margin-top: 12rpx;
   min-height: 82rpx;
   border-radius: 24rpx;
-  background: rgba(255, 253, 246, 0.95);
   padding: 0 20rpx;
   box-sizing: border-box;
   display: flex;
@@ -108,7 +119,7 @@
   margin-top: 16rpx;
   height: 82rpx;
   border-radius: 999rpx;
-  color: #ffffff;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,48 +152,106 @@
 .mode-chip {
   padding: 16rpx 22rpx;
   border-radius: 999rpx;
-  background: rgba(255,253,246,0.95);
+  background: rgba(255, 253, 246, 0.96);
   color: #74695b;
   font-size: 24rpx;
+  border: 2rpx solid transparent;
 }
 
 .theme-chip-active,
 .mode-chip-active {
-  color: #ffffff;
+  color: #fff;
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.font-small .profile-name {
+  font-size: 34rpx;
+}
+
+.font-small .field-input,
+.font-small .picker-display {
+  font-size: 26rpx;
+}
+
+.font-small .theme-chip,
+.font-small .mode-chip {
+  font-size: 22rpx;
+}
+
+.font-large .profile-name {
+  font-size: 40rpx;
+}
+
+.font-large .field-input,
+.font-large .picker-display {
+  font-size: 32rpx;
+}
+
+.font-large .theme-chip,
+.font-large .mode-chip {
+  font-size: 28rpx;
+}
+
+.mode-warm .section-card,
+.mode-warm .profile-card {
+  box-shadow: 0 14rpx 34rpx rgba(113, 88, 44, 0.06);
+}
+
+.mode-night .section-card,
+.mode-night .profile-card {
+  box-shadow: 0 14rpx 34rpx rgba(65, 56, 42, 0.08);
 }
 
 .theme-meadow .avatar-default,
 .theme-meadow .save-btn,
 .theme-meadow .action-btn,
 .theme-meadow .theme-chip-active,
-.theme-meadow .mode-chip-active { background: #60AB70; }
+.theme-meadow .mode-chip-active {
+  background: #60AB70;
+  border-color: #60AB70;
+}
 
 .theme-ocean .avatar-default,
 .theme-ocean .save-btn,
 .theme-ocean .action-btn,
 .theme-ocean .theme-chip-active,
-.theme-ocean .mode-chip-active { background: #4583BD; }
+.theme-ocean .mode-chip-active {
+  background: #4583BD;
+  border-color: #4583BD;
+}
 
 .theme-berry .avatar-default,
 .theme-berry .save-btn,
 .theme-berry .action-btn,
 .theme-berry .theme-chip-active,
-.theme-berry .mode-chip-active { background: #DC6872; }
+.theme-berry .mode-chip-active {
+  background: #DC6872;
+  border-color: #DC6872;
+}
 
 .theme-sunny .avatar-default,
 .theme-sunny .save-btn,
 .theme-sunny .action-btn,
 .theme-sunny .theme-chip-active,
-.theme-sunny .mode-chip-active { background: #E96B4D; }
+.theme-sunny .mode-chip-active {
+  background: #E96B4D;
+  border-color: #E96B4D;
+}
 
 .theme-citrus .avatar-default,
 .theme-citrus .save-btn,
 .theme-citrus .action-btn,
 .theme-citrus .theme-chip-active,
-.theme-citrus .mode-chip-active { background: #F2833E; }
+.theme-citrus .mode-chip-active {
+  background: #F2833E;
+  border-color: #F2833E;
+}
 
-.theme-lagoon .avatar-default,
-.theme-lagoon .save-btn,
-.theme-lagoon .action-btn,
-.theme-lagoon .theme-chip-active,
-.theme-lagoon .mode-chip-active { background: #62B4A5; }
+.theme-dream .avatar-default,
+.theme-dream .save-btn,
+.theme-dream .action-btn,
+.theme-dream .theme-chip-active,
+.theme-dream .mode-chip-active {
+  background: #8B7CF6;
+  border-color: #8B7CF6;
+}

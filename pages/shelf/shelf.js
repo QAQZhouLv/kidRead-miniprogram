@@ -334,11 +334,47 @@ Page({
     const source = e.currentTarget.dataset.source || "all";
     if (!story) return;
 
-    this.setData({
-      actionSheetVisible: true,
-      actionSheetTitle: story.displayTitle || "这本书",
-      actionStory: story,
-      actionSource: source
+    const items = ["重命名", story.is_favorite ? "移除喜欢" : "加入喜欢"];
+    const actionMap = ["rename", story.is_favorite ? "removeFavorite" : "toggleFavorite"];
+
+    if (source === "recent") {
+      items.push("移出最近阅读");
+      actionMap.push("removeRecent");
+    }
+
+    items.push("删除书籍");
+    actionMap.push("delete");
+
+    wx.showActionSheet({
+      itemList: items,
+      success: async (res) => {
+        const action = actionMap[res.tapIndex];
+        if (!action) return;
+
+        if (action === "rename") {
+          this.openRenameDialog(story);
+          return;
+        }
+
+        if (action === "toggleFavorite") {
+          await this.handleToggleFavorite(story);
+          return;
+        }
+
+        if (action === "removeFavorite") {
+          await this.handleRemoveFavorite(story);
+          return;
+        }
+
+        if (action === "removeRecent") {
+          this.handleRemoveRecent(story);
+          return;
+        }
+
+        if (action === "delete") {
+          await this.handleDeleteStory(story);
+        }
+      }
     });
   },
 
