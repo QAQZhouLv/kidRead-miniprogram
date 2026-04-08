@@ -1,3 +1,4 @@
+
 .msg-wrap {
   display: flex;
   margin-bottom: 22rpx;
@@ -26,16 +27,14 @@
   max-width: 88%;
   background: rgba(255, 253, 246, 0.96);
   border-radius: 30rpx;
-  padding: 18rpx;
+  padding: 20rpx;
   box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.04);
-  box-sizing: border-box;
 }
 
 .section-block {
   border-radius: 22rpx;
-  padding: 14rpx 16rpx;
+  padding: 12rpx 14rpx;
   transition: all 0.2s ease;
-  box-sizing: border-box;
 }
 
 .section-block + .section-block {
@@ -55,53 +54,33 @@
   border-color: #efd05a;
 }
 
-.lead-block {
+/* .lead-block {
   background: #f7f1e4;
-  color: #7c6f5d;
   font-size: 26rpx;
-  line-height: 1.7;
-  padding-top: 14rpx;
-  padding-bottom: 14rpx;
-}
+  color: #7c6f5d;
+  line-height: 1.76;
+} */
 
+.lead-block,
 .guide-block {
   background: #f5efe2;
-  color: #7c6f5d;
-  font-size: 26rpx;
-  line-height: 1.7;
-  padding-top: 14rpx;
-  padding-bottom: 14rpx;
+  font-size: 30rpx;
+  color: #5c4b2e;
+  line-height: 1.9;
 }
 
 .story-block {
   background: #fff2c7;
   font-size: 30rpx;
   font-weight: 500;
-  line-height: 1.82;
+  line-height: 1.95;
   color: #3f382f;
-  padding-top: 16rpx;
-  padding-bottom: 16rpx;
-}
-
-
-.lead-text,
-.story-fallback {
-  letter-spacing: 0;
-  word-spacing: 0;
-  display: block;
-}
-
-.sentence-text,
-.sentence {
-  letter-spacing: 0;
-  word-spacing: 0;
 }
 
 .story-paragraph {
-  margin-bottom: 20rpx;
+  margin-bottom: 22rpx;
   text-indent: 2em;
-  line-height: 1.82;
-  word-break: break-word;
+  line-height: 1.95;
 }
 
 .story-paragraph:last-child {
@@ -109,18 +88,16 @@
 }
 
 .story-fallback {
-  line-height: 1.82;
+  display: block;
+  line-height: 1.95;
   white-space: pre-wrap;
   text-indent: 2em;
-  word-break: break-word;
 }
 
 .sentence-text {
   display: inline;
-  line-height: 1.82;
+  line-height: 1.85;
   border-bottom: 4rpx dashed transparent;
-  padding-bottom: 2rpx;
-  word-break: break-word;
 }
 
 .story-sentence {
@@ -131,16 +108,20 @@
   border-bottom-color: #d7ab24;
 }
 
-.sentence {
+.lead-inline-flow {
   display: inline;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* .sentence {
   line-height: 1.8;
-  border-bottom: 4rpx dashed transparent;
-  padding-bottom: 2rpx;
 }
 
 .playing-sentence {
-  border-bottom-color: #d7ab24;
-}
+  border-bottom: 4rpx dashed #d7ab24;
+} */
 
 .pending-text {
   font-size: 24rpx;

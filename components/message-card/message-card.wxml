@@ -1,81 +1,67 @@
-<view class="msg-wrap {{renderMessage.role === 'user' ? 'user-wrap' : 'assistant-wrap'}}">
-  <block wx:if="{{renderMessage.role === 'user'}}">
-    <view class="user-bubble">
-      {{renderMessage.text}}
-    </view>
-  </block>
+<view class="msg-wrap {{message.role === 'user' ? 'user-wrap' : 'assistant-wrap'}}">
+  <view wx:if="{{message.role === 'user'}}" class="user-bubble">
+    {{message.text}}
+  </view>
 
-  <block wx:else>
-    <view class="assistant-card">
-      <view
-        wx:if="{{renderMessage.leadText}}"
-        class="section-block lead-block {{playingMessageId === renderMessage.id && playingSection === 'lead' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
-        data-section="lead"
-        bindtap="onSectionTap"
-      >
-        <view class="lead-text">
-          <block wx:if="{{renderMessage.leadSentences && renderMessage.leadSentences.length}}">
-            <text
-              wx:for="{{renderMessage.leadSentences}}"
-              wx:key="index"
-              id="sent-{{renderMessage.id}}-lead-{{index}}"
-              class="sentence {{playingMessageId === renderMessage.id && playingSection === 'lead' && playingSentenceIndex === index ? 'playing-sentence' : ''}}"
-            >
-              {{item}}
-            </text>
-          </block>
-          <text wx:else>{{renderMessage.leadText}}</text>
-        </view>
-      </view>
-
-      <view
-        wx:if="{{renderMessage.storyText}}"
-        class="section-block story-block {{playingMessageId === renderMessage.id && playingSection === 'story' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
-        data-section="story"
-        bindtap="onSectionTap"
-      >
-        <block wx:if="{{renderMessage.storyParagraphs && renderMessage.storyParagraphs.length}}">
-          <view wx:for="{{renderMessage.storyParagraphs}}" wx:key="index" class="story-paragraph">
-            <block wx:for="{{item.sentences}}" wx:key="index" wx:for-item="sentence">
-              <text
-                id="sent-{{renderMessage.id}}-story-{{sentence.index}}"
-                class="sentence-text story-sentence {{playingMessageId === renderMessage.id && playingSection === 'story' && playingSentenceIndex === sentence.index ? 'sentence-text-playing' : ''}}"
-              >
-                {{sentence.text}}
-              </text>
-            </block>
-          </view>
-        </block>
-        <text wx:else class="story-fallback">{{renderMessage.storyText}}</text>
-      </view>
-
-      <view
-        wx:if="{{renderMessage.guideText}}"
-        class="section-block guide-block {{playingMessageId === renderMessage.id && playingSection === 'guide' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
-        data-section="guide"
-        bindtap="onSectionTap"
-      >
-        <block wx:for="{{renderMessage.guideSentences || []}}" wx:key="index">
+  <view wx:if="{{message.role === 'assistant'}}" class="assistant-card">
+    <view
+      wx:if="{{message.leadText}}"
+      class="section-block lead-block {{playingMessageId === message.id && playingSection === 'lead' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
+      data-section="lead"
+      bindtap="onSectionTap"
+    >
+      <text class="lead-inline-flow">
+        <block wx:for="{{message.leadSentences || []}}" wx:key="index">
           <text
-            id="sent-{{renderMessage.id}}-guide-{{index}}"
-            class="sentence-text {{playingMessageId === renderMessage.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}"
-          >
-            {{item}}
-          </text>
+            id="sent-{{message.id}}-lead-{{index}}"
+            class="sentence-text {{playingMessageId === message.id && playingSection === 'lead' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}"
+          >{{item}}</text>
         </block>
-      </view>
+      </text>
+    </view>
 
-      <view wx:if="{{normalizedChoices.length}}" class="choices-wrap">
-        <view
-          wx:for="{{normalizedChoices}}"
-          wx:key="*this"
+    <view
+      wx:if="{{message.storyText}}"
+      class="section-block story-block {{playingMessageId === message.id && playingSection === 'story' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
+      data-section="story"
+      bindtap="onSectionTap"
+    >
+      <block wx:if="{{message.storyParagraphs && message.storyParagraphs.length}}">
+        <view wx:for="{{message.storyParagraphs}}" wx:key="index" class="story-paragraph">
+          <block wx:for="{{item.sentences}}" wx:key="index" wx:for-item="sentence">
+            <text id="sent-{{message.id}}-story-{{sentence.index}}" class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === sentence.index ? 'sentence-text-playing' : ''}}">{{sentence.text}}</text>
+          </block>
+        </view>
+      </block>
+      <text wx:else class="story-fallback">{{message.storyText}}</text>
+    </view>
+
+    <view
+      wx:if="{{message.guideText}}"
+      class="section-block guide-block {{playingMessageId === message.id && playingSection === 'guide' ? 'section-block-playing' : ''}} {{ttsEnabled ? 'section-block-enabled' : 'section-block-disabled'}}"
+      data-section="guide"
+      bindtap="onSectionTap"
+    >
+      <block wx:for="{{message.guideSentences || []}}" wx:key="index">
+        <text id="sent-{{message.id}}-guide-{{index}}" class="sentence-text {{playingMessageId === message.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+      </block>
+    </view>
+
+    <view wx:if="{{message.pending}}" class="pending-text">
+      正在生成中…
+    </view>
+
+    <view wx:if="{{message.choices && message.choices.length}}" class="choices-wrap">
+      <block wx:for="{{message.choices}}" wx:key="*this">
+        <button
           class="choice-btn"
+          size="mini"
           data-text="{{item}}"
           bindtap="onChoiceTap"
         >
           {{item}}
-        </view>
-      </view>
+        </button>
+      </block>
     </view>
-  </block>
+  </view>
 </view>

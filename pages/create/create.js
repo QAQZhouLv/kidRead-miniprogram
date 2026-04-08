@@ -42,7 +42,6 @@ function getNavMetrics() {
   };
 }
 
-
 function buildStoryParagraphs(text = "") {
   const normalized = String(text || "")
     .replace(/\r/g, "")
@@ -51,14 +50,11 @@ function buildStoryParagraphs(text = "") {
   if (!normalized) return [];
 
   const rawParagraphs = normalized
-    .split(/\n\s*\n+/)
-    .map(item => item.replace(/\n/g, " ").trim())
+    .split(/\n+/)
+    .map(item => item.trim())
     .filter(Boolean);
 
-  const paragraphs = rawParagraphs.length ? rawParagraphs : [
-    normalized.replace(/\n/g, " ").trim()
-  ];
-
+  const paragraphs = rawParagraphs.length ? rawParagraphs : [normalized];
   let globalIndex = 0;
 
   return paragraphs.map((paragraph) => {
