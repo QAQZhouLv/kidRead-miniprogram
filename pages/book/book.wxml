@@ -1,23 +1,54 @@
 <view class="page {{themeClass}}" bindtap="onPageTap">
+  <view class="page-bg"></view>
+  <view class="top-glow"></view>
+
   <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
     <view class="nav-left">
       <view class="nav-back" bindtap="onTapNavBack" catchtap="onTapNavBack">‹</view>
     </view>
-    <view class="nav-title">{{story ? story.title : '故事详情'}}</view>
+
+    <view class="nav-title">
+      {{displayTitle || (story ? story.title : '故事详情')}}
+    </view>
+
     <view class="nav-right"></view>
   </view>
 
   <block wx:if="{{story}}">
-    <view class="reader" style="padding-top:{{navTotalHeight + 10}}px;">
-      <view class="chapter-title" wx:if="{{story.chapter_title}}">{{story.chapter_title}}</view>
-      <block wx:for="{{contentParagraphs}}" wx:key="index">
-        <view class="content-paragraph">{{item}}</view>
-      </block>
-    </view>
+    <scroll-view
+      class="reader-scroll"
+      scroll-y="true"
+      enhanced="true"
+      show-scrollbar="false"
+      style="padding-top:{{navTotalHeight + 8}}px;"
+    >
+      <view class="reader-shell">
+        <view class="reader-body">
+          <block wx:for="{{contentParagraphs}}" wx:key="index">
+            <view class="content-paragraph">{{item}}</view>
+          </block>
+        </view>
+      </view>
+
+      <view class="bottom-safe"></view>
+    </scroll-view>
   </block>
 
   <view wx:if="{{controlsVisible}}" class="reader-actions">
-    <view class="reader-action" bindtap="onListenTap" catchtap="onListenTap">{{isReading ? '停' : '听'}}</view>
-    <view class="reader-action" bindtap="onChatTap" catchtap="onChatTap">聊</view>
+    <view
+      class="reader-action"
+      bindtap="onListenTap"
+      catchtap="onListenTap"
+    >
+      {{isReading ? '停' : '听'}}
+    </view>
+
+    <view
+      class="reader-action"
+      bindtap="onChatTap"
+      catchtap="onChatTap"
+    >
+      聊
+    </view>
   </view>
 </view>

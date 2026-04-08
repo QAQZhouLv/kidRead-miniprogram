@@ -31,25 +31,31 @@ function splitContentToParagraphs(text = "") {
 
   if (!normalized) return [];
 
-  const paragraphs = normalized
+  return normalized
     .split(/\n+/)
     .map(item => item.trim())
     .filter(Boolean);
+}
 
-  return paragraphs;
+function buildDisplayTitle(title = "") {
+  const text = String(title || "").trim();
+  if (!text) return "故事详情";
+  if (text.length <= 12) return text;
+  return `${text.slice(0, 12)}...`;
 }
 
 Page({
   data: {
     storyId: null,
     story: null,
+    displayTitle: "故事详情",
     statusBarHeight: 20,
     navBarHeight: 44,
     navTotalHeight: 64,
     controlsVisible: false,
     isReading: false,
     contentParagraphs: [],
-    themeClass: 'theme-meadow'
+    themeClass: "theme-meadow"
   },
 
   onLoad(options) {
@@ -117,6 +123,7 @@ Page({
       const story = await getStoryDetail(this.data.storyId);
       this.setData({
         story,
+        displayTitle: buildDisplayTitle(story && story.title),
         contentParagraphs: splitContentToParagraphs(story && story.content)
       });
     } catch (err) {
