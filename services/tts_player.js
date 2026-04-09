@@ -323,6 +323,19 @@ function createTTSPlayer(options = {}) {
     });
   }
 
+  async function preloadMessage(message, startSection = "lead") {
+    if (state.destroyed) return null;
+
+    const queue = buildPlayQueue(message, startSection);
+    if (!queue.length) return null;
+
+    await ensureAudioForItem(queue[0]);
+    if (queue[1]) {
+      prefetchItem(queue[1]);
+    }
+    return queue[0];
+  }
+
   async function playQueue(queue, token) {
     for (let i = 0; i < queue.length; i += 1) {
       const item = queue[i];
@@ -379,12 +392,14 @@ function createTTSPlayer(options = {}) {
       console.error("tts playMessage error:", err);
       emit("onPlayStateChange", { playing: false });
       emit("onError", err);
+      throw err;
     }
   }
 
   return {
     setCallbacks,
     playMessage,
+    preloadMessage,
     stop,
     destroy,
     splitTextToSentences,

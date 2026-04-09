@@ -1,54 +1,153 @@
-<view class="page {{themeClass}}" bindtap="onPageTap">
-  <view class="page-bg"></view>
-  <view class="top-glow"></view>
+<view
+  class="page {{actualReaderMode === 'night' ? 'reader-night' : 'reader-day'}}"
+  style="background: {{readerBgColor}};"
+  bindtap="onPageTap"
+>
+  <view
+    class="brightness-mask"
+    style="background: rgba(0,0,0, {{brightnessMaskOpacity}});"
+  />
 
-  <view class="custom-nav" style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;">
+  <view
+    class="custom-nav"
+    style="padding-top:{{statusBarHeight}}px;height:{{navBarHeight}}px;background: {{readerBgColor}};"
+  >
     <view class="nav-left">
       <view class="nav-back" bindtap="onTapNavBack" catchtap="onTapNavBack">‹</view>
+      <view class="nav-title">{{displayTitle}}</view>
     </view>
-
-    <view class="nav-title">
-      {{displayTitle || (story ? story.title : '故事详情')}}
-    </view>
-
     <view class="nav-right"></view>
   </view>
 
-  <block wx:if="{{story}}">
+  <view
+    class="page-body"
+    style="padding-top: {{navTotalHeight}}px;"
+  >
     <scroll-view
+      scroll-y
       class="reader-scroll"
-      scroll-y="true"
-      enhanced="true"
+      scroll-with-animation="{{readingMode}}"
+      scroll-into-view="{{activeSentenceAnchorId}}"
       show-scrollbar="false"
-      style="padding-top:{{navTotalHeight + 8}}px;"
+      enhanced="true"
     >
-      <view class="reader-shell">
-        <view class="reader-body">
-          <block wx:for="{{contentParagraphs}}" wx:key="index">
-            <view class="content-paragraph">{{item}}</view>
-          </block>
-        </view>
+      <view class="reader-article" style="color: {{readerTextColor}};">
+        <block wx:for="{{contentParagraphs}}" wx:key="id">
+          <view
+            class="content-paragraph"
+            data-index="{{index}}"
+            bindtap="onParagraphTap"
+            catchtap="onParagraphTap"
+            style="font-size: {{paragraphFontSize}}rpx;"
+          >
+            <block wx:for="{{item.sentences}}" wx:key="id" wx:for-item="sentence">
+              <text
+                id="{{sentence.anchorId}}"
+                class="sentence-text {{activeParagraphIndex === sentence.paragraphIndex && activeSentenceIndex === sentence.sentenceIndex ? 'sentence-text-reading' : ''}}"
+              >{{sentence.text}}</text>
+            </block>
+          </view>
+        </block>
       </view>
 
-      <view class="bottom-safe"></view>
+      <view class="reader-bottom-safe"></view>
     </scroll-view>
-  </block>
+  </view>
 
-  <view wx:if="{{controlsVisible}}" class="reader-actions">
+  <view
+    wx:if="{{controlsVisible && !showSettingsPanel && !readingMode}}"
+    class="floating-actions"
+    catchtap="noop"
+  >
+    <view class="floating-btn" bindtap="onChatTap" catchtap="onChatTap">聊</view>
+    <view class="floating-btn" bindtap="onListenTap" catchtap="onListenTap">听</view>
+  </view>
+
+  <view wx:if="{{readingMode}}" class="floating-actions" catchtap="noop">
+    <view class="floating-btn" bindtap="onListenTap" catchtap="onListenTap">停</view>
+  </view>
+
+  <view
+    wx:if="{{controlsVisible && !readingMode}}"
+    class="bottom-tools {{actualReaderMode === 'night' ? 'bottom-tools-night' : 'bottom-tools-day'}}"
+    catchtap="noop"
+  >
     <view
-      class="reader-action"
-      bindtap="onListenTap"
-      catchtap="onListenTap"
+      class="bottom-tool {{actualReaderMode === 'night' ? 'bottom-tool-night' : 'bottom-tool-day'}}"
+      bindtap="onToggleDayNight"
+      catchtap="onToggleDayNight"
     >
-      {{isReading ? '停' : '听'}}
+      <svg-icon
+        name="{{actualReaderMode === 'night' ? 'reader-day' : 'reader-night'}}"
+        color="{{actualReaderMode === 'night' ? '#F5F5F5' : '#2F2B25'}}"
+        size="40rpx"
+      />
+      <view class="bottom-tool-text">
+        {{actualReaderMode === 'night' ? '日间' : '夜间'}}
+      </view>
     </view>
 
     <view
-      class="reader-action"
-      bindtap="onChatTap"
-      catchtap="onChatTap"
+      class="bottom-tool {{showSettingsPanel ? 'bottom-tool-active' : ''}} {{actualReaderMode === 'night' ? 'bottom-tool-night' : 'bottom-tool-day'}}"
+      bindtap="onToggleSettingsPanel"
+      catchtap="onToggleSettingsPanel"
     >
-      聊
+      <svg-icon
+        name="reader-settings"
+        color="{{actualReaderMode === 'night' ? '#F5F5F5' : '#2F2B25'}}"
+        size="40rpx"
+      />
+      <view class="bottom-tool-text">设置</view>
+    </view>
+  </view>
+
+  <view
+    wx:if="{{showSettingsPanel && !readingMode}}"
+    class="settings-panel {{actualReaderMode === 'night' ? 'settings-panel-night' : 'settings-panel-day'}}"
+    catchtap="noop"
+  >
+    <view class="settings-row">
+      <view class="settings-label">亮度</view>
+      <slider
+        min="0"
+        max="100"
+        step="1"
+        value="{{readerBrightness}}"
+        bindchanging="onBrightnessChanging"
+        bindchange="onBrightnessChange"
+      />
+    </view>
+
+    <view class="settings-row">
+      <view class="settings-label">字体大小</view>
+      <view class="font-size-actions">
+        <view class="size-btn" bindtap="onFontSizeMinus" catchtap="onFontSizeMinus">A-</view>
+        <view class="size-value">{{paragraphFontSize}}</view>
+        <view class="size-btn" bindtap="onFontSizePlus" catchtap="onFontSizePlus">A+</view>
+      </view>
+    </view>
+
+    <view class="settings-row">
+      <view class="settings-label">背景颜色</view>
+      <view class="bg-options">
+        <view class="bg-dot bg-white {{readerBg === 'white' ? 'bg-dot-active' : ''}}" data-key="white" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+        <view class="bg-dot bg-pink {{readerBg === 'pink' ? 'bg-dot-active' : ''}}" data-key="pink" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+        <view class="bg-dot bg-green {{readerBg === 'green' ? 'bg-dot-active' : ''}}" data-key="green" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+        <view class="bg-dot bg-theme {{readerBg === 'theme' ? 'bg-dot-active' : ''}}" data-key="theme" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+        <view class="bg-dot bg-black {{readerBg === 'black' ? 'bg-dot-active' : ''}}" data-key="black" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+        <view class="bg-dot bg-gray {{readerBg === 'gray' ? 'bg-dot-active' : ''}}" data-key="gray" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+        <view class="bg-dot bg-brown {{readerBg === 'brown' ? 'bg-dot-active' : ''}}" data-key="brown" bindtap="onSelectBg" catchtap="onSelectBg"></view>
+      </view>
+    </view>
+
+    <view class="settings-row">
+      <view class="settings-label">翻页模式</view>
+      <view class="page-effect-options">
+        <view class="effect-btn {{pageEffect === 'scroll' ? 'active' : ''}}" data-key="scroll" bindtap="onSelectPageEffect" catchtap="onSelectPageEffect">上下</view>
+        <view class="effect-btn {{pageEffect === 'slide' ? 'active' : ''}}" data-key="slide" bindtap="onSelectPageEffect" catchtap="onSelectPageEffect">平移</view>
+        <view class="effect-btn {{pageEffect === 'none' ? 'active' : ''}}" data-key="none" bindtap="onSelectPageEffect" catchtap="onSelectPageEffect">无动画</view>
+        <view class="effect-btn {{pageEffect === 'cover' ? 'active' : ''}}" data-key="cover" bindtap="onSelectPageEffect" catchtap="onSelectPageEffect">仿真</view>
+      </view>
     </view>
   </view>
 </view>
