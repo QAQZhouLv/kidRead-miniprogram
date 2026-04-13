@@ -636,6 +636,19 @@ Page({
           }
         }
 
+        if (msg.type === "section_replace") {
+          const section = msg.section || "story";
+          const content = msg.content || "";
+
+          if (section === "lead") {
+            current.leadText = content;
+          } else if (section === "story") {
+            current.storyText = content;
+          } else if (section === "guide") {
+            current.guideText = content;
+          }
+        }
+
         if (msg.type === "meta") {
           current.choices = msg.choices || [];
           current.shouldSave = !!msg.should_save;
