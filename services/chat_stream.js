@@ -1,10 +1,7 @@
 const { WS_BASE_URL } = require("../config/index");
 
 function createChatStream(onMessage, onError) {
-  const socketTask = wx.connectSocket({
-    url: `${WS_BASE_URL}/ws/chat/stream`
-  });
-
+  let socketTask = null;
   let isOpen = false;
   let isClosed = false;
   let openPromiseResolve = null;
@@ -15,31 +12,46 @@ function createChatStream(onMessage, onError) {
     openPromiseReject = reject;
   });
 
-  socketTask.onOpen(() => {
-    isOpen = true;
-    if (openPromiseResolve) openPromiseResolve();
-  });
-
-  socketTask.onMessage((res) => {
-    try {
-      const data = JSON.parse(res.data);
-      onMessage && onMessage(data);
-    } catch (e) {
-      console.error("chat stream parse error:", e);
+  const initPromise = (async () => {
+    const app = getApp();
+    if (app && typeof app.ensureLogin === "function") {
+      await app.ensureLogin();
     }
-  });
+    const token = app && app.getAuthToken ? app.getAuthToken() : "";
+    const url = token
+      ? `${WS_BASE_URL}/ws/chat/stream?token=${encodeURIComponent(token)}`
+      : `${WS_BASE_URL}/ws/chat/stream`;
 
-  socketTask.onError((err) => {
-    if (!isOpen && openPromiseReject) {
-      openPromiseReject(err);
-    }
-    onError && onError(err);
-  });
+    socketTask = wx.connectSocket({ url });
 
-  socketTask.onClose(() => {
-    isOpen = false;
-    isClosed = true;
-  });
+    socketTask.onOpen(() => {
+      isOpen = true;
+      if (openPromiseResolve) openPromiseResolve();
+    });
+
+    socketTask.onMessage((res) => {
+      try {
+        const data = JSON.parse(res.data);
+        onMessage && onMessage(data);
+      } catch (e) {
+        console.error("chat stream parse error:", e);
+      }
+    });
+
+    socketTask.onError((err) => {
+      if (!isOpen && openPromiseReject) {
+        openPromiseReject(err);
+      }
+      onError && onError(err);
+    });
+
+    socketTask.onClose(() => {
+      isOpen = false;
+      isClosed = true;
+    });
+
+    return openPromise;
+  })();
 
   return {
     async send(payload) {
@@ -47,6 +59,7 @@ function createChatStream(onMessage, onError) {
         throw new Error("socket already closed");
       }
 
+      await initPromise;
       if (!isOpen) {
         await openPromise;
       }
@@ -63,7 +76,9 @@ function createChatStream(onMessage, onError) {
     close() {
       if (isClosed) return;
       try {
-        socketTask.close({});
+        if (socketTask) {
+          socketTask.close({});
+        }
       } catch (e) {
         console.error("socket close error:", e);
       }

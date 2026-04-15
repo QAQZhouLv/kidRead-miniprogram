@@ -14,6 +14,10 @@ const RECENT_READ_KEY = "kidread_recent_reading_ids";
 const MAX_HISTORY = 10;
 const MAX_RECENT = 3;
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function pickThemeIndex(story) {
   const seedSource = `${story.id || ""}${story.title || ""}${story.age || ""}`;
   let hash = 0;
@@ -99,7 +103,7 @@ Page({
 
     themeName: "meadow",
     themeClass: "theme-meadow",
-    theme: applyThemeChrome('meadow')
+    theme: applyThemeChrome("meadow")
   },
 
   async onShow() {
@@ -117,7 +121,33 @@ Page({
       this.setData({ hasCheckedOnboarding: true });
     }
 
-    this.loadShelfPage();
+    await this.ensureAuthReady();
+    await this.loadShelfPage();
+  },
+
+  async ensureAuthReady() {
+    const app = getApp ? getApp() : null;
+
+    try {
+      if (app && app.globalData && app.globalData.loginReadyPromise) {
+        await app.globalData.loginReadyPromise;
+      } else if (app && typeof app.ensureLogin === "function") {
+        await app.ensureLogin();
+      }
+    } catch (err) {
+      console.error("ensureAuthReady login promise error:", err);
+    }
+
+    for (let i = 0; i < 12; i++) {
+      const token = safeGetStorage("token", "");
+      if (token) {
+        return true;
+      }
+      await sleep(150);
+    }
+
+    console.warn("ensureAuthReady timeout: token still missing, will continue and let request layer handle retry.");
+    return false;
   },
 
   applyTheme() {
@@ -146,7 +176,7 @@ Page({
     return !profile.hasSeenOnboarding;
   },
 
-  async loadShelfPage() {
+  async loadShelfPage(retryCount = 1) {
     this.setData({ loading: true });
 
     try {
@@ -164,6 +194,14 @@ Page({
       });
     } catch (err) {
       console.error("loadShelfPage error:", err);
+
+      const statusCode = err && (err.statusCode || (err.response && err.response.statusCode));
+      if (statusCode === 401 && retryCount > 0) {
+        console.warn("loadShelfPage got 401, retrying once after ensureAuthReady...");
+        await this.ensureAuthReady();
+        return this.loadShelfPage(retryCount - 1);
+      }
+
       this.setData({ loading: false });
 
       wx.showToast({
