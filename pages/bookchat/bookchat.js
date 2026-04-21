@@ -302,8 +302,6 @@ Page({
       messages: [opening],
       openingPlayed: false
     });
-
-    openingPlayed: false
   },
 
   async loadStory() {

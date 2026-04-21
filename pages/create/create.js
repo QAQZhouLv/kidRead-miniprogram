@@ -83,6 +83,34 @@ function decorateMessage(message = {}) {
   return decorateAssistantMessage(message);
 }
 
+
+function getInputDraftStorageKey(sessionId = "") {
+  return `kidread_create_input_draft_${sessionId}`;
+}
+
+function loadLocalInputDraft(sessionId = "") {
+  if (!sessionId) return "";
+  try {
+    return wx.getStorageSync(getInputDraftStorageKey(sessionId)) || "";
+  } catch (err) {
+    console.error("loadLocalInputDraft error:", err);
+    return "";
+  }
+}
+
+function saveLocalInputDraft(sessionId = "", text = "") {
+  if (!sessionId) return;
+  try {
+    if (text) {
+      wx.setStorageSync(getInputDraftStorageKey(sessionId), text);
+    } else {
+      wx.removeStorageSync(getInputDraftStorageKey(sessionId));
+    }
+  } catch (err) {
+    console.error("saveLocalInputDraft error:", err);
+  }
+}
+
 Page({
   data: {
     age: 8,
@@ -107,6 +135,9 @@ Page({
     draftText: "",
     showEditPanel: false,
     editingText: "",
+    sessionDraftSegments: [],
+    sessionDraftText: "",
+    hasUnsavedDraft: false,
 
     archiving: false,
 
@@ -136,6 +167,9 @@ Page({
     this.bindTtsCallbacks();
     await this.loadSessions();
     await this.loadCreateOpening();
+    this.setData({
+      draftText: loadLocalInputDraft(this.data.sessionId)
+    });
   },
 
   initNavBar() {
@@ -344,22 +378,21 @@ Page({
   },
 
   async persistDraft() {
-    const text = (this.data.draftText || "").trim();
-    if (!text) return;
-  
+    const content = (this.data.sessionDraftSegments || []).join("\n").trim();
+
     await this.ensureSessionIfNeeded();
-  
-    if (this._lastSavedDraft === text) return;
-    this._lastSavedDraft = text;
-  
+
+    if (this._lastSavedDraft === content) return;
+    this._lastSavedDraft = content;
+
     try {
-      await updateSessionDraft(this.data.sessionId, text);
+      await updateSessionDraft(this.data.sessionId, content);
     } catch (err) {
       console.error("persistDraft save error:", err);
       this._lastSavedDraft = null;
       return;
     }
-  
+
     try {
       this.loadSessions();
     } catch (err) {
@@ -420,9 +453,12 @@ Page({
       sessionCreated: false,
       isHistorySession: false,
       createdStoryId: null,
-      draftText: "",
+      draftText: loadLocalInputDraft(sessionId),
       showEditPanel: false,
       editingText: "",
+      sessionDraftSegments: [],
+      sessionDraftText: "",
+      hasUnsavedDraft: false,
       messages: [],
       openingPlayed: false
     });
@@ -444,12 +480,20 @@ Page({
       const rows = await getMessagesBySession(sessionId);
       const messages = this.mapBackendMessagesToPageMessages(rows);
 
+      const sessionDraftSegments = (session.draft_content || "")
+        .split("\n")
+        .map(item => item.trim())
+        .filter(Boolean);
+
       this.setData({
         drawerVisible: false,
         sessionId,
         sessionCreated: true,
         isHistorySession: true,
-        draftText: session.draft_content || "",
+        draftText: loadLocalInputDraft(sessionId),
+        sessionDraftSegments,
+        sessionDraftText: sessionDraftSegments.join("\n"),
+        hasUnsavedDraft: sessionDraftSegments.length > 0,
         messages: messages.length
           ? messages
           : [
@@ -602,6 +646,7 @@ Page({
       loading: true,
       draftText: ""
     });
+    saveLocalInputDraft(this.data.sessionId, "");
 
     const stream = createChatStream(
       async (msg) => {
@@ -661,8 +706,26 @@ Page({
         if (msg.type === "done") {
           current.pending = false;
           current.currentSection = "";
+
+          let draftSegments = [...(this.data.sessionDraftSegments || [])];
+          const newStoryText = (current.storyText || "").trim();
+          if (newStoryText && current.shouldSave) {
+            draftSegments.push(newStoryText);
+          }
+
           decorateAssistantMessage(current);
-          this.setData({ messages, loading: false });
+          this.setData({
+            messages,
+            loading: false,
+            sessionDraftSegments: draftSegments,
+            sessionDraftText: draftSegments.join("\n"),
+            hasUnsavedDraft: draftSegments.length > 0
+          });
+
+          if (newStoryText && current.shouldSave) {
+            await this.persistDraft();
+          }
+
           stream.close();
           await this.loadSessions();
           await this.autoPlayLatestAssistantMessage();
@@ -695,7 +758,7 @@ Page({
         text,
         history: [],
         current_story_content: "",
-        session_draft_content: this.collectStoryText(nextMessages)
+        session_draft_content: (this.data.sessionDraftSegments || []).join("\n")
       });
     } catch (err) {
       console.error("stream send error:", err);
@@ -721,8 +784,11 @@ Page({
     }
   },
 
-  collectStoryText(messages = this.data.messages) {
-    return messages
+  collectStoryText() {
+    const draftText = (this.data.sessionDraftSegments || []).join("\n").trim();
+    if (draftText) return draftText;
+
+    return (this.data.messages || [])
       .filter(item => item.role === "assistant" && item.storyText)
       .map(item => item.storyText)
       .join("\n");
@@ -794,17 +860,9 @@ Page({
   },
 
   onBarDraftChange(e) {
-    this.setData({
-      draftText: e.detail.text || ""
-    });
-  
-    if (this._draftTimer) {
-      clearTimeout(this._draftTimer);
-    }
-  
-    this._draftTimer = setTimeout(() => {
-      this.persistDraft();
-    }, 400);
+    const draftText = e.detail.text || "";
+    this.setData({ draftText });
+    saveLocalInputDraft(this.data.sessionId, draftText);
   },
 
   onBarSend(e) {
@@ -836,10 +894,11 @@ Page({
   },
 
   confirmDraftEdit() {
+    const draftText = this.data.editingText || "";
     this.setData({
-      draftText: this.data.editingText || "",
+      draftText,
       showEditPanel: false
     });
-    this.persistDraft();
+    saveLocalInputDraft(this.data.sessionId, draftText);
   }
 });
