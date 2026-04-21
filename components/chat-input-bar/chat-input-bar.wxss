@@ -3,10 +3,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 16rpx 24rpx 24rpx;
   box-sizing: border-box;
   z-index: 99;
   background: transparent;
+}
+
+.input-bar-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.input-bar-shell {
+  position: relative;
+  z-index: 1;
+  padding: 16rpx 24rpx 24rpx;
+  box-sizing: border-box;
 }
 
 .input-bar {
@@ -29,12 +44,17 @@
   justify-content: center;
   box-sizing: border-box;
   flex-shrink: 0;
-  box-shadow: 0 8rpx 18rpx rgba(0,0,0,0.05);
+  box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
-.left-icon-btn { margin-right: 16rpx; }
-.right-icon-btn { margin-left: 16rpx; }
+.left-icon-btn {
+  margin-right: 16rpx;
+}
+
+.right-icon-btn {
+  margin-left: 16rpx;
+}
 
 .text-input {
   flex: 1;
@@ -79,11 +99,28 @@
   opacity: 0.35;
 }
 
-.dot1 { animation-delay: 0s; }
-.dot2 { animation-delay: 0.2s; }
-.dot3 { animation-delay: 0.4s; }
+.dot1 {
+  animation-delay: 0s;
+}
+
+.dot2 {
+  animation-delay: 0.2s;
+}
+
+.dot3 {
+  animation-delay: 0.4s;
+}
 
 @keyframes dotPulse {
-  0%, 80%, 100% { opacity: 0.25; transform: scale(0.9); }
-  40% { opacity: 1; transform: scale(1.18); }
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
 }

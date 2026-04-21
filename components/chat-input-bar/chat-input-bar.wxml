@@ -1,51 +1,55 @@
 <view class="input-bar-wrap">
-  <view class="input-bar" style="{{inputBarStyle}}">
-    <view class="left-icon-btn" bindtap="onMenuTap" style="{{iconBtnStyle}}">
-      <svg-icon name="menu" color="{{iconColor}}" size="34rpx" />
+  <view class="input-bar-mask" style="{{wrapMaskStyle}}"></view>
+
+  <view class="input-bar-shell">
+    <view class="input-bar" style="{{inputBarStyle}}">
+      <view class="left-icon-btn" bindtap="onMenuTap" style="{{iconBtnStyle}}">
+        <svg-icon name="menu" color="{{iconColor}}" size="34rpx" />
+      </view>
+
+      <block wx:if="{{mode === 'text'}}">
+        <input
+          class="text-input"
+          placeholder="{{placeholder}}"
+          value="{{inputText}}"
+          bindinput="onInput"
+          bindfocus="onInputFocus"
+          bindblur="onInputBlur"
+          confirm-type="send"
+          bindconfirm="onSend"
+          style="{{inputStyle}}"
+        />
+
+        <view class="right-icon-btn" bindtap="switchToVoice" style="{{iconBtnStyle}}">
+          <svg-icon name="mic" color="{{iconColor}}" size="34rpx" />
+        </view>
+      </block>
+
+      <block wx:if="{{mode === 'voice'}}">
+        <view
+          class="voice-press-area {{pressActive ? 'voice-press-area-active' : ''}}"
+          bindtouchstart="onPressToTalkStart"
+          bindtouchend="onPressToTalkEnd"
+          bindtouchcancel="onPressToTalkEnd"
+          style="{{pressActive ? activeVoiceStyle : voiceTextStyle}}"
+        >
+          <block wx:if="{{!isRecording}}">
+            <text class="voice-main-text" style="{{voiceTextStyle}}">按住说话</text>
+          </block>
+
+          <block wx:if="{{isRecording}}">
+            <view class="voice-anim-wrap">
+              <view class="dot dot1" style="{{dotStyle}}"></view>
+              <view class="dot dot2" style="{{dotStyle}}"></view>
+              <view class="dot dot3" style="{{dotStyle}}"></view>
+            </view>
+          </block>
+        </view>
+
+        <view class="right-icon-btn" bindtap="switchToText" style="{{iconBtnStyle}}">
+          <svg-icon name="keyboard" color="{{iconColor}}" size="34rpx" />
+        </view>
+      </block>
     </view>
-
-    <block wx:if="{{mode === 'text'}}">
-      <input
-        class="text-input"
-        placeholder="{{placeholder}}"
-        value="{{inputText}}"
-        bindinput="onInput"
-        bindfocus="onInputFocus"
-        bindblur="onInputBlur"
-        confirm-type="send"
-        bindconfirm="onSend"
-        style="{{inputStyle}}"
-      />
-
-      <view class="right-icon-btn" bindtap="switchToVoice" style="{{iconBtnStyle}}">
-        <svg-icon name="mic" color="{{iconColor}}" size="34rpx" />
-      </view>
-    </block>
-
-    <block wx:if="{{mode === 'voice'}}">
-      <view
-        class="voice-press-area {{pressActive ? 'voice-press-area-active' : ''}}"
-        bindtouchstart="onPressToTalkStart"
-        bindtouchend="onPressToTalkEnd"
-        bindtouchcancel="onPressToTalkEnd"
-        style="{{pressActive ? activeVoiceStyle : voiceTextStyle}}"
-      >
-        <block wx:if="{{!isRecording}}">
-          <text class="voice-main-text" style="{{voiceTextStyle}}">按住说话</text>
-        </block>
-
-        <block wx:if="{{isRecording}}">
-          <view class="voice-anim-wrap">
-            <view class="dot dot1" style="{{dotStyle}}"></view>
-            <view class="dot dot2" style="{{dotStyle}}"></view>
-            <view class="dot dot3" style="{{dotStyle}}"></view>
-          </view>
-        </block>
-      </view>
-
-      <view class="right-icon-btn" bindtap="switchToText" style="{{iconBtnStyle}}">
-        <svg-icon name="keyboard" color="{{iconColor}}" size="34rpx" />
-      </view>
-    </block>
   </view>
 </view>

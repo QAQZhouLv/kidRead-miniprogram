@@ -1,4 +1,3 @@
-
 .page {
   box-sizing: border-box;
   min-height: 100vh;
@@ -6,16 +5,16 @@
 
 .custom-nav {
   position: fixed;
-  left: 18rpx;
-  right: 18rpx;
-  top: 10rpx;
+  left: 0;
+  right: 0;
+  top: 0;
   z-index: 110;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 18rpx;
-  padding-right: 18rpx;
-  border-radius: 32rpx;
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+  border-radius: 0 0 32rpx 32rpx;
   backdrop-filter: blur(12rpx);
   box-sizing: content-box;
   box-shadow: 0 14rpx 34rpx rgba(81, 67, 44, 0.08);
@@ -60,14 +59,16 @@
 
 .nav-back {
   font-size: 50rpx;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .nav-bell {
   border: 3rpx solid transparent;
 }
 
-.nav-bell-off { opacity: 0.82; }
+.nav-bell-off {
+  opacity: 0.82;
+}
 
 .page-content {
   padding-left: 24rpx;
@@ -169,14 +170,11 @@
   font-size: 28rpx;
   font-weight: 700;
   text-align: center;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   line-height: 1;
   box-sizing: border-box;
-
   box-shadow: 0 12rpx 28rpx rgba(0, 0, 0, 0.1);
 }
 

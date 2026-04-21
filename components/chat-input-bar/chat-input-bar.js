@@ -3,25 +3,37 @@ const { getThemeTokens } = require("../../utils/theme");
 
 const recorderManager = wx.getRecorderManager();
 
+const PAGE_BG_BY_THEME = {
+  meadow: "#ece6c9",
+  ocean: "#eae4cc",
+  berry: "#f3dfd6",
+  sunny: "#f8e8d9",
+  citrus: "#f3e0c8",
+  lagoon: "#e8e5cf",
+};
+
 function normalizeTheme(theme) {
   if (!theme || typeof theme !== "object") {
     return getThemeTokens("meadow");
   }
-  return {
-    ...getThemeTokens(theme.key || "meadow"),
-    ...theme
-  };
+  return { ...getThemeTokens(theme.key || "meadow"), ...theme };
+}
+
+function getPageBgColor(theme) {
+  const key = theme && theme.key ? theme.key : "meadow";
+  return PAGE_BG_BY_THEME[key] || PAGE_BG_BY_THEME.meadow;
 }
 
 function buildStyles(theme) {
   return {
+    wrapMaskStyle: `background: ${getPageBgColor(theme)};`,
     inputBarStyle: `background: ${theme.cardSurfaceStrong};`,
     iconBtnStyle: `background: ${theme.paper};`,
     inputStyle: `color: ${theme.inputText};`,
     voiceTextStyle: `color: ${theme.subtleText};`,
     activeVoiceStyle: `background: ${theme.secondary}; box-shadow: inset 0 6rpx 14rpx rgba(0, 0, 0, 0.06);`,
     dotStyle: `background: ${theme.accent};`,
-    iconColor: theme.iconText
+    iconColor: theme.iconText,
   };
 }
 
@@ -29,20 +41,20 @@ Component({
   properties: {
     loading: {
       type: Boolean,
-      value: false
+      value: false,
     },
     placeholder: {
       type: String,
-      value: "发消息或按住说话..."
+      value: "发消息或按住说话...",
     },
     value: {
       type: String,
-      value: ""
+      value: "",
     },
     theme: {
       type: Object,
-      value: null
-    }
+      value: null,
+    },
   },
 
   data: {
@@ -53,13 +65,14 @@ Component({
     voiceDraftText: "",
     voiceBaseText: "",
     pressActive: false,
+    wrapMaskStyle: "",
     inputBarStyle: "",
     iconBtnStyle: "",
     inputStyle: "",
     voiceTextStyle: "",
     activeVoiceStyle: "",
     dotStyle: "",
-    iconColor: "#61584b"
+    iconColor: "#61584b",
   },
 
   observers: {
@@ -68,9 +81,10 @@ Component({
         this.setData({ inputText: val || "" });
       }
     },
+
     theme(theme) {
       this.applyTheme(theme);
-    }
+    },
   },
 
   lifetimes: {
@@ -83,22 +97,16 @@ Component({
       });
 
       recorderManager.onError((err) => {
-        this.setData({
-          isRecording: false,
-          pressActive: false
-        });
+        this.setData({ isRecording: false, pressActive: false });
         console.error("recorder error:", err);
-        wx.showToast({
-          title: "录音异常",
-          icon: "none"
-        });
+        wx.showToast({ title: "录音异常", icon: "none" });
       });
     },
 
     detached() {
       const client = this.data.streamClient;
       if (client) client.close();
-    }
+    },
   },
 
   methods: {
@@ -132,36 +140,25 @@ Component({
     onSend() {
       const text = (this.data.inputText || "").trim();
       if (!text || this.properties.loading) return;
-
-      this.triggerEvent("send", {
-        text,
-        inputMode: "text"
-      });
-
-      this.setData({
-        inputText: "",
-        voiceDraftText: "",
-        voiceBaseText: ""
-      });
+      this.triggerEvent("send", { text, inputMode: "text" });
+      this.setData({ inputText: "", voiceDraftText: "", voiceBaseText: "" });
     },
 
     onPressToTalkStart() {
       if (this.properties.loading || this.data.isRecording) return;
 
       const currentText = this.data.inputText || "";
-
       const streamClient = createVoiceStream(
         (msg) => {
           if (msg.type === "partial" || msg.type === "final" || msg.type === "done") {
             const liveText = (msg.text || "").trim();
-
             const mergedText = [this.data.voiceBaseText, liveText]
               .filter(Boolean)
               .join(this.data.voiceBaseText && liveText ? " " : "");
 
             this.setData({
               inputText: mergedText,
-              voiceDraftText: liveText
+              voiceDraftText: liveText,
             });
 
             this.triggerEvent("draftchange", { text: mergedText });
@@ -171,27 +168,18 @@ Component({
             this.setData({
               isRecording: false,
               pressActive: false,
-              mode: "voice"
+              mode: "voice",
             });
           }
 
           if (msg.type === "error") {
-            wx.showToast({
-              title: "语音识别失败",
-              icon: "none"
-            });
+            wx.showToast({ title: "语音识别失败", icon: "none" });
           }
         },
         (err) => {
           console.error("stream socket error:", err);
-          this.setData({
-            isRecording: false,
-            pressActive: false
-          });
-          wx.showToast({
-            title: "语音连接失败",
-            icon: "none"
-          });
+          this.setData({ isRecording: false, pressActive: false });
+          wx.showToast({ title: "语音连接失败", icon: "none" });
         }
       );
 
@@ -200,7 +188,7 @@ Component({
         pressActive: true,
         streamClient,
         voiceBaseText: currentText,
-        voiceDraftText: ""
+        voiceDraftText: "",
       });
 
       recorderManager.start({
@@ -209,17 +197,14 @@ Component({
         numberOfChannels: 1,
         encodeBitRate: 64000,
         format: "pcm",
-        frameSize: 5
+        frameSize: 5,
       });
     },
 
     onPressToTalkEnd() {
       if (!this.data.isRecording) return;
 
-      this.setData({
-        pressActive: false
-      });
-
+      this.setData({ pressActive: false });
       recorderManager.stop();
 
       const client = this.data.streamClient;
@@ -230,6 +215,6 @@ Component({
 
     onMenuTap() {
       this.triggerEvent("menu");
-    }
-  }
+    },
+  },
 });
