@@ -151,6 +151,7 @@ Page({
       await this.restoreMessagesAndDraft();
     } else {
       this.initOpeningMessages();
+      this.playOpeningIfNeeded();
     }
 
     await this.loadSessions();
@@ -182,11 +183,21 @@ Page({
     wx.switchTab({ url: '/pages/shelf/shelf' });
   },
 
+  clearOpeningPlayTimer() {
+    if (this._openingPlayTimer) {
+      clearTimeout(this._openingPlayTimer);
+      this._openingPlayTimer = null;
+    }
+  },
+
   onHide() {
+    this.clearOpeningPlayTimer();
     this.stopTTS();
   },
 
   onUnload() {
+    this.clearOpeningPlayTimer();
+
     if (this.ttsPlayer) {
       this.ttsPlayer.destroy();
       this.ttsPlayer = null;
@@ -371,14 +382,14 @@ Page({
 
       if (!messages.length) {
         this.initOpeningMessages();
-      }
-
-      if (messages.length) {
+        this.playOpeningIfNeeded();
+      } else {
         this.setData({ openingPlayed: true });
       }
     } catch (err) {
       console.error("restoreMessagesAndDraft error:", err);
       this.initOpeningMessages();
+      this.playOpeningIfNeeded();
     }
   },
 
@@ -444,6 +455,7 @@ Page({
     });
 
     this.initOpeningMessages();
+    this.playOpeningIfNeeded();
     await this.loadSessions();
   },
 
@@ -622,15 +634,21 @@ Page({
   playOpeningIfNeeded() {
     if (!this.data.autoReadEnabled) return;
     if (this.data.openingPlayed) return;
+
     const firstAssistant = (this.data.messages || []).find(item => item.role === "assistant");
     if (!firstAssistant) return;
-  
-    setTimeout(async () => {
+
+    this.clearOpeningPlayTimer();
+
+    this._openingPlayTimer = setTimeout(async () => {
       try {
+        if (!this.ttsPlayer || typeof this.ttsPlayer.playMessage !== "function") return;
         await this.playAssistantMessageFrom(firstAssistant, "lead");
         this.setData({ openingPlayed: true });
       } catch (err) {
         console.error("playOpeningIfNeeded error:", err);
+      } finally {
+        this._openingPlayTimer = null;
       }
     }, 300);
   },
