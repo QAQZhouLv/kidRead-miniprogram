@@ -1,14 +1,14 @@
-
 .drawer-mask {
   position: fixed;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(42, 31, 18, 0.18);
   z-index: 140;
 }
 
 .drawer {
   position: fixed;
-  top: 0;
   left: 0;
   bottom: 0;
   width: 78%;
@@ -18,9 +18,10 @@
   transform: translateX(0);
   display: flex;
   flex-direction: column;
-  padding: 40rpx 24rpx 24rpx;
+  padding: 24rpx 24rpx 24rpx;
   box-sizing: border-box;
   box-shadow: 24rpx 0 40rpx rgba(0,0,0,0.08);
+  border-top-right-radius: 28rpx;
 }
 
 .drawer-header {

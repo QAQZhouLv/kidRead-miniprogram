@@ -3,6 +3,7 @@
   title="历史会话"
   sessions="{{sessions}}"
   currentSessionId="{{sessionId}}"
+  offsetTop="{{navTotalHeight}}"
   bind:close="closeDrawer"
   bind:newsession="startNewSessionFromDrawer"
   bind:selectsession="switchSessionFromDrawer"
@@ -60,7 +61,7 @@
       <view class="draft-content" style="color: {{theme.text}};">{{sessionDraftText}}</view>
     </view>
 
-    <view class="chat-list" style="background: {{theme.cardSurface}};">
+    <view class="chat-list">
       <block wx:for="{{messages}}" wx:key="id">
         <message-card
           message="{{item}}"

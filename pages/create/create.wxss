@@ -63,10 +63,12 @@
 }
 
 .chat-list {
-  border-radius: 32rpx;
-  box-shadow: 0 12rpx 30rpx rgba(81, 67, 44, 0.05);
-  padding: 18rpx;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
 }
+
 
 .chat-list-top {
   margin-top: 0;

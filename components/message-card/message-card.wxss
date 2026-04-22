@@ -1,4 +1,3 @@
-
 .msg-wrap {
   display: flex;
   margin-bottom: 22rpx;
@@ -23,22 +22,29 @@
   box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
+/* 只去掉外层总卡片，不动结构 */
 .assistant-card {
   max-width: 88%;
-  background: rgba(255, 253, 246, 0.96);
-  border-radius: 30rpx;
-  padding: 20rpx;
-  box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.04);
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
+/* 把每个 section 直接做成独立聊天框 */
 .section-block {
-  border-radius: 22rpx;
-  padding: 12rpx 14rpx;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 28rpx 28rpx 28rpx 10rpx;
+  padding: 18rpx 22rpx;
+  box-sizing: border-box;
   transition: all 0.2s ease;
+  box-shadow: 0 10rpx 22rpx rgba(0, 0, 0, 0.04);
 }
 
 .section-block + .section-block {
-  margin-top: 10rpx;
+  margin-top: 12rpx;
 }
 
 .section-block-enabled {
@@ -46,31 +52,24 @@
 }
 
 .section-block-disabled {
-  opacity: 0.92;
+  opacity: 1;
 }
 
 .section-block-playing {
-  background: #fff7dc;
   border-color: #efd05a;
+  background: #fff7dc !important;
 }
-
-/* .lead-block {
-  background: #f7f1e4;
-  font-size: 26rpx;
-  color: #7c6f5d;
-  line-height: 1.76;
-} */
 
 .lead-block,
 .guide-block {
-  background: #f5efe2;
+  background: rgba(255, 253, 246, 0.96);
   font-size: 30rpx;
   color: #5c4b2e;
   line-height: 1.9;
 }
 
 .story-block {
-  background: #fff2c7;
+  background: rgba(255, 253, 246, 0.96);
   font-size: 30rpx;
   font-weight: 500;
   line-height: 1.95;
@@ -114,14 +113,6 @@
   line-height: inherit;
   color: inherit;
 }
-
-/* .sentence {
-  line-height: 1.8;
-}
-
-.playing-sentence {
-  border-bottom: 4rpx dashed #d7ab24;
-} */
 
 .pending-text {
   font-size: 24rpx;

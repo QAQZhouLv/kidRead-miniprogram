@@ -3,6 +3,7 @@
   title="创作历史"
   sessions="{{sessions}}"
   currentSessionId="{{sessionId}}"
+  offsetTop="{{navTotalHeight}}"
   bind:close="closeDrawer"
   bind:newsession="startNewCreateSession"
   bind:selectsession="switchCreateSession"
@@ -32,7 +33,7 @@
   </view>
 
   <view class="page-content" style="padding-top:{{navTotalHeight + 12}}px;">
-    <view class="chat-list chat-list-top" style="background: {{theme.cardSurface}};">
+    <view class="chat-list chat-list-top">
       <block wx:for="{{messages}}" wx:key="id">
         <message-card
           message="{{item}}"

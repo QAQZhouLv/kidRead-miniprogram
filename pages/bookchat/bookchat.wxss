@@ -79,8 +79,7 @@
 
 .page-header,
 .book-preview,
-.draft-preview,
-.chat-list {
+.draft-preview {
   border-radius: 32rpx;
   box-shadow: 0 12rpx 30rpx rgba(81, 67, 44, 0.05);
 }
@@ -132,7 +131,10 @@
 
 .chat-list {
   margin-top: 8rpx;
-  padding: 18rpx;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .draft-bubble-wrap {

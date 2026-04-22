@@ -6,7 +6,11 @@ Component({
       type: Array,
       value: []
     },
-    currentSessionId: String
+    currentSessionId: String,
+    offsetTop: {
+      type: Number,
+      value: 0
+    }
   },
 
   data: {
