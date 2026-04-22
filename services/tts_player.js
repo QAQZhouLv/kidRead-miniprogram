@@ -323,6 +323,15 @@ function createTTSPlayer(options = {}) {
     });
   }
 
+  function prefetchRemaining(queue = [], startIndex = 0) {
+    for (let i = startIndex; i < queue.length; i += 1) {
+      const item = queue[i];
+      if (!item || !item.text) continue;
+      item.text = normalizePlayText(item.text);
+      prefetchItem(item);
+    }
+  }
+
   async function preloadMessage(message, startSection = "lead") {
     if (state.destroyed) return null;
 
@@ -330,9 +339,7 @@ function createTTSPlayer(options = {}) {
     if (!queue.length) return null;
 
     await ensureAudioForItem(queue[0]);
-    if (queue[1]) {
-      prefetchItem(queue[1]);
-    }
+    prefetchRemaining(queue, 1);
     return queue[0];
   }
 
@@ -348,11 +355,7 @@ function createTTSPlayer(options = {}) {
 
       await ensureAudioForItem(item);
 
-      const nextItem = queue[i + 1];
-      if (nextItem) {
-        nextItem.text = normalizePlayText(nextItem.text);
-        prefetchItem(nextItem);
-      }
+      prefetchRemaining(queue, i + 1);
 
       if (!item.audioUrl) {
         throw new Error("未获取到可播放的音频地址");
@@ -378,9 +381,7 @@ function createTTSPlayer(options = {}) {
 
     try {
       await ensureAudioForItem(queue[0]);
-      if (queue[1]) {
-        prefetchItem(queue[1]);
-      }
+      prefetchRemaining(queue, 1);
 
       await playQueue(queue, token);
 

@@ -270,6 +270,36 @@ Page({
     await this.playAssistantMessageFrom(lastAssistant, "lead");
   },
 
+  warmAssistantMessageAudio(message, startSection = "lead") {
+    if (!this.ttsPlayer || typeof this.ttsPlayer.preloadMessage !== "function") return;
+    if (!message || message.role !== "assistant") return;
+
+    const snapshot = {
+      id: message.id,
+      role: "assistant",
+      leadText: message.leadText || "",
+      storyText: message.storyText || "",
+      guideText: message.guideText || ""
+    };
+
+    this.ttsPlayer.preloadMessage(snapshot, startSection).catch((err) => {
+      console.warn("tts preload failed:", err);
+    });
+  },
+
+  warmCompletedSectionIfNeeded(message, nextSection = "") {
+    if (!message || message.role !== "assistant") return;
+
+    if (nextSection === "story" && String(message.leadText || "").trim()) {
+      this.warmAssistantMessageAudio(message, "lead");
+      return;
+    }
+
+    if (nextSection === "guide" && String(message.storyText || "").trim()) {
+      this.warmAssistantMessageAudio(message, "story");
+    }
+  },
+
   onToggleAutoRead() {
     const next = !this.data.autoReadEnabled;
     this.setData({ autoReadEnabled: next });
@@ -665,7 +695,9 @@ Page({
         }
 
         if (msg.type === "section_start") {
-          current.currentSection = msg.section || "";
+          const nextSection = msg.section || "";
+          this.warmCompletedSectionIfNeeded(current, nextSection);
+          current.currentSection = nextSection;
         }
 
         if (msg.type === "section_delta") {
@@ -714,6 +746,7 @@ Page({
           }
 
           decorateAssistantMessage(current);
+          this.warmAssistantMessageAudio(current, "lead");
           this.setData({
             messages,
             loading: false,
