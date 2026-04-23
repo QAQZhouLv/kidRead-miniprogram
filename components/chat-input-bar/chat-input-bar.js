@@ -1,4 +1,4 @@
-const { createVoiceStream } = require("../../services/voice_stream");
+const { createPersistentVoiceStream } = require("../../services/voice_stream");
 const { getThemeTokens } = require("../../utils/theme");
 
 const recorderManager = wx.getRecorderManager();
@@ -64,6 +64,7 @@ Component({
     streamClient: null,
     voiceDraftText: "",
     voiceBaseText: "",
+    currentUtteranceId: "",
     pressActive: false,
     wrapMaskStyle: "",
     inputBarStyle: "",
@@ -90,14 +91,17 @@ Component({
   lifetimes: {
     attached() {
       this.applyTheme(this.properties.theme);
+      this.ensureStreamClient();
 
       recorderManager.onFrameRecorded((res) => {
-        if (!this.data.streamClient || !res.frameBuffer) return;
-        this.data.streamClient.sendFrame(res.frameBuffer);
+        const client = this.data.streamClient;
+        const utteranceId = this.data.currentUtteranceId;
+        if (!client || !utteranceId || !res.frameBuffer) return;
+        client.sendFrame(res.frameBuffer, { utteranceId });
       });
 
       recorderManager.onError((err) => {
-        this.setData({ isRecording: false, pressActive: false });
+        this.cleanupRecordingState();
         console.error("recorder error:", err);
         wx.showToast({ title: "录音异常", icon: "none" });
       });
@@ -115,12 +119,82 @@ Component({
       this.setData(buildStyles(theme));
     },
 
+    ensureStreamClient() {
+      if (this.data.streamClient) {
+        return this.data.streamClient;
+      }
+
+      const client = createPersistentVoiceStream(
+        (msg) => this.handleVoiceStreamMessage(msg),
+        (err) => this.handleVoiceStreamError(err)
+      );
+
+      this.setData({ streamClient: client });
+      return client;
+    },
+
+    handleVoiceStreamMessage(msg) {
+      const currentUtteranceId = this.data.currentUtteranceId;
+      const msgUtteranceId = msg.utterance_id || "";
+
+      if (msgUtteranceId && currentUtteranceId && msgUtteranceId !== currentUtteranceId) {
+        return;
+      }
+
+      if (msg.type === "partial" || msg.type === "final" || msg.type === "done") {
+        const liveText = (msg.text || "").trim();
+        const mergedText = [this.data.voiceBaseText, liveText]
+          .filter(Boolean)
+          .join(this.data.voiceBaseText && liveText ? " " : "");
+
+        this.setData({
+          inputText: mergedText,
+          voiceDraftText: liveText,
+        });
+
+        this.triggerEvent("draftchange", { text: mergedText });
+      }
+
+      if (msg.type === "done") {
+        this.cleanupRecordingState();
+      }
+
+      if (msg.type === "error") {
+        wx.showToast({ title: "语音识别失败", icon: "none" });
+        this.cleanupRecordingState();
+      }
+    },
+
+    handleVoiceStreamError(err) {
+      console.error("stream socket error:", err);
+      this.cleanupRecordingState();
+      wx.showToast({ title: "语音连接失败", icon: "none" });
+
+      const current = this.data.streamClient;
+      if (current) {
+        try {
+          current.close();
+        } catch (e) {}
+      }
+      this.setData({ streamClient: null });
+    },
+
+    cleanupRecordingState() {
+      this.setData({
+        isRecording: false,
+        pressActive: false,
+        currentUtteranceId: "",
+        mode: "voice",
+      });
+    },
+
     switchToText() {
       this.setData({ mode: "text" });
     },
 
     switchToVoice() {
       this.setData({ mode: "voice" });
+      this.ensureStreamClient();
     },
 
     onInput(e) {
@@ -147,49 +221,19 @@ Component({
     onPressToTalkStart() {
       if (this.properties.loading || this.data.isRecording) return;
 
+      const client = this.ensureStreamClient();
       const currentText = this.data.inputText || "";
-      const streamClient = createVoiceStream(
-        (msg) => {
-          if (msg.type === "partial" || msg.type === "final" || msg.type === "done") {
-            const liveText = (msg.text || "").trim();
-            const mergedText = [this.data.voiceBaseText, liveText]
-              .filter(Boolean)
-              .join(this.data.voiceBaseText && liveText ? " " : "");
-
-            this.setData({
-              inputText: mergedText,
-              voiceDraftText: liveText,
-            });
-
-            this.triggerEvent("draftchange", { text: mergedText });
-          }
-
-          if (msg.type === "done") {
-            this.setData({
-              isRecording: false,
-              pressActive: false,
-              mode: "voice",
-            });
-          }
-
-          if (msg.type === "error") {
-            wx.showToast({ title: "语音识别失败", icon: "none" });
-          }
-        },
-        (err) => {
-          console.error("stream socket error:", err);
-          this.setData({ isRecording: false, pressActive: false });
-          wx.showToast({ title: "语音连接失败", icon: "none" });
-        }
-      );
+      const utteranceId = `utt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 
       this.setData({
         isRecording: true,
         pressActive: true,
-        streamClient,
         voiceBaseText: currentText,
         voiceDraftText: "",
+        currentUtteranceId: utteranceId,
       });
+
+      client.beginUtterance({ utteranceId });
 
       recorderManager.start({
         duration: 60000,
@@ -208,8 +252,9 @@ Component({
       recorderManager.stop();
 
       const client = this.data.streamClient;
-      if (client) {
-        client.stop();
+      const utteranceId = this.data.currentUtteranceId;
+      if (client && utteranceId) {
+        client.endUtterance({ utteranceId });
       }
     },
 
