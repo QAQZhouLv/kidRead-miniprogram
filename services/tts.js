@@ -1,9 +1,18 @@
+
 const { request } = require("../utils/api");
 const { HTTP_BASE_URL } = require("../config/index");
 
 function synthesizeTTS(data) {
   return request({
     url: "/api/tts/synthesize",
+    method: "POST",
+    data
+  });
+}
+
+function prepareTTSMessage(data) {
+  return request({
+    url: "/api/tts/prepare-message",
     method: "POST",
     data
   });
@@ -17,5 +26,6 @@ function toAbsoluteAudioUrl(audioUrl) {
 
 module.exports = {
   synthesizeTTS,
+  prepareTTSMessage,
   toAbsoluteAudioUrl
 };

@@ -192,10 +192,12 @@ Page({
   },
 
   onHide() {
+    this.clearTtsWarmupTimers();
     this.stopTTS();
   },
 
   onUnload() {
+    this.clearTtsWarmupTimers();
     if (this._openingPlayTimer) {
       clearTimeout(this._openingPlayTimer);
       this._openingPlayTimer = null;
@@ -232,6 +234,132 @@ Page({
       }
     });
   },
+
+  ensureTtsWarmupState() {
+    if (!this._ttsWarmupTimers) {
+      this._ttsWarmupTimers = {};
+    }
+    if (!this._ttsWarmupKeys) {
+      this._ttsWarmupKeys = {};
+    }
+  },
+
+  clearTtsWarmupTimers() {
+    this.ensureTtsWarmupState();
+    Object.keys(this._ttsWarmupTimers).forEach((key) => {
+      const timer = this._ttsWarmupTimers[key];
+      if (timer) {
+        clearTimeout(timer);
+      }
+    });
+    this._ttsWarmupTimers = {};
+  },
+
+  resetTtsWarmupState() {
+    this.clearTtsWarmupTimers();
+    this._ttsWarmupKeys = {};
+  },
+
+  getWarmupTextForSection(message, startSection = "lead") {
+    if (!message || message.role !== "assistant") return "";
+
+    const parts = [];
+    if (startSection === "lead") {
+      parts.push(message.leadText || "", message.storyText || "", message.guideText || "");
+    } else if (startSection === "story") {
+      parts.push(message.storyText || "", message.guideText || "");
+    } else {
+      parts.push(message.guideText || "");
+    }
+
+    return String(parts.filter(Boolean).join("\n")).trim();
+  },
+
+  scheduleTtsWarmup(message, startSection = "lead", options = {}) {
+    if (!this.data.autoReadEnabled) return;
+    if (!message || message.role !== "assistant") return;
+    if (!this.ttsPlayer || typeof this.ttsPlayer.preloadMessage !== "function") return;
+
+    const text = this.getWarmupTextForSection(message, startSection);
+    if (!text) return;
+
+    const delay = typeof options.delay === "number" ? options.delay : 0;
+    const force = !!options.force;
+
+    this.ensureTtsWarmupState();
+
+    const key = [
+      message.id || "",
+      startSection,
+      text.length,
+      text.slice(0, 24),
+      text.slice(-24)
+    ].join("|");
+
+    if (!force && this._ttsWarmupKeys[startSection] === key) {
+      return;
+    }
+
+    this._ttsWarmupKeys[startSection] = key;
+
+    if (this._ttsWarmupTimers[startSection]) {
+      clearTimeout(this._ttsWarmupTimers[startSection]);
+    }
+
+    this._ttsWarmupTimers[startSection] = setTimeout(async () => {
+      delete this._ttsWarmupTimers[startSection];
+      try {
+        await this.ttsPlayer.preloadMessage(message, startSection);
+      } catch (err) {
+        console.warn("tts preloadMessage warn:", err);
+      }
+    }, delay);
+  },
+
+  maybeWarmupCompletedSection(message, nextSection = "") {
+    if (!message || message.role !== "assistant") return;
+
+    if (nextSection === "story") {
+      if ((message.leadText || "").trim()) {
+        this.scheduleTtsWarmup(message, "lead", { delay: 0 });
+      }
+      return;
+    }
+
+    if (nextSection === "guide") {
+      if ((message.leadText || "").trim()) {
+        this.scheduleTtsWarmup(message, "lead", { delay: 0 });
+      }
+      if ((message.storyText || "").trim()) {
+        this.scheduleTtsWarmup(message, "story", { delay: 0 });
+      }
+    }
+  },
+
+  maybeWarmupCurrentSection(message, section = "") {
+    if (!message || message.role !== "assistant") return;
+
+    const field =
+      section === "lead"
+        ? "leadText"
+        : section === "story"
+          ? "storyText"
+          : section === "guide"
+            ? "guideText"
+            : "";
+
+    if (!field) return;
+
+    const text = String(message[field] || "").trim();
+    if (!text) return;
+
+    const threshold = section === "story" ? 42 : 18;
+    if (text.length < threshold) return;
+    if (!/[。！？!?；;\n]$/.test(text)) return;
+
+    this.scheduleTtsWarmup(message, section, { delay: 120 });
+  },
+
 
   resetPlayingState() {
     this.setData({
@@ -270,41 +398,20 @@ Page({
     await this.playAssistantMessageFrom(lastAssistant, "lead");
   },
 
-  warmAssistantMessageAudio(message, startSection = "lead") {
-    if (!this.ttsPlayer || typeof this.ttsPlayer.preloadMessage !== "function") return;
-    if (!message || message.role !== "assistant") return;
-
-    const snapshot = {
-      id: message.id,
-      role: "assistant",
-      leadText: message.leadText || "",
-      storyText: message.storyText || "",
-      guideText: message.guideText || ""
-    };
-
-    this.ttsPlayer.preloadMessage(snapshot, startSection).catch((err) => {
-      console.warn("tts preload failed:", err);
-    });
-  },
-
-  warmCompletedSectionIfNeeded(message, nextSection = "") {
-    if (!message || message.role !== "assistant") return;
-
-    if (nextSection === "story" && String(message.leadText || "").trim()) {
-      this.warmAssistantMessageAudio(message, "lead");
-      return;
-    }
-
-    if (nextSection === "guide" && String(message.storyText || "").trim()) {
-      this.warmAssistantMessageAudio(message, "story");
-    }
-  },
-
   onToggleAutoRead() {
     const next = !this.data.autoReadEnabled;
     this.setData({ autoReadEnabled: next });
+
     if (!next) {
+      this.clearTtsWarmupTimers();
       this.stopTTS();
+      return;
+    }
+
+    const messages = this.data.messages || [];
+    const lastAssistant = [...messages].reverse().find(item => item.role === "assistant" && !item.pending);
+    if (lastAssistant) {
+      this.scheduleTtsWarmup(lastAssistant, "lead", { force: true });
     }
   },
 
@@ -646,6 +753,7 @@ Page({
   },
 
   async sendMessage(text, inputMode = "text") {
+    this.clearTtsWarmupTimers();
     this.stopTTS();
     await this.ensureSessionIfNeeded();
 
@@ -695,9 +803,8 @@ Page({
         }
 
         if (msg.type === "section_start") {
-          const nextSection = msg.section || "";
-          this.warmCompletedSectionIfNeeded(current, nextSection);
-          current.currentSection = nextSection;
+          current.currentSection = msg.section || "";
+          this.maybeWarmupCompletedSection(current, current.currentSection);
         }
 
         if (msg.type === "section_delta") {
@@ -711,6 +818,8 @@ Page({
           } else if (section === "guide") {
             current.guideText = (current.guideText || "") + delta;
           }
+
+          this.maybeWarmupCurrentSection(current, section);
         }
 
         if (msg.type === "section_replace") {
@@ -746,7 +855,6 @@ Page({
           }
 
           decorateAssistantMessage(current);
-          this.warmAssistantMessageAudio(current, "lead");
           this.setData({
             messages,
             loading: false,
@@ -759,9 +867,14 @@ Page({
             await this.persistDraft();
           }
 
+          this.scheduleTtsWarmup(current, "lead", { force: true });
+
           stream.close();
-          await this.loadSessions();
+          const loadSessionsPromise = this.loadSessions().catch((err) => {
+            console.warn("loadSessions after done warn:", err);
+          });
           await this.autoPlayLatestAssistantMessage();
+          await loadSessionsPromise;
         }
 
         if (msg.type === "error") {
