@@ -44,6 +44,10 @@
               <text
                 id="{{sentence.anchorId}}"
                 class="sentence-text {{activeParagraphIndex === sentence.paragraphIndex && activeSentenceIndex === sentence.sentenceIndex ? 'sentence-text-reading' : ''}}"
+                data-paragraph-index="{{sentence.paragraphIndex}}"
+                data-sentence-index="{{sentence.sentenceIndex}}"
+                bindtap="onSentenceTap"
+                catchtap="onSentenceTap"
               >{{sentence.text}}</text>
             </block>
           </view>

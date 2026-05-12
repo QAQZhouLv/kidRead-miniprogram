@@ -4,6 +4,7 @@ function createChatStream(onMessage, onError) {
   let socketTask = null;
   let isOpen = false;
   let isClosed = false;
+  let closedByUser = false;
   let openPromiseResolve = null;
   let openPromiseReject = null;
 
@@ -18,9 +19,7 @@ function createChatStream(onMessage, onError) {
       await app.ensureLogin();
     }
     const token = app && app.getAuthToken ? app.getAuthToken() : "";
-    const url = token
-      ? `${WS_BASE_URL}/ws/chat/stream?token=${encodeURIComponent(token)}`
-      : `${WS_BASE_URL}/ws/chat/stream`;
+    const url = token ? `${WS_BASE_URL}/ws/chat/stream?token=${encodeURIComponent(token)}` : `${WS_BASE_URL}/ws/chat/stream`;
 
     socketTask = wx.connectSocket({ url });
 
@@ -42,12 +41,18 @@ function createChatStream(onMessage, onError) {
       if (!isOpen && openPromiseReject) {
         openPromiseReject(err);
       }
-      onError && onError(err);
+      if (!closedByUser) {
+        onError && onError(err);
+      }
     });
 
     socketTask.onClose(() => {
       isOpen = false;
       isClosed = true;
+      socketTask = null;
+      if (!closedByUser) {
+        onError && onError({ errMsg: "chat stream closed" });
+      }
     });
 
     return openPromise;
@@ -58,12 +63,10 @@ function createChatStream(onMessage, onError) {
       if (isClosed) {
         throw new Error("socket already closed");
       }
-
       await initPromise;
       if (!isOpen) {
         await openPromise;
       }
-
       return new Promise((resolve, reject) => {
         socketTask.send({
           data: JSON.stringify(payload),
@@ -72,9 +75,10 @@ function createChatStream(onMessage, onError) {
         });
       });
     },
-
     close() {
       if (isClosed) return;
+      closedByUser = true;
+      isClosed = true;
       try {
         if (socketTask) {
           socketTask.close({});
@@ -82,10 +86,10 @@ function createChatStream(onMessage, onError) {
       } catch (e) {
         console.error("socket close error:", e);
       }
+      socketTask = null;
+      isOpen = false;
     }
   };
 }
 
-module.exports = {
-  createChatStream
-};
+module.exports = { createChatStream };

@@ -15,6 +15,9 @@
           <text
             id="sent-{{message.id}}-lead-{{index}}"
             class="sentence-text {{playingMessageId === message.id && playingSection === 'lead' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}"
+            data-section="lead"
+            data-sentence-index="{{index}}"
+            catchtap="onSentenceTap"
           >{{item}}</text>
         </block>
       </text>
@@ -29,7 +32,7 @@
       <block wx:if="{{message.storyParagraphs && message.storyParagraphs.length}}">
         <view wx:for="{{message.storyParagraphs}}" wx:key="index" class="story-paragraph">
           <block wx:for="{{item.sentences}}" wx:key="index" wx:for-item="sentence">
-            <text id="sent-{{message.id}}-story-{{sentence.index}}" class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === sentence.index ? 'sentence-text-playing' : ''}}">{{sentence.text}}</text>
+            <text id="sent-{{message.id}}-story-{{sentence.index}}" class="sentence-text story-sentence {{playingMessageId === message.id && playingSection === 'story' && playingSentenceIndex === sentence.index ? 'sentence-text-playing' : ''}}" data-section="story" data-sentence-index="{{sentence.index}}" catchtap="onSentenceTap">{{sentence.text}}</text>
           </block>
         </view>
       </block>
@@ -43,7 +46,7 @@
       bindtap="onSectionTap"
     >
       <block wx:for="{{message.guideSentences || []}}" wx:key="index">
-        <text id="sent-{{message.id}}-guide-{{index}}" class="sentence-text {{playingMessageId === message.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}">{{item}}</text>
+        <text id="sent-{{message.id}}-guide-{{index}}" class="sentence-text {{playingMessageId === message.id && playingSection === 'guide' && playingSentenceIndex === index ? 'sentence-text-playing' : ''}}" data-section="guide" data-sentence-index="{{index}}" catchtap="onSentenceTap">{{item}}</text>
       </block>
     </view>
 

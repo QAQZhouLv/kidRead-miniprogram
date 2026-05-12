@@ -3,9 +3,9 @@ const { synthesizeTTS, prepareTTSMessage, toAbsoluteAudioUrl } = require("./tts"
 
 const SENTENCE_STICKY_SECONDS = 0.18;
 const SENTENCE_POLL_INTERVAL = 120;
-const DEFAULT_SEGMENT_CHAR_LIMIT = 90;
-const DEFAULT_MAX_SENTENCES_PER_SEGMENT = 3;
-const DEFAULT_PREFETCH_COUNT = 2;
+const DEFAULT_SEGMENT_CHAR_LIMIT = 180;
+const DEFAULT_MAX_SENTENCES_PER_SEGMENT = 6;
+const DEFAULT_PREFETCH_COUNT = 3;
 
 const SENTENCE_RE = /[^。！？!?；;\n]+[。！？!?；;\n]?/g;
 
@@ -82,10 +82,53 @@ function buildFallbackSectionSegments(section, text) {
   return segments;
 }
 
-function buildPlayQueue(message, startSection = "lead", manifest) {
+function buildPlayQueue(message, startSection = "lead", manifest, startSentenceIndex = -1) {
   const order = ["lead", "story", "guide"];
   const startIndex = Math.max(order.indexOf(startSection || "lead"), 0);
   const queue = [];
+  const wantedSentenceIndex = Number.isFinite(Number(startSentenceIndex)) ? Number(startSentenceIndex) : -1;
+
+  function pushSectionSegments(section, segments, useManifest = false) {
+    let pendingSentenceIndex = section === order[startIndex] ? wantedSentenceIndex : -1;
+
+    segments.forEach((segment, idx) => {
+      const startIdx = useManifest
+        ? Number(segment.start_sentence_index || 0)
+        : Number(segment.startSentenceIndex || 0);
+      const endIdx = useManifest
+        ? Number(segment.end_sentence_index || 0)
+        : Number(segment.endSentenceIndex || 0);
+
+      if (pendingSentenceIndex >= 0 && endIdx < pendingSentenceIndex) {
+        return;
+      }
+
+      const item = {
+        messageId: message.id,
+        section,
+        segmentId: useManifest
+          ? (segment.segment_id || `${section}_${segment.segment_index || idx}`)
+          : (segment.segmentId || `${section}_${idx}`),
+        text: normalizePlayText(segment.text || ""),
+        startSentenceIndex: startIdx,
+        endSentenceIndex: endIdx,
+        audioUrl: "",
+        duration: 0,
+        timeline: [],
+        playFromSentenceIndex: -1,
+        playFromTime: 0
+      };
+
+      if (pendingSentenceIndex >= 0) {
+        item.playFromSentenceIndex = pendingSentenceIndex;
+        pendingSentenceIndex = -1;
+      }
+
+      if (item.text) {
+        queue.push(item);
+      }
+    });
+  }
 
   if (manifest && Array.isArray(manifest.sections) && manifest.sections.length) {
     const sectionMap = new Map();
@@ -97,39 +140,15 @@ function buildPlayQueue(message, startSection = "lead", manifest) {
       const section = order[i];
       const sectionInfo = sectionMap.get(section);
       if (!sectionInfo || !Array.isArray(sectionInfo.segments)) continue;
-      sectionInfo.segments.forEach((segment) => {
-        queue.push({
-          messageId: message.id,
-          section,
-          segmentId: segment.segment_id || `${section}_${segment.segment_index || 0}`,
-          text: normalizePlayText(segment.text || ""),
-          startSentenceIndex: Number(segment.start_sentence_index || 0),
-          endSentenceIndex: Number(segment.end_sentence_index || 0),
-          audioUrl: "",
-          duration: 0,
-          timeline: []
-        });
-      });
+      pushSectionSegments(section, sectionInfo.segments, true);
     }
-    return queue.filter((item) => item.text);
+    return queue;
   }
 
   for (let i = startIndex; i < order.length; i += 1) {
     const section = order[i];
     const text = message[`${section}Text`] || message[`${section}_text`] || "";
-    buildFallbackSectionSegments(section, text).forEach((segment) => {
-      queue.push({
-        messageId: message.id,
-        section,
-        segmentId: segment.segmentId,
-        text: segment.text,
-        startSentenceIndex: segment.startSentenceIndex,
-        endSentenceIndex: segment.endSentenceIndex,
-        audioUrl: "",
-        duration: 0,
-        timeline: []
-      });
-    });
+    pushSectionSegments(section, buildFallbackSectionSegments(section, text), false);
   }
 
   return queue;
@@ -216,6 +235,18 @@ function createTTSPlayer(options = {}) {
     }));
   }
 
+  function resolvePlayFromTime(item) {
+    const wanted = Number(item.playFromSentenceIndex);
+    if (!Number.isFinite(wanted) || wanted < 0) return 0;
+    const timeline = Array.isArray(item.timeline) ? item.timeline : [];
+    if (!timeline.length) return 0;
+    const exact = timeline.find((entry) => Number(entry.index) === wanted);
+    if (exact) return Number(exact.start || 0);
+    const later = timeline.find((entry) => Number(entry.index) > wanted);
+    if (later) return Number(later.start || 0);
+    return 0;
+  }
+
   function findSentenceIndexByTimeFast(timeline, currentTime, previousIndex) {
     if (!Array.isArray(timeline) || !timeline.length) return -1;
     if (previousIndex >= 0 && previousIndex < timeline.length) {
@@ -277,6 +308,9 @@ function createTTSPlayer(options = {}) {
   function playAudio(item, token) {
     return new Promise((resolve, reject) => {
       let settled = false;
+      let hasTriggeredPlay = false;
+      let hasAppliedSeek = false;
+      let hasStartedTracking = false;
 
       const cleanup = () => {
         clearSentenceTimer();
@@ -302,13 +336,28 @@ function createTTSPlayer(options = {}) {
           finish(resolve);
           return;
         }
+        if (hasTriggeredPlay) return;
+        hasTriggeredPlay = true;
         try {
           audio.play();
         } catch (err) {
           finish(reject, err);
         }
       };
-      const onPlay = () => startSentenceTracking(item, token);
+      const onPlay = () => {
+        if (token !== state.token || state.destroyed || settled) return;
+        if (!hasStartedTracking) {
+          hasStartedTracking = true;
+          startSentenceTracking(item, token);
+        }
+        const playFromTime = Number(item.playFromTime || 0);
+        if (playFromTime > 0 && !hasAppliedSeek && typeof audio.seek === "function") {
+          hasAppliedSeek = true;
+          try {
+            audio.seek(playFromTime);
+          } catch (seekErr) {}
+        }
+      };
 
       audio.onEnded(onEnded);
       audio.onError(onError);
@@ -360,6 +409,7 @@ function createTTSPlayer(options = {}) {
     item.audioUrl = meta.audioUrl;
     item.timeline = mapTimelineToGlobal(item, meta.timeline || []);
     item.duration = meta.duration || 0;
+    item.playFromTime = resolvePlayFromTime(item);
     return item;
   }
 
@@ -417,10 +467,10 @@ function createTTSPlayer(options = {}) {
     return pendingManifestCache.get(cacheKey);
   }
 
-  async function preloadMessage(message, startSection = "lead") {
+  async function preloadMessage(message, startSection = "lead", startSentenceIndex = -1) {
     if (state.destroyed) return null;
     const manifest = await ensureMessageManifest(message);
-    const queue = buildPlayQueue(message, startSection, manifest);
+    const queue = buildPlayQueue(message, startSection, manifest, startSentenceIndex);
     if (!queue.length) return null;
 
     await ensureAudioForItem(queue[0]);
@@ -457,13 +507,13 @@ function createTTSPlayer(options = {}) {
     }
   }
 
-  async function playMessage(message, startSection = "lead") {
+  async function playMessage(message, startSection = "lead", startSentenceIndex = -1) {
     if (state.destroyed) return;
     stop();
     const token = state.token;
 
     const manifest = await ensureMessageManifest(message);
-    const queue = buildPlayQueue(message, startSection, manifest);
+    const queue = buildPlayQueue(message, startSection, manifest, startSentenceIndex);
     if (!queue.length) {
       emit("onFinish", { reason: "empty" });
       return;
@@ -495,7 +545,7 @@ function createTTSPlayer(options = {}) {
     stop,
     destroy,
     splitTextToSentences,
-    buildPlayQueue: (message, startSection = "lead") => {
+    buildPlayQueue: (message, startSection = "lead", startSentenceIndex = -1) => {
       const cacheKey = buildMessageCacheKey(
         message,
         state.voice,
@@ -503,7 +553,7 @@ function createTTSPlayer(options = {}) {
         state.segmentCharLimit,
         state.maxSentencesPerSegment
       );
-      return buildPlayQueue(message, startSection, messageManifestCache.get(cacheKey));
+      return buildPlayQueue(message, startSection, messageManifestCache.get(cacheKey), startSentenceIndex);
     }
   };
 }

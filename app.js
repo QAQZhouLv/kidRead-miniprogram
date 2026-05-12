@@ -124,7 +124,9 @@ App({
           dev_openid: devOpenid,
           nickname: profile.nickname || "童童",
           display_name: profile.nickname || "童童",
-          avatar_url: profile.avatarUrl || ""
+          avatar_url: profile.avatarUrl || "",
+          age: profile.age || 6,
+          theme_preference: profile.themeName || "meadow"
         }
       });
 

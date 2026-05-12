@@ -47,6 +47,18 @@ Component({
       const section = e.currentTarget.dataset.section;
       this.triggerEvent("sectiontap", {
         section,
+        startSentenceIndex: 0,
+        message: this.data.message,
+        ttsEnabled: this.data.ttsEnabled
+      });
+    },
+
+    onSentenceTap(e) {
+      const section = e.currentTarget.dataset.section;
+      const sentenceIndex = Number(e.currentTarget.dataset.sentenceIndex);
+      this.triggerEvent("sectiontap", {
+        section,
+        startSentenceIndex: Number.isFinite(sentenceIndex) ? sentenceIndex : 0,
         message: this.data.message,
         ttsEnabled: this.data.ttsEnabled
       });
