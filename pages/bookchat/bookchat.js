@@ -44,23 +44,24 @@ function getNavMetrics() {
 
 function buildStoryParagraphs(text = "") {
   const normalized = String(text || "")
-    .replace(/\r/g, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
     .trim();
 
   if (!normalized) return [];
 
-  const rawParagraphs = normalized
+  const paragraphs = normalized
     .split(/\n\s*\n+/)
-    .map(item => item.replace(/\n/g, " ").trim())
+    .map((item) => item.replace(/\n+/g, " ").replace(/\s+/g, " ").trim())
     .filter(Boolean);
 
-  const paragraphs = rawParagraphs.length ? rawParagraphs : [
-    normalized.replace(/\n/g, " ").trim()
-  ];
+  const finalParagraphs = paragraphs.length
+    ? paragraphs
+    : [normalized.replace(/\n+/g, " ").replace(/\s+/g, " ").trim()];
 
   let globalIndex = 0;
 
-  return paragraphs.map((paragraph) => {
+  return finalParagraphs.map((paragraph) => {
     const sentences = splitTextToSentences(paragraph).map((sentence) => ({
       text: sentence,
       index: globalIndex++
@@ -183,6 +184,17 @@ Page({
     wx.switchTab({ url: '/pages/shelf/shelf' });
   },
 
+  closeActiveChatStream() {
+    if (this._activeChatStream) {
+      try {
+        this._activeChatStream.close();
+      } catch (err) {
+        console.warn("closeActiveChatStream warn:", err);
+      }
+      this._activeChatStream = null;
+    }
+  },
+
   clearOpeningPlayTimer() {
     if (this._openingPlayTimer) {
       clearTimeout(this._openingPlayTimer);
@@ -191,12 +203,14 @@ Page({
   },
 
   onHide() {
+    this.closeActiveChatStream();
     this.clearOpeningPlayTimer();
     this.clearTtsWarmupTimers();
     this.stopTTS();
   },
 
   onUnload() {
+    this.closeActiveChatStream();
     this.clearOpeningPlayTimer();
     this.clearTtsWarmupTimers();
 
@@ -374,7 +388,7 @@ Page({
     this.resetPlayingState();
   },
 
-  async playAssistantMessageFrom(message, startSection) {
+  async playAssistantMessageFrom(message, startSection, startSentenceIndex = 0) {
     if (!this.data.autoReadEnabled) {
       this.stopTTS();
       wx.showToast({ title: "自动朗读已关闭", icon: "none" });
@@ -382,7 +396,11 @@ Page({
     }
 
     if (!message || message.role !== "assistant") return;
-    await this.ttsPlayer.playMessage(message, startSection || "lead");
+    if (!this.ttsPlayer || typeof this.ttsPlayer.playMessage !== "function") return;
+
+    const safeSection = startSection || "lead";
+    const safeSentenceIndex = Number.isFinite(Number(startSentenceIndex)) ? Number(startSentenceIndex) : 0;
+    await this.ttsPlayer.playMessage(message, safeSection, safeSentenceIndex);
   },
 
   async autoPlayLatestAssistantMessage() {
@@ -413,12 +431,15 @@ Page({
   onSectionTap(e) {
     const detail = e.detail || {};
     const section = detail.section || "lead";
+    const startSentenceIndex = Number.isFinite(Number(detail.startSentenceIndex))
+      ? Number(detail.startSentenceIndex)
+      : 0;
     const message =
       detail.message ||
       (this.data.messages || []).find(item => item.id === detail.messageId);
-  
+
     if (!message) return;
-    this.playAssistantMessageFrom(message, section);
+    this.playAssistantMessageFrom(message, section, startSentenceIndex);
   },
 
   buildSessionId(storyId) {
@@ -882,6 +903,7 @@ Page({
       loading: true
     });
 
+    this.closeActiveChatStream();
     const stream = createChatStream(
       async (msg) => {
         const messages = [...this.data.messages];
@@ -970,7 +992,7 @@ Page({
 
           this.scheduleTtsWarmup(current, "lead", { force: true });
 
-          stream.close();
+          this.closeActiveChatStream();
           const loadSessionsPromise = this.loadSessions().catch((err) => {
             console.warn("loadSessions after done warn:", err);
           });
@@ -986,7 +1008,7 @@ Page({
           current.choices = ["继续写下去", "解释一下", "换个方向"];
           decorateAssistantMessage(current);
           this.setData({ messages, loading: false });
-          stream.close();
+          this.closeActiveChatStream();
         }
       },
       (err) => {
@@ -994,6 +1016,7 @@ Page({
         this.setData({ loading: false });
       }
     );
+    this._activeChatStream = stream;
 
     try {
       await stream.send({
@@ -1027,7 +1050,7 @@ Page({
         loading: false
       });
 
-      stream.close();
+      this.closeActiveChatStream();
     }
   },
 

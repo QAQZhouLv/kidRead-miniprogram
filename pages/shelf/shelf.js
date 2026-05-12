@@ -45,15 +45,23 @@ function normalizeDate(input) {
 }
 
 function normalizeStories(stories = []) {
-  return stories.map((item) => ({
-    ...item,
-    ai_cover_url: toAbsoluteImageUrl(item.cover_image_url),
-    displayTitle: item.title || "未命名故事",
-    displayAge: item.age || "未知",
-    displayDate: normalizeDate(item.updated_at || item.created_at),
-    themeIndex: pickThemeIndex(item),
-    is_favorite: !!item.is_favorite
-  }));
+  return stories.map((item) => {
+    const displayCoverUrl = toAbsoluteImageUrl(
+      item.display_cover_url || item.cover_image_url || item.fallback_cover_url || item.ai_cover_url || ""
+    );
+
+    return {
+      ...item,
+      ai_cover_url: displayCoverUrl,
+      display_cover_url: displayCoverUrl,
+      displayTitle: item.title || "未命名故事",
+      displayAge: item.age || "未知",
+      displayDate: normalizeDate(item.updated_at || item.created_at),
+      themeIndex: pickThemeIndex(item),
+      is_favorite: !!item.is_favorite,
+      cover_status: item.cover_status || (displayCoverUrl ? "ready" : "fallback")
+    };
+  });
 }
 
 function safeGetStorage(key, fallback) {
@@ -129,9 +137,7 @@ Page({
     const app = getApp ? getApp() : null;
 
     try {
-      if (app && app.globalData && app.globalData.loginReadyPromise) {
-        await app.globalData.loginReadyPromise;
-      } else if (app && typeof app.ensureLogin === "function") {
+      if (app && typeof app.ensureLogin === "function") {
         await app.ensureLogin();
       }
     } catch (err) {
@@ -139,7 +145,10 @@ Page({
     }
 
     for (let i = 0; i < 12; i++) {
-      const token = safeGetStorage("token", "");
+      const token =
+        (app && typeof app.getAuthToken === "function" && app.getAuthToken()) ||
+        safeGetStorage("kidread_auth_token", "") ||
+        safeGetStorage("token", "");
       if (token) {
         return true;
       }

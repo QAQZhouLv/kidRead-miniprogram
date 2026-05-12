@@ -28,14 +28,18 @@ Component({
 
   observers: {
     imageUrl(newVal) {
-      if (newVal) {
+      if (String(newVal || "").trim()) {
         this.setData({ imageFailed: false });
       }
     }
   },
 
   methods: {
-    onImageError() {
+    onImageError(e) {
+      console.warn("book-cover image load failed:", {
+        imageUrl: this.data.imageUrl,
+        err: e && e.detail
+      });
       this.setData({ imageFailed: true });
     }
   }

@@ -9,6 +9,8 @@ function createPersistentVoiceStream(onMessage, onError) {
   let isSocketOpen = false;
   let isConnectionReady = false;
   let isClosed = false;
+  let isClosingByUser = false;
+  let connectPromise = null;
   let pendingSocketPayloads = [];
   let currentUtteranceId = "";
   let readyUtteranceMap = Object.create(null);
@@ -29,10 +31,12 @@ function createPersistentVoiceStream(onMessage, onError) {
   function resetConnectionState() {
     isSocketOpen = false;
     isConnectionReady = false;
+    connectPromise = null;
     pendingSocketPayloads = [];
     readyUtteranceMap = Object.create(null);
     pendingUtteranceFrames = Object.create(null);
     currentUtteranceId = "";
+    socketTask = null;
   }
 
   function sendRawPayload(payload) {
@@ -44,6 +48,9 @@ function createPersistentVoiceStream(onMessage, onError) {
 
     socketTask.send({
       data: JSON.stringify(payload),
+      fail(err) {
+        emitError(err);
+      }
     });
   }
 
@@ -78,62 +85,76 @@ function createPersistentVoiceStream(onMessage, onError) {
   }
 
   function connect() {
-    if (socketTask || isClosed) {
-      return;
+    if (connectPromise) {
+      return connectPromise;
+    }
+    if (isClosed) {
+      return Promise.reject(new Error("voice stream already closed"));
     }
 
-    socketTask = wx.connectSocket({
-      url: `${WS_BASE_URL}/ws/asr/stream`,
-    });
+    connectPromise = new Promise((resolve, reject) => {
+      isClosingByUser = false;
+      socketTask = wx.connectSocket({
+        url: `${WS_BASE_URL}/ws/asr/stream`,
+      });
 
-    socketTask.onOpen(() => {
-      isSocketOpen = true;
-      sendRawPayload({ type: "start" });
-      flushSocketPayloads();
-    });
+      socketTask.onOpen(() => {
+        isSocketOpen = true;
+        sendRawPayload({ type: "start" });
+        flushSocketPayloads();
+      });
 
-    socketTask.onMessage((res) => {
-      try {
-        const data = JSON.parse(res.data);
+      socketTask.onMessage((res) => {
+        try {
+          const data = JSON.parse(res.data);
 
-        if (data.type === "ready") {
-          isConnectionReady = true;
-          flushSocketPayloads();
-        }
-
-        if (data.type === "utterance_ready") {
-          const utteranceId = data.utterance_id;
-          if (utteranceId) {
-            readyUtteranceMap[utteranceId] = true;
-            flushUtteranceFrames(utteranceId);
+          if (data.type === "ready") {
+            isConnectionReady = true;
+            flushSocketPayloads();
+            resolve();
           }
+
+          if (data.type === "utterance_ready") {
+            const utteranceId = data.utterance_id;
+            if (utteranceId) {
+              readyUtteranceMap[utteranceId] = true;
+              flushUtteranceFrames(utteranceId);
+            }
+          }
+
+          emitMessage(data);
+        } catch (e) {
+          console.error("voice stream parse error:", e);
         }
+      });
 
-        emitMessage(data);
-      } catch (e) {
-        console.error("voice stream parse error:", e);
-      }
+      socketTask.onError((err) => {
+        if (!isConnectionReady) {
+          reject(err);
+        }
+        if (!isClosingByUser) {
+          emitError(err);
+        }
+      });
+
+      socketTask.onClose(() => {
+        const shouldNotify = !isClosed && !isClosingByUser;
+        resetConnectionState();
+        if (shouldNotify) {
+          emitError({ errMsg: "voice stream closed" });
+        }
+      });
     });
 
-    socketTask.onError((err) => {
-      emitError(err);
-    });
-
-    socketTask.onClose(() => {
-      resetConnectionState();
-      socketTask = null;
-      if (!isClosed) {
-        emitError({ errMsg: "voice stream closed" });
-      }
-    });
+    return connectPromise;
   }
 
-  function beginUtterance(options = {}) {
+  async function beginUtterance(options = {}) {
     const utteranceId = options.utteranceId || `utt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     currentUtteranceId = utteranceId;
     readyUtteranceMap[utteranceId] = false;
     pendingUtteranceFrames[utteranceId] = [];
-    connect();
+    await connect();
     sendRawPayload({
       type: "begin_utterance",
       utterance_id: utteranceId,
@@ -182,11 +203,14 @@ function createPersistentVoiceStream(onMessage, onError) {
   }
 
   function ping() {
+    if (!socketTask || !isSocketOpen) return;
     sendRawPayload({ type: "ping" });
   }
 
   function close() {
+    if (isClosed) return;
     isClosed = true;
+    isClosingByUser = true;
     currentUtteranceId = "";
     readyUtteranceMap = Object.create(null);
     pendingUtteranceFrames = Object.create(null);
@@ -196,9 +220,8 @@ function createPersistentVoiceStream(onMessage, onError) {
         socketTask.close({});
       }
     } catch (e) {}
+    resetConnectionState();
   }
-
-  connect();
 
   return {
     connect,

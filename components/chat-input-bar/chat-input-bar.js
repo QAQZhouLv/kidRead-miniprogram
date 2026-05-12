@@ -91,7 +91,6 @@ Component({
   lifetimes: {
     attached() {
       this.applyTheme(this.properties.theme);
-      this.ensureStreamClient();
 
       recorderManager.onFrameRecorded((res) => {
         const client = this.data.streamClient;
@@ -108,9 +107,14 @@ Component({
     },
 
     detached() {
-      const client = this.data.streamClient;
-      if (client) client.close();
+      this.closeStreamClient();
     },
+  },
+
+  pageLifetimes: {
+    hide() {
+      this.handlePageHide();
+    }
   },
 
   methods: {
@@ -131,6 +135,26 @@ Component({
 
       this.setData({ streamClient: client });
       return client;
+    },
+
+    closeStreamClient() {
+      const client = this.data.streamClient;
+      if (client) {
+        try {
+          client.close();
+        } catch (e) {}
+      }
+      this.setData({ streamClient: null, currentUtteranceId: "" });
+    },
+
+    handlePageHide() {
+      if (this.data.isRecording) {
+        try {
+          recorderManager.stop();
+        } catch (e) {}
+      }
+      this.cleanupRecordingState();
+      this.closeStreamClient();
     },
 
     handleVoiceStreamMessage(msg) {
@@ -170,13 +194,7 @@ Component({
       this.cleanupRecordingState();
       wx.showToast({ title: "语音连接失败", icon: "none" });
 
-      const current = this.data.streamClient;
-      if (current) {
-        try {
-          current.close();
-        } catch (e) {}
-      }
-      this.setData({ streamClient: null });
+      this.closeStreamClient();
     },
 
     cleanupRecordingState() {
@@ -190,6 +208,9 @@ Component({
 
     switchToText() {
       this.setData({ mode: "text" });
+      if (!this.data.isRecording) {
+        this.closeStreamClient();
+      }
     },
 
     switchToVoice() {
@@ -233,16 +254,22 @@ Component({
         currentUtteranceId: utteranceId,
       });
 
-      client.beginUtterance({ utteranceId });
-
-      recorderManager.start({
-        duration: 60000,
-        sampleRate: 16000,
-        numberOfChannels: 1,
-        encodeBitRate: 64000,
-        format: "pcm",
-        frameSize: 5,
-      });
+      Promise.resolve(client.beginUtterance({ utteranceId }))
+        .then(() => {
+          recorderManager.start({
+            duration: 60000,
+            sampleRate: 16000,
+            numberOfChannels: 1,
+            encodeBitRate: 64000,
+            format: "pcm",
+            frameSize: 5,
+          });
+        })
+        .catch((err) => {
+          console.error("beginUtterance error:", err);
+          this.cleanupRecordingState();
+          wx.showToast({ title: "语音连接失败", icon: "none" });
+        });
     },
 
     onPressToTalkEnd() {

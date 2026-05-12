@@ -33,11 +33,13 @@ function splitParagraphTexts(text = "") {
   if (!normalized) return [];
 
   const paragraphs = normalized
-    .split(/\n+/)
-    .map((item) => item.trim())
+    .split(/\n\s*\n+/)
+    .map((item) => item.replace(/\n+/g, " ").replace(/\s+/g, " ").trim())
     .filter(Boolean);
 
-  return paragraphs.length ? paragraphs : [normalized];
+  return paragraphs.length
+    ? paragraphs
+    : [normalized.replace(/\n+/g, " ").replace(/\s+/g, " ").trim()];
 }
 
 function splitSentences(text = "") {
@@ -385,7 +387,7 @@ Page({
 
   noop() {},
 
-  buildPlayableParagraphQueue(startParagraphIndex = 0) {
+  buildPlayableParagraphQueue(startParagraphIndex = 0, startSentenceIndex = 0) {
     const paragraphs = this.data.contentParagraphs || [];
     const queue = [];
 
@@ -393,13 +395,18 @@ Page({
       const paragraph = paragraphs[i];
       if (!paragraph || !paragraph.text || !paragraph.speakable) continue;
 
+      const localStartSentenceIndex = i === startParagraphIndex
+        ? Math.max(0, Math.min(Number(startSentenceIndex || 0), Math.max((paragraph.sentences || []).length - 1, 0)))
+        : 0;
+      const firstSentence = paragraph.sentences && paragraph.sentences[localStartSentenceIndex]
+        ? paragraph.sentences[localStartSentenceIndex]
+        : (paragraph.sentences && paragraph.sentences[0] ? paragraph.sentences[0] : null);
+
       queue.push({
         paragraphIndex: i,
         text: paragraph.text,
-        firstAnchorId:
-          paragraph.sentences && paragraph.sentences[0]
-            ? paragraph.sentences[0].anchorId
-            : "",
+        startSentenceIndex: localStartSentenceIndex,
+        firstAnchorId: firstSentence ? firstSentence.anchorId : "",
         sentenceCount: (paragraph.sentences || []).length
       });
     }
@@ -429,12 +436,12 @@ Page({
     });
   },
 
-  async startReadingFromParagraph(startParagraphIndex = 0) {
+  async startReadingFromParagraph(startParagraphIndex = 0, startSentenceIndex = 0) {
     const paragraphs = this.data.contentParagraphs || [];
     if (!paragraphs.length) return;
     if (startParagraphIndex < 0 || startParagraphIndex >= paragraphs.length) return;
 
-    const queue = this.buildPlayableParagraphQueue(startParagraphIndex);
+    const queue = this.buildPlayableParagraphQueue(startParagraphIndex, startSentenceIndex);
     if (!queue.length) {
       wx.showToast({ title: "没有可朗读内容", icon: "none" });
       return;
@@ -456,7 +463,7 @@ Page({
       readingQueue: queue,
       readingCursor: 0,
       activeParagraphIndex: first.paragraphIndex,
-      activeSentenceIndex: 0,
+      activeSentenceIndex: Number(first.startSentenceIndex || 0),
       activeSentenceAnchorId: first.firstAnchorId || ""
     });
 
@@ -482,7 +489,7 @@ Page({
     this.setData({
       readingCursor: index,
       activeParagraphIndex: current.paragraphIndex,
-      activeSentenceIndex: 0,
+      activeSentenceIndex: Number(current.startSentenceIndex || 0),
       activeSentenceAnchorId: current.firstAnchorId || "",
       isReading: true
     });
@@ -492,7 +499,7 @@ Page({
     try {
       const message = this.createParagraphMessage(current);
 
-      await this.ttsPlayer.playMessage(message, "story");
+      await this.ttsPlayer.playMessage(message, "story", Number(current.startSentenceIndex || 0));
 
       if (this._readingAbort || token !== this._readingToken) return;
 
@@ -541,14 +548,18 @@ Page({
   },
 
   async onParagraphTap(e) {
-    if (!this.data.readingMode) {
-      return;
-    }
-
     const paragraphIndex = Number(e.currentTarget.dataset.index);
     if (Number.isNaN(paragraphIndex)) return;
 
-    await this.startReadingFromParagraph(paragraphIndex);
+    await this.startReadingFromParagraph(paragraphIndex, 0);
+  },
+
+  async onSentenceTap(e) {
+    const paragraphIndex = Number(e.currentTarget.dataset.paragraphIndex);
+    const sentenceIndex = Number(e.currentTarget.dataset.sentenceIndex);
+    if (Number.isNaN(paragraphIndex)) return;
+
+    await this.startReadingFromParagraph(paragraphIndex, Number.isNaN(sentenceIndex) ? 0 : sentenceIndex);
   },
 
   onChatTap() {
