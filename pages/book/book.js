@@ -24,6 +24,23 @@ function getNavMetrics() {
   };
 }
 
+// function splitParagraphTexts(text = "") {
+//   const normalized = String(text || "")
+//     .replace(/\r\n/g, "\n")
+//     .replace(/\r/g, "\n")
+//     .trim();
+
+//   if (!normalized) return [];
+
+//   const paragraphs = normalized
+//     .split(/\n\s*\n+/)
+//     .map((item) => item.replace(/\n+/g, " ").replace(/\s+/g, " ").trim())
+//     .filter(Boolean);
+
+//   return paragraphs.length
+//     ? paragraphs
+//     : [normalized.replace(/\n+/g, " ").replace(/\s+/g, " ").trim()];
+// }
 function splitParagraphTexts(text = "") {
   const normalized = String(text || "")
     .replace(/\r\n/g, "\n")
@@ -33,13 +50,11 @@ function splitParagraphTexts(text = "") {
   if (!normalized) return [];
 
   const paragraphs = normalized
-    .split(/\n\s*\n+/)
-    .map((item) => item.replace(/\n+/g, " ").replace(/\s+/g, " ").trim())
+    .split(/\n+/)
+    .map((item) => item.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 
-  return paragraphs.length
-    ? paragraphs
-    : [normalized.replace(/\n+/g, " ").replace(/\s+/g, " ").trim()];
+  return paragraphs;
 }
 
 function splitSentences(text = "") {
